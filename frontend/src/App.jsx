@@ -1,41 +1,58 @@
 import { useState } from "react";
 import axios from "axios";
 import Result from "./Result";
+import DealHistory from "./DealHistory";
+import { useEffect } from "react";
+
+
 
 function App() {
+  const [deals, setDeals] = useState([]);
   const [amount, setAmount] = useState("");
   const [commission, setCommission] = useState(null);
   const [error, setError] = useState("");
+   
+  useEffect(() => {
+  axios.get("http://localhost:8080/deals")
+    .then(res => setDeals(res.data))
+    .catch(err => console.error(err));
+}, []);
 
   const calculateCommission = async () => {
-    if (!amount) {
-      setError("Deal amount is required");
-      setCommission(null);
-      return;
-    }
+  if (!amount) {
+    setError("Deal amount is required");
+    return;
+  }
 
-    if (Number(amount) <= 0) {
-      setError("Deal amount must be greater than zero");
-      setCommission(null);
-      return;
-    }
+  if (Number(amount) <= 0) {
+    setError("Deal amount must be greater than zero");
+    return;
+  }
 
-    try {
-      setError("");
+  try {
+    setError("");
 
-      const response = await axios.post(
-        "http://localhost:8080/deals",
-        { amount: Number(amount) }
-      );
+    const response = await axios.post(
+      "http://localhost:8080/deals",
+      { amount: Number(amount) }
+    );
 
-      setCommission(response.data.commission);
+    setCommission(response.data.commission);
 
-    } catch (err) {
-      console.error(err);
-      setError("Failed to connect to backend");
-      setCommission(null);
-    }
-  };
+    // 🔥 ADD NEW DEAL TO TABLE IMMEDIATELY
+    setDeals(prev => [
+      ...prev,
+      {
+        amount: Number(amount),
+        status: "CREATED"
+      }
+    ]);
+
+  } catch (err) {
+    console.error(err);
+    setError("Failed to connect to backend");
+  }
+};
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
@@ -81,6 +98,19 @@ function App() {
         >
           CALCULATE
         </button>
+
+        
+        <button
+          onClick={() => setDeals([])}
+          className="w-full mt-4 border border-gray-600 text-white py-2 rounded-md hover:bg-gray-800"
+        >
+          Clear Deal History
+        </button>
+
+       <DealHistory deals={deals} />
+
+
+
 
         {commission !== null && (
           <Result commission={commission} />
