@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import AppIcon from "./AppIcon";
 
 const Sidebar = () => {
   const navItems = [
@@ -8,46 +9,54 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-64 bg-black border-r border-gray-800 h-screen flex flex-col">
-      <div className="p-6 border-b border-gray-800">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-white flex items-center justify-center">
-            <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div>
-            <h2 className="text-sm font-semibold text-white uppercase tracking-wide">Sales Reward</h2>
-            <p className="text-xs text-gray-400 uppercase tracking-wider">Engine</p>
-          </div>
-        </div>
-      </div>
-
-      <nav className="flex-1 p-4 space-y-1 mt-2">
-        {navItems.map((item) => (
+    <aside className="w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r-2 border-slate-700 h-screen flex flex-col relative shadow-xl">
+      <div className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-primary-500 to-accent-500 opacity-20"></div>
+      
+      <nav className="flex-1 p-6 space-y-2 mt-8">
+        {navItems.map((item, index) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center space-x-3 px-4 py-2.5 text-sm transition-colors ${
+              `flex items-center space-x-4 px-4 py-3 text-sm transition-all relative group rounded-lg ${
                 isActive
-                  ? "bg-white text-black font-medium"
-                  : "text-gray-300 hover:text-white hover:bg-gray-900"
+                  ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium shadow-lg"
+                  : "text-gray-300 hover:text-white hover:bg-slate-700/50"
               }`
             }
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={item.icon} />
-            </svg>
-            <span>{item.label}</span>
+            {({ isActive }) => (
+              <>
+                {isActive && (
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r-full"></div>
+                )}
+                <div className={`w-5 h-5 flex items-center justify-center ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'}`}>
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
+                  </svg>
+                </div>
+                <span className="tracking-wide">{item.label}</span>
+                {isActive && (
+                  <div className="ml-auto text-white font-light">→</div>
+                )}
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
+
+      <div className="p-6 border-t border-slate-700">
+        <div className="bg-gradient-to-r from-primary-600/20 to-accent-600/20 border border-primary-500/30 rounded-lg p-4 flex flex-col items-center">
+          <AppIcon size="w-10 h-10" />
+          <div className="text-xs text-gray-300 uppercase tracking-widest text-center mt-3 mb-1">Track & Earn</div>
+          <div className="h-px bg-gradient-to-r from-primary-500 to-accent-500 w-12"></div>
+        </div>
+      </div>
     </aside>
   );
 };

@@ -4,24 +4,65 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 font-sans antialiased;
+    @apply font-sans antialiased;
+    background: linear-gradient(to bottom right, #f8fafc, #eff6ff, #eef2ff);
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-black hover:bg-gray-900 text-white font-medium py-2.5 px-6 rounded-sm shadow-sm hover:shadow transition-all duration-150;
+    @apply text-white font-medium py-2.5 px-6 transition-all duration-200 relative overflow-hidden shadow-lg hover:shadow-xl;
+    background: linear-gradient(to right, #2563eb, #1d4ed8);
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(to right, #1d4ed8, #1e40af);
+  }
+  
+  .btn-primary::before {
+    content: '';
+    @apply absolute inset-0 bg-white opacity-0 transition-opacity duration-200;
+  }
+  
+  .btn-primary:hover::before {
+    @apply opacity-10;
   }
   
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-gray-900 font-medium py-2.5 px-6 rounded-sm shadow-sm hover:shadow border border-gray-300 transition-all duration-150;
+    @apply bg-white hover:bg-gray-50 text-gray-900 font-medium py-2.5 px-6 border border-gray-300 transition-all duration-150 shadow-sm hover:shadow;
   }
   
   .input-modern {
-    @apply w-full px-4 py-2.5 border border-gray-300 rounded-sm focus:ring-1 focus:ring-black focus:border-black transition-all duration-150 bg-white text-gray-900;
+    @apply w-full px-4 py-3 border-b-2 border-gray-300 bg-transparent transition-all duration-200 text-gray-900 placeholder-gray-400;
+  }
+  
+  .input-modern:focus {
+    border-color: #3b82f6;
   }
   
   .card-modern {
-    @apply bg-white rounded-sm shadow-sm border border-gray-200;
+    @apply bg-white border border-gray-200 relative shadow-sm hover:shadow-md transition-all duration-300;
+  }
+  
+  .card-modern::before {
+    content: '';
+    @apply absolute top-0 left-0 w-1 h-full opacity-0 transition-opacity duration-200;
+    background: linear-gradient(to bottom, #3b82f6, #14b8a6);
+  }
+  
+  .card-modern:hover::before {
+    @apply opacity-100;
+  }
+  
+  .section-title {
+    @apply text-3xl font-light tracking-tight mb-2;
+    background: linear-gradient(to right, #1e40af, #0d9488);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .section-subtitle {
+    @apply text-sm text-gray-600 uppercase tracking-widest mb-6;
   }
 }
