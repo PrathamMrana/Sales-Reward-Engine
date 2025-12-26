@@ -1,9 +1,11 @@
 import { useState } from "react";
 import SalesLayout from "../layouts/SalesLayout";
 import { useSales } from "../context/SalesContext";
+import { useNotifications } from "../context/NotificationContext";
 
 const Calculator = () => {
   const { addDeal } = useSales();
+  const { addNotification } = useNotifications();
 
   const [amount, setAmount] = useState("");
   const [rate, setRate] = useState("");
@@ -13,12 +15,21 @@ const Calculator = () => {
     const incentive = (Number(amount) * Number(rate)) / 100;
     setResult(incentive);
 
+    const now = new Date();
+    const dealDate = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
+    
     addDeal({
       amount: Number(amount),
       rate: Number(rate),
       incentive,
-      date: new Date().toLocaleDateString(),
+      date: dealDate,
       status: "Draft"
+    });
+
+    addNotification({
+      type: "success",
+      title: "Deal Created",
+      message: `Deal worth ₹${Number(amount).toLocaleString('en-IN')} created. Incentive: ₹${incentive.toLocaleString('en-IN', { maximumFractionDigits: 2 })}. Status: Draft`
     });
 
     setAmount("");

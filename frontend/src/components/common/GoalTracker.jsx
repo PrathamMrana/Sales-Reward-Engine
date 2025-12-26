@@ -1,21 +1,70 @@
 import { useSales } from "../../context/SalesContext";
-import { useState } from "react";
+import { useNotifications } from "../../context/NotificationContext";
+import { useState, useEffect, useRef } from "react";
 
 const GoalTracker = () => {
   const { monthlyTarget, updateMonthlyTarget, deals } = useSales();
+  const { addNotification } = useNotifications();
   const [isEditing, setIsEditing] = useState(false);
   const [tempTarget, setTempTarget] = useState(monthlyTarget);
+  const previousPercentage = useRef(0);
+  const milestoneNotified = useRef(new Set());
 
   const now = new Date();
   const thisMonthDeals = deals.filter(deal => {
-    const dealDate = new Date(deal.date);
-    return dealDate.getMonth() === now.getMonth() && 
-           dealDate.getFullYear() === now.getFullYear() &&
-           deal.status === "Approved";
+    try {
+      let dealDate;
+      if (typeof deal.date === 'string') {
+        dealDate = new Date(deal.date);
+        if (isNaN(dealDate.getTime())) {
+          const parts = deal.date.split('/');
+          if (parts.length === 3) {
+            dealDate = new Date(parts[2], parts[0] - 1, parts[1]);
+          }
+        }
+      } else {
+        dealDate = new Date(deal.date);
+      }
+      return dealDate.getMonth() === now.getMonth() && 
+             dealDate.getFullYear() === now.getFullYear() &&
+             deal.status === "Approved";
+    } catch {
+      return false;
+    }
   });
 
-  const achieved = thisMonthDeals.reduce((sum, d) => sum + d.incentive, 0);
+  const achieved = thisMonthDeals.reduce((sum, d) => sum + (d.incentive || 0), 0);
   const percentage = Math.min((achieved / monthlyTarget) * 100, 100);
+
+  // Check for milestone achievements
+  useEffect(() => {
+    const milestones = [50, 75, 90, 100];
+    const currentMilestone = milestones.find(m => percentage >= m && !milestoneNotified.current.has(m));
+    
+    if (currentMilestone) {
+      milestoneNotified.current.add(currentMilestone);
+      if (currentMilestone === 100) {
+        addNotification({
+          type: "success",
+          title: "🎉 Target Achieved!",
+          message: `Congratulations! You've reached your monthly target of ₹${monthlyTarget.toLocaleString('en-IN')}.`
+        });
+      } else {
+        addNotification({
+          type: "info",
+          title: `Milestone: ${currentMilestone}% Complete`,
+          message: `You've achieved ${currentMilestone}% of your monthly target. Keep going!`
+        });
+      }
+    }
+
+    // Reset milestones if percentage drops (e.g., new month)
+    if (percentage < previousPercentage.current) {
+      milestoneNotified.current.clear();
+    }
+    
+    previousPercentage.current = percentage;
+  }, [percentage, monthlyTarget, addNotification]);
 
   const handleSave = () => {
     updateMonthlyTarget(tempTarget);

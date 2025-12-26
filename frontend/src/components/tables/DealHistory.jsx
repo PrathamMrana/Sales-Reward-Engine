@@ -1,10 +1,12 @@
 import { useState, useMemo } from "react";
 import { useSales } from "../../context/SalesContext";
+import { useNotifications } from "../../context/NotificationContext";
 import StatusBadge from "../common/StatusBadge";
 import DateFilter from "../common/DateFilter";
 
 const DealHistory = () => {
   const { deals, deleteDeal, updateDealStatus } = useSales();
+  const { addNotification } = useNotifications();
   const [dateFilter, setDateFilter] = useState("all");
 
   const filteredDeals = useMemo(() => {
@@ -28,7 +30,29 @@ const DealHistory = () => {
   }, [deals, dateFilter]);
 
   const handleStatusChange = (dealId, newStatus) => {
+    const deal = deals.find(d => d.id === dealId);
     updateDealStatus(dealId, newStatus);
+    
+    // Add notifications for status changes
+    if (newStatus === "Approved") {
+      addNotification({
+        type: "success",
+        title: "Deal Approved!",
+        message: `Deal worth ₹${deal?.amount.toLocaleString('en-IN')} has been approved. Incentive: ₹${deal?.incentive.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`
+      });
+    } else if (newStatus === "Rejected") {
+      addNotification({
+        type: "warning",
+        title: "Deal Rejected",
+        message: `Deal worth ₹${deal?.amount.toLocaleString('en-IN')} has been rejected.`
+      });
+    } else if (newStatus === "Submitted") {
+      addNotification({
+        type: "info",
+        title: "Deal Submitted",
+        message: `Deal worth ₹${deal?.amount.toLocaleString('en-IN')} has been submitted for approval.`
+      });
+    }
   };
 
   const getNextStatus = (currentStatus) => {
@@ -44,15 +68,24 @@ const DealHistory = () => {
   if (deals.length === 0) {
     return (
       <div className="card-modern p-16 text-center relative">
-        <div className="absolute top-0 left-0 w-16 h-16 border-b border-r border-gray-200"></div>
-        <div className="flex flex-col items-center justify-center">
-          <div className="w-16 h-16 border-2 border-gray-300 flex items-center justify-center mb-6">
-            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-primary-100 to-accent-100 opacity-20 rounded-full -mr-24 -mt-24"></div>
+        <div className="relative z-10 flex flex-col items-center justify-center">
+          <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-accent-100 rounded-full flex items-center justify-center mb-6 shadow-lg">
+            <svg className="w-10 h-10 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <h3 className="text-sm font-light text-gray-700 mb-2 uppercase tracking-widest">No deals recorded</h3>
-          <p className="text-xs text-gray-500">Start calculating your rewards</p>
+          <h3 className="text-base font-semibold text-gray-800 mb-2">No Deals Recorded Yet</h3>
+          <p className="text-sm text-gray-600 mb-4 max-w-md">Start calculating your rewards to see them appear here. Create your first deal using the Calculator.</p>
+          <a 
+            href="/sales/calculator" 
+            className="inline-flex items-center space-x-2 text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
+          >
+            <span>Go to Calculator</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
         </div>
       </div>
     );
@@ -120,6 +153,7 @@ const DealHistory = () => {
                           <button
                             onClick={() => handleStatusChange(deal.id, nextStatus)}
                             className="text-xs uppercase tracking-widest px-3 py-1.5 border-2 border-primary-400 bg-white hover:bg-gradient-to-r hover:from-primary-600 hover:to-primary-700 hover:text-white hover:border-primary-600 transition-all rounded-lg font-medium shadow-sm hover:shadow-md"
+                            title={`Move to ${nextStatus}`}
                           >
                             {nextStatus === "Submitted" ? "Submit" : nextStatus === "Approved" ? "Approve" : "Resubmit"}
                           </button>
@@ -128,13 +162,24 @@ const DealHistory = () => {
                           <button
                             onClick={() => handleStatusChange(deal.id, "Rejected")}
                             className="text-xs uppercase tracking-widest px-3 py-1.5 border-2 border-red-400 bg-white hover:bg-gradient-to-r hover:from-red-600 hover:to-rose-600 hover:text-white hover:border-red-600 transition-all rounded-lg font-medium shadow-sm hover:shadow-md"
+                            title="Reject this deal"
                           >
                             Reject
                           </button>
                         )}
+                        {deal.status === "Draft" && (
+                          <span className="text-xs text-gray-500 italic">Submit to proceed</span>
+                        )}
+                        {deal.status === "Approved" && (
+                          <span className="text-xs text-emerald-600 font-medium">✓ Approved</span>
+                        )}
+                        {deal.status === "Rejected" && (
+                          <span className="text-xs text-red-600 font-medium">✗ Rejected</span>
+                        )}
                         <button
                           onClick={() => deleteDeal(originalIndex)}
                           className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 transition-all rounded-lg shadow-md hover:shadow-lg"
+                          title="Delete this deal"
                         >
                           <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

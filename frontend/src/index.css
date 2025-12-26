@@ -41,17 +41,22 @@
   }
   
   .card-modern {
-    @apply bg-white border border-gray-200 relative shadow-sm hover:shadow-md transition-all duration-300;
+    @apply bg-white border border-gray-200 relative shadow-sm hover:shadow-lg transition-all duration-300 rounded-lg;
   }
   
   .card-modern::before {
     content: '';
-    @apply absolute top-0 left-0 w-1 h-full opacity-0 transition-opacity duration-200;
+    @apply absolute top-0 left-0 w-1 h-full opacity-0 transition-opacity duration-300;
     background: linear-gradient(to bottom, #3b82f6, #14b8a6);
+    border-radius: 0.5rem 0 0 0.5rem;
   }
   
   .card-modern:hover::before {
     @apply opacity-100;
+  }
+  
+  .card-modern:hover {
+    @apply -translate-y-0.5;
   }
   
   .section-title {
