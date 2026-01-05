@@ -24,9 +24,9 @@ const SalesLayout = ({ children }) => {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
+      <Sidebar />
 
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden" style={{ position: 'relative' }}>
           {/* User Name and Role - Leftmost corner below app name */}
           <div className="bg-white/80 backdrop-blur-sm border-b border-primary-100 px-8 py-3 shadow-sm">
             <div className="flex items-center justify-between">
@@ -37,7 +37,7 @@ const SalesLayout = ({ children }) => {
                   <p className="text-xs text-primary-600 uppercase tracking-widest font-medium">{auth?.role || "SALES"}</p>
                 </div>
               </div>
-              <Topbar />
+        <Topbar />
             </div>
           </div>
           

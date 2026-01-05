@@ -3,6 +3,8 @@ import StatCard from "../../components/common/StatCard";
 import DealHistory from "../../components/tables/DealHistory";
 import GoalTracker from "../../components/common/GoalTracker";
 import PerformanceTrend from "../../components/charts/PerformanceTrend";
+import DealStatusChart from "../../components/charts/DealStatusChart";
+import MonthlyPerformanceBar from "../../components/charts/MonthlyPerformanceBar";
 import InsightsPanel from "../../components/common/InsightsPanel";
 import PerformanceComparison from "../../components/common/PerformanceComparison";
 import { useSales } from "../../context/SalesContext";
@@ -98,12 +100,12 @@ const SalesDashboard = () => {
               trend={dealsTrend ? (parseFloat(dealsTrend) > 0 ? "up" : "down") : null}
               trendValue={dealsTrend ? `${Math.abs(parseFloat(dealsTrend))}%` : null}
             />
-            <StatCard
-              title="Total Incentive"
+        <StatCard
+          title="Total Incentive"
               value={`₹${(totalIncentive || 0).toLocaleString('en-IN')}`}
               gradient="emerald"
               subtitle="Approved deals only"
-            />
+        />
             <StatCard 
               title="This Month Incentive" 
               value={`₹${(thisMonthIncentive || 0).toLocaleString('en-IN')}`}
@@ -139,6 +141,18 @@ const SalesDashboard = () => {
             <div>
               <InsightsPanel />
             </div>
+          </div>
+        </section>
+
+        {/* Section 3.25: Deal Status Distribution & Monthly Performance */}
+        <section className="space-y-4">
+          <div className="flex items-center space-x-2 mb-2">
+            <div className="w-1 h-6 bg-gradient-to-b from-primary-500 to-accent-500 rounded-full"></div>
+            <h2 className="text-lg font-semibold text-gray-900">Deal Status & Monthly Performance</h2>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <DealStatusChart />
+            <MonthlyPerformanceBar />
           </div>
         </section>
 

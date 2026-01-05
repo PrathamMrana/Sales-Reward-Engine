@@ -15,7 +15,7 @@ function Navbar() {
           backgroundClip: 'text'
         }}>
           Sales Reward Engine
-        </h1>
+      </h1>
       </div>
 
       <div className="flex gap-8 text-sm">

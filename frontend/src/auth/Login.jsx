@@ -63,26 +63,26 @@ const Login = () => {
               <label className="block text-xs font-medium text-gray-700 mb-3 uppercase tracking-widest">
                 Email Address
               </label>
-              <input
+        <input
                 className="input-modern"
                 type="email"
                 placeholder="your.email@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
                 required
-              />
+        />
             </div>
 
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-3 uppercase tracking-widest">
                 Password
               </label>
-              <input
+        <input
                 className="input-modern"
-                type="password"
+          type="password"
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
@@ -92,8 +92,8 @@ const Login = () => {
               className="w-full btn-primary py-3 text-sm uppercase tracking-widest font-medium"
             >
               Sign In →
-            </button>
-            </form>
+        </button>
+      </form>
 
             <div className="mt-8 pt-6 border-t border-gray-200">
               <p className="text-xs text-gray-500 text-center">

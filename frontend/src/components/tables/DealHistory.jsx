@@ -118,10 +118,10 @@ const DealHistory = () => {
                 <th className="px-6 py-4 text-left text-xs font-semibold text-primary-800 uppercase tracking-widest">Incentive</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-primary-800 uppercase tracking-widest">Status</th>
                 <th className="px-6 py-4 text-center text-xs font-semibold text-primary-800 uppercase tracking-widest">Actions</th>
-              </tr>
-            </thead>
+          </tr>
+        </thead>
 
-            <tbody>
+        <tbody>
               {filteredDeals.map((deal, index) => {
                 const nextStatus = getNextStatus(deal.status);
                 const originalIndex = deals.findIndex(d => d.id === deal.id);
@@ -176,23 +176,23 @@ const DealHistory = () => {
                         {deal.status === "Rejected" && (
                           <span className="text-xs text-red-600 font-medium">✗ Rejected</span>
                         )}
-                        <button
+                <button
                           onClick={() => deleteDeal(originalIndex)}
                           className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 transition-all rounded-lg shadow-md hover:shadow-lg"
                           title="Delete this deal"
-                        >
+                >
                           <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
-                          Delete
-                        </button>
+                  Delete
+                </button>
                       </div>
-                    </td>
-                  </tr>
+              </td>
+            </tr>
                 );
               })}
-            </tbody>
-          </table>
+        </tbody>
+      </table>
         </div>
       </div>
     </div>

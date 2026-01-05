@@ -15,12 +15,12 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard title="Total Sales" value="₹12,00,000" />
           <StatCard title="Incentives Paid" value="₹2,00,000" />
-          <StatCard title="Top Performer" value="Amit" />
-          <StatCard title="Pending Approvals" value="5" />
-        </div>
+        <StatCard title="Top Performer" value="Amit" />
+        <StatCard title="Pending Approvals" value="5" />
+      </div>
 
         <div className="pt-6">
-          <SalesChart />
+      <SalesChart />
         </div>
       </div>
     </AdminLayout>

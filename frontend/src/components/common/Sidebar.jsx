@@ -17,7 +17,7 @@ const Sidebar = () => {
       
       <nav className="flex-1 p-6 space-y-2 mt-8">
         {navItems.map((item, index) => (
-          <NavLink
+      <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
@@ -39,7 +39,7 @@ const Sidebar = () => {
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                  >
+      >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                   </svg>
                 </div>
@@ -49,7 +49,7 @@ const Sidebar = () => {
                 )}
               </>
             )}
-          </NavLink>
+      </NavLink>
         ))}
       </nav>
 

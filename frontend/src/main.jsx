@@ -12,7 +12,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <AuthProvider>
       <SalesProvider>
         <NotificationProvider>
-          <App />
+        <App />
         </NotificationProvider>
       </SalesProvider>
     </AuthProvider>

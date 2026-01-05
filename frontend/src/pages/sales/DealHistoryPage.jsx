@@ -10,7 +10,7 @@ const DealHistoryPage = () => {
           <div className="h-px bg-black w-24 mt-2"></div>
           <p className="section-subtitle mt-4">View & Manage Records</p>
         </div>
-        <DealHistory />
+      <DealHistory />
       </div>
     </SalesLayout>
   );
