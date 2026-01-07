@@ -37,7 +37,6 @@ public class IncentiveService {
         incentive.setYear(year);
         incentive.setTotalSales(totalSales);
         incentive.setIncentiveAmount(incentiveAmount);
-
         // 🔥 SAVE TO DATABASE
         incentiveDAO.save(incentive);
 

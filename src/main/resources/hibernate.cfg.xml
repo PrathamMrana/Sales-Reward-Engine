@@ -14,8 +14,6 @@
         <property name="hibernate.format_sql">true</property>
 
         <property name="hibernate.hbm2ddl.auto">update</property>
-
-
         <mapping class="org.example.entity.User"/>
         <mapping class="org.example.entity.Incentive"></mapping>
         <mapping class="org.example.entity.IncentiveRule"></mapping>
