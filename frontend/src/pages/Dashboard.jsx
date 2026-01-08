@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
 
 function Dashboard() {
+  const { auth } = useAuth();
   const [deals, setDeals] = useState([]);
 
   useEffect(() => {
@@ -20,12 +22,40 @@ function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
-      <h1 className="text-3xl font-semibold mb-2">Analytics Dashboard</h1>
-      <p className="text-gray-400 mb-8">
-        System-level insights & sales performance
-      </p>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-semibold mb-2 text-gray-800 dark:text-white">Analytics Dashboard</h1>
+          <p className="text-gray-400">System-level insights & sales performance</p>
+        </div>
+
+        {/* Profile Badge */}
+        {auth?.profile && (
+          <div className="text-right">
+            <div className="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-widest text-xs">Employee</div>
+            <div className="font-mono font-semibold dark:text-gray-200">{auth.profile.employeeCode} <span className="mx-1">•</span> {auth.profile.department}</div>
+          </div>
+        )}
+      </div>
 
       <div className="grid md:grid-cols-3 gap-6">
+        {/* Performance Rating Card */}
+        {auth?.performance && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="border border-indigo-500/30 rounded-xl p-6 bg-gradient-to-br from-indigo-900/50 to-purple-900/20"
+          >
+            <p className="text-indigo-300 text-sm uppercase tracking-wider">Performance Rating</p>
+            <div className="flex items-end space-x-2 mt-2">
+              <h2 className="text-3xl font-bold text-white">{auth.performance.performanceRating}</h2>
+              <span className="text-indigo-200 mb-1">/ 5.0</span>
+            </div>
+            <div className="mt-2 text-xs text-indigo-200">
+              Target: ${auth.performance.currentMonthTarget?.toLocaleString()}
+            </div>
+          </motion.div>
+        )}
+
         {[
           { label: "Total Deals", value: totalDeals },
           { label: "Total Revenue", value: `₹${totalRevenue}` },
@@ -39,7 +69,7 @@ function Dashboard() {
             className="border border-gray-800 rounded-xl p-6 bg-gradient-to-br from-black to-gray-900"
           >
             <p className="text-gray-400 text-sm">{card.label}</p>
-            <h2 className="text-2xl font-bold mt-2">{card.value}</h2>
+            <h2 className="text-2xl font-bold mt-2 text-white">{card.value}</h2>
           </motion.div>
         ))}
       </div>

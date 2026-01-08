@@ -4,11 +4,11 @@ import RequireAuth from "./auth/RequireAuth";
 import SalesDashboard from "./pages/sales/SalesDashboard";
 import DealHistoryPage from "./pages/sales/DealHistoryPage";
 import Calculator from "./pages/Calculator";
-import ProfilePage from "./pages/sales/ProfilePage";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import DealApproval from "./pages/admin/DealApproval";
+import UserManagement from "./pages/admin/UserManagement";
 import IncentivePolicyPage from "./pages/sales/IncentivePolicyPage";
-import ReportsPage from "./pages/sales/ReportsPage";
-import Unauthorized from "./pages/Unauthorized";
-import NotFound from "./pages/NotFound";
+import ProfilePage from "./pages/sales/ProfilePage";
 import { useAuth } from "./context/AuthContext";
 
 const App = () => {
@@ -20,26 +20,37 @@ const App = () => {
       <Route
         path="/"
         element={
-          auth ? <Navigate to="/sales" /> : <Navigate to="/login" />
+          auth
+            ? (auth.user?.role === "ADMIN" ? <Navigate to="/admin" /> : <Navigate to="/sales" />)
+            : <Navigate to="/login" />
         }
       />
 
       <Route path="/login" element={<Login />} />
+
+      {/* SHARED ROUTES (ADMIN & SALES) */}
+      <Route element={<RequireAuth allowedRoles={["ADMIN", "SALES"]} />}>
+        <Route path="/sales/policy" element={<IncentivePolicyPage />} />
+        <Route path="/sales/profile" element={<ProfilePage />} />
+      </Route>
+
+      {/* ADMIN ROUTES */}
+      <Route element={<RequireAuth allowedRoles={["ADMIN"]} />}>
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/approvals" element={<DealApproval />} />
+        <Route path="/admin/users" element={<UserManagement />} />
+      </Route>
 
       {/* SALES ROUTES */}
       <Route element={<RequireAuth allowedRoles={["SALES"]} />}>
         <Route path="/sales" element={<SalesDashboard />} />
         <Route path="/sales/history" element={<DealHistoryPage />} />
         <Route path="/sales/calculator" element={<Calculator />} />
-        <Route path="/sales/profile" element={<ProfilePage />} />
-        <Route path="/sales/policy" element={<IncentivePolicyPage />} />
-        <Route path="/sales/reports" element={<ReportsPage />} />
       </Route>
 
-      <Route path="/unauthorized" element={<Unauthorized />} />
-      <Route path="*" element={<NotFound />} />
+      <Route path="/unauthorized" element={<h1>Unauthorized</h1>} />
+      <Route path="*" element={<h1>Not Found</h1>} />
     </Routes>
   );
 };
-
 export default App;

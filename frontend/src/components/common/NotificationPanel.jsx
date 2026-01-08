@@ -78,7 +78,7 @@ const NotificationPanel = () => {
             className="fixed inset-0 z-[9998] bg-black/10"
             onClick={() => setIsOpen(false)}
           ></div>
-          <div 
+          <div
             className="fixed w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-[9999] max-h-[80vh] overflow-hidden flex flex-col"
             style={{
               top: `${buttonPosition.top}px`,
@@ -129,9 +129,8 @@ const NotificationPanel = () => {
                   {notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${
-                        !notification.read ? "bg-blue-50/30" : ""
-                      }`}
+                      className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${!notification.read ? "bg-blue-50/30" : ""
+                        }`}
                       onClick={() => markAsRead(notification.id)}
                     >
                       <div className="flex items-start space-x-3">
@@ -144,10 +143,16 @@ const NotificationPanel = () => {
                             <p className="text-xs text-gray-600 mt-1">{notification.message}</p>
                           )}
                           <p className="text-xs text-gray-400 mt-1">
-                            {new Date(notification.timestamp).toLocaleTimeString('en-US', {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
+                            {(() => {
+                              try {
+                                return new Date(notification.timestamp).toLocaleTimeString('en-US', {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                });
+                              } catch (e) {
+                                return '';
+                              }
+                            })()}
                           </p>
                         </div>
                         <button

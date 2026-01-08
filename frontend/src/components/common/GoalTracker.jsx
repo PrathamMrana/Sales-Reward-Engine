@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 
 const GoalTracker = () => {
   const { monthlyTarget, updateMonthlyTarget, deals } = useSales();
-  const { addNotification } = useNotifications();
+  const { addNotification, notifications } = useNotifications();
   const [isEditing, setIsEditing] = useState(false);
   const [tempTarget, setTempTarget] = useState(monthlyTarget);
   const previousPercentage = useRef(0);
@@ -25,9 +25,9 @@ const GoalTracker = () => {
       } else {
         dealDate = new Date(deal.date);
       }
-      return dealDate.getMonth() === now.getMonth() && 
-             dealDate.getFullYear() === now.getFullYear() &&
-             deal.status === "Approved";
+      return dealDate.getMonth() === now.getMonth() &&
+        dealDate.getFullYear() === now.getFullYear() &&
+        deal.status === "Approved";
     } catch {
       return false;
     }
@@ -40,21 +40,28 @@ const GoalTracker = () => {
   useEffect(() => {
     const milestones = [50, 75, 90, 100];
     const currentMilestone = milestones.find(m => percentage >= m && !milestoneNotified.current.has(m));
-    
+
     if (currentMilestone) {
       milestoneNotified.current.add(currentMilestone);
-      if (currentMilestone === 100) {
-        addNotification({
-          type: "success",
-          title: "🎉 Target Achieved!",
-          message: `Congratulations! You've reached your monthly target of ₹${monthlyTarget.toLocaleString('en-IN')}.`
-        });
-      } else {
-        addNotification({
-          type: "info",
-          title: `Milestone: ${currentMilestone}% Complete`,
-          message: `You've achieved ${currentMilestone}% of your monthly target. Keep going!`
-        });
+      const title = currentMilestone === 100 ? "🎉 Target Achieved!" : `Milestone: ${currentMilestone}% Complete`;
+
+      // Prevent duplicate notifications (check history too so we don't re-notify on refresh)
+      const alreadyNotified = notifications.some(n => n.title === title);
+
+      if (!alreadyNotified) {
+        if (currentMilestone === 100) {
+          addNotification({
+            type: "success",
+            title: title,
+            message: `Congratulations! You've reached your monthly target of ₹${monthlyTarget.toLocaleString('en-IN')}.`
+          });
+        } else {
+          addNotification({
+            type: "info",
+            title: title,
+            message: `You've achieved ${currentMilestone}% of your monthly target. Keep going!`
+          });
+        }
       }
     }
 
@@ -62,7 +69,7 @@ const GoalTracker = () => {
     if (percentage < previousPercentage.current) {
       milestoneNotified.current.clear();
     }
-    
+
     previousPercentage.current = percentage;
   }, [percentage, monthlyTarget, addNotification]);
 
