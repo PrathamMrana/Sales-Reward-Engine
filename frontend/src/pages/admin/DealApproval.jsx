@@ -76,8 +76,34 @@ const DealApproval = () => {
     return (
         <SalesLayout>
             <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                <div className="flex items-center space-x-4">
-                    <h1 className="text-2xl font-semibold">Deal Approvals</h1>
+                <div className="flex items-center space-x-2">
+                    <button
+                        onClick={() => {
+                            const headers = ["ID", "Date", "Sales Exec", "Amount", "Incentive", "Status", "Rejection Reason"];
+                            const csvContent = [
+                                headers.join(","),
+                                ...filteredDeals.map(d => [
+                                    d.id,
+                                    new Date(d.createdAt || d.date).toLocaleDateString(),
+                                    `"${d.user ? d.user.name : "Unknown"}"`,
+                                    d.amount,
+                                    d.incentive,
+                                    d.status,
+                                    `"${d.rejectionReason || ""}"`
+                                ].join(","))
+                            ].join("\n");
+
+                            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                            const link = document.createElement("a");
+                            link.href = URL.createObjectURL(blob);
+                            link.download = `deals_export_${new Date().toISOString().slice(0, 10)}.csv`;
+                            link.click();
+                        }}
+                        className="p-2 bg-green-100 rounded-full hover:bg-green-200 transition-colors text-green-700"
+                        title="Export CSV"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    </button>
                     <button
                         onClick={fetchDeals}
                         className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"

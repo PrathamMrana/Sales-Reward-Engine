@@ -9,6 +9,10 @@ import DealApproval from "./pages/admin/DealApproval";
 import UserManagement from "./pages/admin/UserManagement";
 import IncentivePolicyPage from "./pages/sales/IncentivePolicyPage";
 import ProfilePage from "./pages/sales/ProfilePage";
+import NotificationManagement from "./pages/admin/NotificationManagement";
+import AdminPerformance from "./pages/admin/AdminPerformance";
+import PerformanceDashboard from "./pages/admin/PerformanceDashboard";
+import AuditLogs from "./pages/admin/AuditLogs";
 import { useAuth } from "./context/AuthContext";
 
 const App = () => {
@@ -39,6 +43,10 @@ const App = () => {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/approvals" element={<DealApproval />} />
         <Route path="/admin/users" element={<UserManagement />} />
+        <Route path="/admin/notifications" element={<NotificationManagement />} />
+        <Route path="/admin/performance" element={<PerformanceDashboard />} />
+        <Route path="/admin/performance/:userId" element={<AdminPerformance />} />
+        <Route path="/admin/audit-logs" element={<AuditLogs />} />
       </Route>
 
       {/* SALES ROUTES */}

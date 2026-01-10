@@ -21,13 +21,16 @@ public class DealController {
     private final DealRepository dealRepository;
     private final org.example.salesincentivesystem.repository.UserRepository userRepository;
     private final org.example.salesincentivesystem.repository.NotificationRepository notificationRepository;
+    private final org.example.salesincentivesystem.service.AuditLogService auditLogService;
 
     public DealController(DealRepository dealRepository,
             org.example.salesincentivesystem.repository.UserRepository userRepository,
-            org.example.salesincentivesystem.repository.NotificationRepository notificationRepository) {
+            org.example.salesincentivesystem.repository.NotificationRepository notificationRepository,
+            org.example.salesincentivesystem.service.AuditLogService auditLogService) {
         this.dealRepository = dealRepository;
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository;
+        this.auditLogService = auditLogService;
     }
 
     // ✅ POST - create deal
@@ -110,10 +113,25 @@ public class DealController {
         String reason = updates.get("reason");
 
         return dealRepository.findById(id).map(deal -> {
+            String oldStatus = deal.getStatus();
             deal.setStatus(status);
             if (reason != null) {
                 deal.setRejectionReason(reason);
             }
+
+            // Audit Log
+            String detailMsg = "Deal status changed from " + oldStatus + " to " + status;
+            if (reason != null && !reason.isEmpty()) {
+                detailMsg += ". Reason: " + reason;
+            }
+
+            auditLogService.logAction(
+                    null, // Actor unknown without auth context
+                    "ADMIN",
+                    "UPDATE_STATUS",
+                    "DEAL",
+                    deal.getId(),
+                    detailMsg);
 
             // Notify Sales Person
             if (deal.getUser() != null) {

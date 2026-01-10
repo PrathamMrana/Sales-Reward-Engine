@@ -14,9 +14,12 @@ import java.util.Map;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final org.example.salesincentivesystem.service.AuditLogService auditLogService;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository,
+            org.example.salesincentivesystem.service.AuditLogService auditLogService) {
         this.userRepository = userRepository;
+        this.auditLogService = auditLogService;
     }
 
     // GET - List all users (For Admin)
@@ -31,8 +34,19 @@ public class UserController {
         return userRepository.findById(id).map(user -> {
             String newStatus = updates.get("status");
             if (newStatus != null) {
+                String oldStatus = user.getAccountStatus();
                 user.setAccountStatus(newStatus);
                 userRepository.save(user);
+
+                // Audit Log
+                auditLogService.logAction(
+                        null, // Actor unknown without auth context
+                        "ADMIN",
+                        "UPDATE_STATUS",
+                        "USER",
+                        user.getId(),
+                        "Changed status from " + oldStatus + " to " + newStatus);
+
                 return ResponseEntity.ok(user);
             }
             return ResponseEntity.badRequest().body("Status is required");
