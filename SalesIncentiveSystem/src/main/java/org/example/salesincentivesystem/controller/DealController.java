@@ -22,15 +22,18 @@ public class DealController {
     private final org.example.salesincentivesystem.repository.UserRepository userRepository;
     private final org.example.salesincentivesystem.repository.NotificationRepository notificationRepository;
     private final org.example.salesincentivesystem.service.AuditLogService auditLogService;
+    private final org.example.salesincentivesystem.service.RiskAssessmentService riskAssessmentService;
 
     public DealController(DealRepository dealRepository,
             org.example.salesincentivesystem.repository.UserRepository userRepository,
             org.example.salesincentivesystem.repository.NotificationRepository notificationRepository,
-            org.example.salesincentivesystem.service.AuditLogService auditLogService) {
+            org.example.salesincentivesystem.service.AuditLogService auditLogService,
+            org.example.salesincentivesystem.service.RiskAssessmentService riskAssessmentService) {
         this.dealRepository = dealRepository;
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository;
         this.auditLogService = auditLogService;
+        this.riskAssessmentService = riskAssessmentService;
     }
 
     // ✅ POST - create deal
@@ -71,6 +74,11 @@ public class DealController {
             }
         }
 
+        // Calculate Risk Level
+        if (deal.getRiskLevel() == null) {
+            deal.setRiskLevel(riskAssessmentService.assessRisk(deal));
+        }
+
         if (deal.getStatus() == null) {
             deal.setStatus("Draft");
         }
@@ -84,7 +92,7 @@ public class DealController {
                 .forEach(admin -> {
                     org.example.salesincentivesystem.entity.Notification n = new org.example.salesincentivesystem.entity.Notification();
                     n.setUser(admin);
-                    n.setTitle("New Deal Submitted");
+                    n.setTitle("New Deal Submitted (" + savedDeal.getRiskLevel() + " Risk)");
                     n.setMessage("Sales Exec " + finalUserName + " submitted a deal of ₹" + savedDeal.getAmount());
                     n.setType("ALERT");
                     n.setTimestamp(java.time.LocalDateTime.now());
@@ -111,6 +119,7 @@ public class DealController {
     public Deal updateStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> updates) {
         String status = updates.get("status");
         String reason = updates.get("reason");
+        String comment = updates.get("comment"); // Admin comment
 
         return dealRepository.findById(id).map(deal -> {
             String oldStatus = deal.getStatus();
@@ -118,11 +127,17 @@ public class DealController {
             if (reason != null) {
                 deal.setRejectionReason(reason);
             }
+            if (comment != null) {
+                deal.setAdminComment(comment);
+            }
 
             // Audit Log
             String detailMsg = "Deal status changed from " + oldStatus + " to " + status;
             if (reason != null && !reason.isEmpty()) {
-                detailMsg += ". Reason: " + reason;
+                detailMsg += ". Rejection Reason: " + reason;
+            }
+            if (comment != null && !comment.isEmpty()) {
+                detailMsg += ". Admin Comment: " + comment;
             }
 
             auditLogService.logAction(
@@ -143,6 +158,8 @@ public class DealController {
 
                 if ("Rejected".equals(status) && reason != null && !reason.isEmpty()) {
                     msg += ". Reason: " + reason;
+                } else if (comment != null && !comment.isEmpty()) {
+                    msg += ". Admin Comment: " + comment;
                 }
 
                 n.setTitle(title);
@@ -154,5 +171,30 @@ public class DealController {
 
             return dealRepository.save(deal);
         }).orElseThrow(() -> new RuntimeException("Deal not found"));
+    }
+
+    // ✅ POST - Bulk Approve Low Risk
+    @PostMapping("/approve-low-risk")
+    public List<Deal> approveLowRiskDeals() {
+        List<Deal> pendingDeals = dealRepository.findAll().stream()
+                .filter(d -> "Pending".equalsIgnoreCase(d.getStatus()) && "LOW".equalsIgnoreCase(d.getRiskLevel()))
+                .collect(java.util.stream.Collectors.toList());
+
+        for (Deal deal : pendingDeals) {
+            deal.setStatus("Approved");
+            deal.setAdminComment("Auto-approved based on Low Risk level");
+            dealRepository.save(deal);
+
+            // Log & Notify (Simplified loop reuse)
+            auditLogService.logAction(
+                    null,
+                    "ADMIN",
+                    "BULK_APPROVE",
+                    "DEAL",
+                    deal.getId(),
+                    "Bulk approved low risk deal");
+        }
+
+        return pendingDeals;
     }
 }

@@ -125,6 +125,32 @@ public class DataInitializer implements CommandLineRunner {
 
                 System.out.println("Seeded Deals");
             }
+            // CLEANUP: Fix Orphan Deals (Deals with null user)
+            // This happens with initial seed or manual inserts. Assign to "sales@test.com"
+            if (sales != null) {
+                java.util.List<org.example.salesincentivesystem.entity.Deal> orphans = dealRepository.findAll().stream()
+                        .filter(d -> d.getUser() == null)
+                        .collect(java.util.stream.Collectors.toList());
+
+                if (!orphans.isEmpty()) {
+                    System.out.println("FIXING ORPHAN DEALS: Found " + orphans.size() + " deals with no user.");
+                    orphans.forEach(d -> {
+                        d.setUser(sales);
+                        dealRepository.save(d);
+                    });
+                    System.out.println(" Assigned orphaned deals to " + sales.getEmail());
+                }
+            }
+
+            // CLEANUP: Fox Missing Account Status
+            userRepository.findAll().forEach(u -> {
+                if (u.getAccountStatus() == null || u.getAccountStatus().isEmpty()) {
+                    System.out.println("FIXING USER STATUS: Setting Active for " + u.getEmail());
+                    u.setAccountStatus("ACTIVE");
+                    userRepository.save(u);
+                }
+            });
+
         } catch (Exception e) {
             System.err.println("Error seeding rich data: " + e.getMessage());
             e.printStackTrace();

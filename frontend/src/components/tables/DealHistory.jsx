@@ -1,10 +1,12 @@
 import { useState, useMemo } from "react";
+import { useAuth } from "../../context/AuthContext";
 import { useSales } from "../../context/SalesContext";
 import { useNotifications } from "../../context/NotificationContext";
 import StatusBadge from "../common/StatusBadge";
 import DateFilter from "../common/DateFilter";
 
 const DealHistory = () => {
+  const { auth } = useAuth();
   const { deals, deleteDeal, updateDealStatus } = useSales();
   const { addNotification } = useNotifications();
   const [dateFilter, setDateFilter] = useState("all");
@@ -26,13 +28,13 @@ const DealHistory = () => {
         return dealDate >= lastMonth && dealDate <= lastMonthEnd;
       }
       return true;
-    });
+    }).sort((a, b) => new Date(b.date) - new Date(a.date));
   }, [deals, dateFilter]);
 
   const handleStatusChange = (dealId, newStatus) => {
     const deal = deals.find(d => d.id === dealId);
     updateDealStatus(dealId, newStatus);
-    
+
     // Add notifications for status changes
     if (newStatus === "Approved") {
       addNotification({
@@ -75,10 +77,10 @@ const DealHistory = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <h3 className="text-base font-semibold text-gray-800 mb-2">No Deals Recorded Yet</h3>
-          <p className="text-sm text-gray-600 mb-4 max-w-md">Start calculating your rewards to see them appear here. Create your first deal using the Calculator.</p>
-          <a 
-            href="/sales/calculator" 
+          <h3 className="text-base font-semibold text-text-primary mb-2">No Deals Recorded Yet</h3>
+          <p className="text-sm text-text-muted mb-4 max-w-md">Start calculating your rewards to see them appear here. Create your first deal using the Calculator.</p>
+          <a
+            href="/sales/calculator"
             className="inline-flex items-center space-x-2 text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
           >
             <span>Go to Calculator</span>
@@ -94,7 +96,7 @@ const DealHistory = () => {
   return (
     <div className="card-modern relative">
       <div className="absolute top-0 left-0 w-1 h-full bg-black"></div>
-      
+
       <div className="p-8">
         <div className="mb-6">
           <div className="flex items-baseline justify-between mb-2">
@@ -111,88 +113,110 @@ const DealHistory = () => {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b-2 border-primary-200 bg-gradient-to-r from-primary-50 to-accent-50">
-                <th className="px-6 py-4 text-left text-xs font-semibold text-primary-800 uppercase tracking-widest">Date</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-primary-800 uppercase tracking-widest">Amount</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-primary-800 uppercase tracking-widest">Rate</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-primary-800 uppercase tracking-widest">Incentive</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-primary-800 uppercase tracking-widest">Status</th>
-                <th className="px-6 py-4 text-center text-xs font-semibold text-primary-800 uppercase tracking-widest">Actions</th>
-          </tr>
-        </thead>
+              <tr className="border-b-2 border-primary-200 dark:border-primary-700 bg-gradient-to-r from-primary-50 to-accent-50 dark:from-slate-800 dark:to-slate-900">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-primary-800 dark:text-primary-300 uppercase tracking-widest">Date</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-primary-800 dark:text-primary-300 uppercase tracking-widest">Amount</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-primary-800 dark:text-primary-300 uppercase tracking-widest">Rate</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-primary-800 dark:text-primary-300 uppercase tracking-widest">Incentive</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-primary-800 dark:text-primary-300 uppercase tracking-widest">Status</th>
+                <th className="px-6 py-4 text-center text-xs font-semibold text-primary-800 dark:text-primary-300 uppercase tracking-widest">Actions</th>
+              </tr>
+            </thead>
 
-        <tbody>
+            <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
               {filteredDeals.map((deal, index) => {
                 const nextStatus = getNextStatus(deal.status);
                 const originalIndex = deals.findIndex(d => d.id === deal.id);
-                
+
                 return (
-                  <tr key={deal.id || index} className="border-b border-gray-200 hover:bg-gray-50 transition-colors group">
+                  <tr key={deal.id || index} className="dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors group">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-light text-gray-900">{deal.date}</div>
+                      <div className="text-sm font-light text-gray-900 dark:text-gray-300">{deal.date}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">₹{deal.amount.toLocaleString('en-IN')}</div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">₹{deal.amount.toLocaleString('en-IN')}</div>
                     </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-xs font-medium text-primary-700 bg-primary-50 border-2 border-primary-200 px-3 py-1 rounded-lg">
-                      {deal.rate}%
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
-                      ₹{deal.incentive.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                    </div>
-                  </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-xs font-medium text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/30 border-2 border-primary-200 dark:border-primary-700 px-3 py-1 rounded-lg">
+                        {deal.rate}%
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-bold bg-gradient-to-r from-emerald-600 to-green-600 dark:from-emerald-400 dark:to-green-400 bg-clip-text text-transparent">
+                        ₹{deal.incentive.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                      </div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <StatusBadge status={deal.status || "Draft"} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center justify-center space-x-2">
                         {nextStatus && (
-                          <button
-                            onClick={() => handleStatusChange(deal.id, nextStatus)}
-                            className="text-xs uppercase tracking-widest px-3 py-1.5 border-2 border-primary-400 bg-white hover:bg-gradient-to-r hover:from-primary-600 hover:to-primary-700 hover:text-white hover:border-primary-600 transition-all rounded-lg font-medium shadow-sm hover:shadow-md"
-                            title={`Move to ${nextStatus}`}
-                          >
-                            {nextStatus === "Submitted" ? "Submit" : nextStatus === "Approved" ? "Approve" : "Resubmit"}
-                          </button>
+                          /* Only show Approve/Reject buttons if ADMIN, or if acting as Submit/Resubmit for Salesman */
+                          (auth?.user?.role === 'ADMIN' || nextStatus === 'Submitted' || nextStatus === 'Draft') && (
+                            <button
+                              onClick={() => handleStatusChange(deal.id, nextStatus)}
+                              className="text-xs uppercase tracking-widest px-3 py-1.5 border-2 border-primary-400 dark:border-primary-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gradient-to-r hover:from-primary-600 hover:to-primary-700 hover:text-white hover:border-primary-600 transition-all rounded-lg font-medium shadow-sm hover:shadow-md"
+                              title={`Move to ${nextStatus}`}
+                            >
+                              {nextStatus === "Submitted" ? "Submit" : nextStatus === "Approved" ? "Approve" : "Resubmit"}
+                            </button>
+                          )
                         )}
-                        {deal.status === "Submitted" && (
+                        {deal.status === "Submitted" && auth?.user?.role === 'ADMIN' && (
                           <button
                             onClick={() => handleStatusChange(deal.id, "Rejected")}
-                            className="text-xs uppercase tracking-widest px-3 py-1.5 border-2 border-red-400 bg-white hover:bg-gradient-to-r hover:from-red-600 hover:to-rose-600 hover:text-white hover:border-red-600 transition-all rounded-lg font-medium shadow-sm hover:shadow-md"
+                            className="text-xs uppercase tracking-widest px-3 py-1.5 border-2 border-red-400 dark:border-red-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gradient-to-r hover:from-red-600 hover:to-rose-600 hover:text-white hover:border-red-600 transition-all rounded-lg font-medium shadow-sm hover:shadow-md"
                             title="Reject this deal"
                           >
                             Reject
                           </button>
                         )}
                         {deal.status === "Draft" && (
-                          <span className="text-xs text-gray-500 italic">Submit to proceed</span>
-                        )}
-                        {deal.status === "Approved" && (
-                          <span className="text-xs text-emerald-600 font-medium">✓ Approved</span>
+                          <button
+                            onClick={() => window.location.href = `/sales/calculator?edit=${deal.id}&amount=${deal.amount}&rate=${deal.rate}`}
+                            className="text-xs uppercase tracking-widest px-3 py-1.5 border-2 border-gray-400 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700 transition-all rounded-lg font-medium shadow-sm hover:shadow-md"
+                          >
+                            Edit
+                          </button>
                         )}
                         {deal.status === "Rejected" && (
-                          <span className="text-xs text-red-600 font-medium">✗ Rejected</span>
+                          <div className="flex flex-col items-start">
+                            <span className="text-xs text-red-600 dark:text-red-400 font-medium">✗ Rejected</span>
+                            {deal.rejectionReason && (
+                              <span className="text-[10px] text-red-500/80 dark:text-red-400/80 mt-0.5 max-w-[150px] leading-tight text-left">
+                                "{deal.rejectionReason}"
+                              </span>
+                            )}
+                          </div>
                         )}
-                <button
+                        {deal.status === "Approved" && (
+                          <div className="flex flex-col items-start">
+                            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">✓ Approved</span>
+                            {deal.adminComment && (
+                              <span className="text-[10px] text-emerald-500/80 dark:text-emerald-400/80 mt-0.5 max-w-[150px] leading-tight text-left">
+                                "{deal.adminComment}"
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        <button
                           onClick={() => deleteDeal(originalIndex)}
                           className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 transition-all rounded-lg shadow-md hover:shadow-lg"
                           title="Delete this deal"
-                >
+                        >
                           <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
-                  Delete
-                </button>
+                          Delete
+                        </button>
                       </div>
-              </td>
-            </tr>
+                    </td>
+                  </tr>
                 );
               })}
-        </tbody>
-      </table>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

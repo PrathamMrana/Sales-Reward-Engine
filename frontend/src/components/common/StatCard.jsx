@@ -26,23 +26,23 @@ const StatCard = ({ title, value, gradient = "primary", subtitle, trend, trendVa
   };
 
   return (
-    <div className="card-modern p-6 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
-      <div 
+    <div className="glass-card p-6 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden bg-white/50 dark:bg-slate-800/50">
+      <div
         className="absolute top-0 right-0 w-32 h-32 opacity-5 group-hover:opacity-10 transition-opacity rounded-full"
         style={{
           background: `linear-gradient(135deg, ${config.from}, ${config.to})`
         }}
       ></div>
-      
+
       <div className="relative z-10">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest mb-1">{title}</p>
+            <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-1">{title}</p>
             {subtitle && (
-              <p className="text-xs text-gray-500">{subtitle}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-500">{subtitle}</p>
             )}
           </div>
-          <div 
+          <div
             className="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform"
             style={{
               background: `linear-gradient(135deg, ${config.from}, ${config.to})`
@@ -53,17 +53,9 @@ const StatCard = ({ title, value, gradient = "primary", subtitle, trend, trendVa
             </svg>
           </div>
         </div>
-        
+
         <div className="flex items-baseline space-x-2 mb-3">
-          <p 
-            className="text-3xl font-semibold tracking-tight"
-            style={{
-              background: 'linear-gradient(to right, #1e40af, #0d9488)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}
-          >
+          <p className="text-3xl font-bold text-text-primary tracking-tight">
             {value}
           </p>
         </div>
@@ -78,7 +70,7 @@ const StatCard = ({ title, value, gradient = "primary", subtitle, trend, trendVa
         )}
 
         {/* Progress Line */}
-        <div 
+        <div
           className="h-1 mt-4 rounded-full opacity-30 group-hover:opacity-60 transition-opacity"
           style={{
             background: `linear-gradient(to right, ${config.from}, ${config.to})`

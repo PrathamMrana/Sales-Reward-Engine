@@ -29,45 +29,45 @@ const PerformanceDashboard = () => {
     return (
         <SalesLayout>
             <div className="max-w-6xl mx-auto">
-                <h1 className="text-2xl font-semibold mb-6">Sales Performance Leaderboard</h1>
+                <h1 className="text-2xl font-semibold mb-6 text-text-primary">Sales Performance Leaderboard</h1>
 
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="card-modern overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase">
+                                <tr className="bg-surface-2 border-b border-border-subtle text-xs font-semibold text-text-secondary uppercase">
                                     <th className="px-6 py-4">Name</th>
                                     <th className="px-6 py-4">Email</th>
                                     <th className="px-6 py-4">Status</th>
                                     <th className="px-6 py-4 text-right">Action</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-border-subtle">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan="4" className="px-6 py-8 text-center text-gray-500">
+                                        <td colSpan="4" className="px-6 py-8 text-center text-text-muted">
                                             Loading sales executives...
                                         </td>
                                     </tr>
                                 ) : users.length === 0 ? (
                                     <tr>
-                                        <td colSpan="4" className="px-6 py-8 text-center text-gray-500">
+                                        <td colSpan="4" className="px-6 py-8 text-center text-text-muted">
                                             No sales executives found.
                                         </td>
                                     </tr>
                                 ) : (
                                     users.map((user) => (
-                                        <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                                        <tr key={user.id} className="hover:bg-surface-2 transition-colors">
+                                            <td className="px-6 py-4 text-sm font-medium text-text-primary">
                                                 {user.name || user.fullName || "N/A"}
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-600">
+                                            <td className="px-6 py-4 text-sm text-text-secondary">
                                                 {user.email}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.accountStatus === 'ACTIVE'
-                                                        ? 'bg-green-100 text-green-700'
-                                                        : 'bg-red-100 text-red-700'
+                                                    ? 'bg-green-100 text-green-700'
+                                                    : 'bg-red-100 text-red-700'
                                                     }`}>
                                                     {user.accountStatus || 'UNKNOWN'}
                                                 </span>
@@ -75,7 +75,7 @@ const PerformanceDashboard = () => {
                                             <td className="px-6 py-4 text-right">
                                                 <button
                                                     onClick={() => navigate(`/admin/performance/${user.id}`)}
-                                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                                    className="text-primary-600 hover:text-primary-800 text-sm font-medium"
                                                 >
                                                     View Performance →
                                                 </button>

@@ -13,6 +13,7 @@ import NotificationManagement from "./pages/admin/NotificationManagement";
 import AdminPerformance from "./pages/admin/AdminPerformance";
 import PerformanceDashboard from "./pages/admin/PerformanceDashboard";
 import AuditLogs from "./pages/admin/AuditLogs";
+import PolicySimulation from "./pages/admin/PolicySimulation";
 import { useAuth } from "./context/AuthContext";
 
 const App = () => {
@@ -46,7 +47,10 @@ const App = () => {
         <Route path="/admin/notifications" element={<NotificationManagement />} />
         <Route path="/admin/performance" element={<PerformanceDashboard />} />
         <Route path="/admin/performance/:userId" element={<AdminPerformance />} />
+
         <Route path="/admin/audit-logs" element={<AuditLogs />} />
+        <Route path="/admin/simulation" element={<PolicySimulation />} />
+        <Route path="/admin/profile" element={<ProfilePage />} />
       </Route>
 
       {/* SALES ROUTES */}

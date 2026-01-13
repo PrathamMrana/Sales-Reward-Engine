@@ -24,15 +24,15 @@ function Dashboard() {
     <div className="max-w-7xl mx-auto px-6 py-10">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-semibold mb-2 text-gray-800 dark:text-white">Analytics Dashboard</h1>
-          <p className="text-gray-400">System-level insights & sales performance</p>
+          <h1 className="text-3xl font-semibold mb-2 text-text-primary">Analytics Dashboard</h1>
+          <p className="text-text-secondary">System-level insights & sales performance</p>
         </div>
 
         {/* Profile Badge */}
         {auth?.profile && (
           <div className="text-right">
-            <div className="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-widest text-xs">Employee</div>
-            <div className="font-mono font-semibold dark:text-gray-200">{auth.profile.employeeCode} <span className="mx-1">•</span> {auth.profile.department}</div>
+            <div className="text-sm text-text-muted uppercase tracking-widest text-xs">Employee</div>
+            <div className="font-mono font-semibold text-text-primary">{auth.profile.employeeCode} <span className="mx-1">•</span> {auth.profile.department}</div>
           </div>
         )}
       </div>
@@ -66,10 +66,10 @@ function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.2 }}
-            className="border border-gray-800 rounded-xl p-6 bg-gradient-to-br from-black to-gray-900"
+            className="glass-card p-6"
           >
-            <p className="text-gray-400 text-sm">{card.label}</p>
-            <h2 className="text-2xl font-bold mt-2 text-white">{card.value}</h2>
+            <p className="text-text-secondary text-sm font-medium">{card.label}</p>
+            <h2 className="text-2xl font-bold mt-2 text-text-primary">{card.value}</h2>
           </motion.div>
         ))}
       </div>

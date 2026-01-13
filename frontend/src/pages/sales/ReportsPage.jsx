@@ -29,20 +29,20 @@ const ReportsPage = () => {
   // Filter deals based on report type
   const getFilteredDeals = () => {
     const approvedDeals = deals.filter(d => d.status === "Approved");
-    
+
     if (reportType === "all") {
       return approvedDeals;
     }
-    
+
     if (reportType === "monthly") {
       return approvedDeals.filter(deal => {
         const dealDate = parseDate(deal.date);
         if (!dealDate || isNaN(dealDate.getTime())) return false;
-        return dealDate.getMonth() === selectedMonth && 
-               dealDate.getFullYear() === selectedYear;
+        return dealDate.getMonth() === selectedMonth &&
+          dealDate.getFullYear() === selectedYear;
       });
     }
-    
+
     return approvedDeals;
   };
 
@@ -71,13 +71,13 @@ const ReportsPage = () => {
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    
-    const monthNames = ["January", "February", "March", "April", "May", "June", 
+
+    const monthNames = ["January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"];
-    const filename = reportType === "all" 
+    const filename = reportType === "all"
       ? `Sales_Report_All_${new Date().toISOString().split('T')[0]}.csv`
       : `Sales_Report_${monthNames[selectedMonth]}_${selectedYear}.csv`;
-    
+
     link.setAttribute("download", filename);
     link.style.visibility = "hidden";
     document.body.appendChild(link);
@@ -90,7 +90,7 @@ const ReportsPage = () => {
     window.print();
   };
 
-  const monthNames = ["January", "February", "March", "April", "May", "June", 
+  const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"];
 
   const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i);
@@ -109,25 +109,25 @@ const ReportsPage = () => {
         <div className="card-modern p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Report Type</label>
+              <label className="block text-sm font-medium text-text-secondary mb-2">Report Type</label>
               <select
                 value={reportType}
                 onChange={(e) => setReportType(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-4 py-2 border border-border-strong rounded-lg bg-surface-2 text-text-primary focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="monthly">Monthly Report</option>
                 <option value="all">All Time Report</option>
               </select>
             </div>
-            
+
             {reportType === "monthly" && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Month</label>
+                  <label className="block text-sm font-medium text-text-secondary mb-2">Month</label>
                   <select
                     value={selectedMonth}
                     onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-4 py-2 border border-border-strong rounded-lg bg-surface-2 text-text-primary focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   >
                     {monthNames.map((month, index) => (
                       <option key={index} value={index}>{month}</option>
@@ -135,11 +135,11 @@ const ReportsPage = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                  <label className="block text-sm font-medium text-text-secondary mb-2">Year</label>
                   <select
                     value={selectedYear}
                     onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-4 py-2 border border-border-strong rounded-lg bg-surface-2 text-text-primary focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   >
                     {years.map(year => (
                       <option key={year} value={year}>{year}</option>
@@ -154,18 +154,18 @@ const ReportsPage = () => {
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="card-modern p-6">
-            <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest mb-2">Total Deals</p>
-            <p className="text-3xl font-bold text-gray-900">{totalDeals}</p>
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Total Deals</p>
+            <p className="text-3xl font-bold text-text-primary">{totalDeals}</p>
           </div>
           <div className="card-modern p-6">
-            <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest mb-2">Total Incentive</p>
-            <p className="text-3xl font-bold text-gray-900">
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Total Incentive</p>
+            <p className="text-3xl font-bold text-text-primary">
               ₹{totalIncentive.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
             </p>
           </div>
           <div className="card-modern p-6">
-            <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest mb-2">Avg Incentive/Deal</p>
-            <p className="text-3xl font-bold text-gray-900">
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Avg Incentive/Deal</p>
+            <p className="text-3xl font-bold text-text-primary">
               ₹{avgIncentive.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
             </p>
           </div>
@@ -173,7 +173,7 @@ const ReportsPage = () => {
 
         {/* Export Actions */}
         <div className="card-modern p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Export Report</h3>
+          <h3 className="text-lg font-semibold text-text-primary mb-4">Export Report</h3>
           <div className="flex flex-wrap gap-4">
             <button
               onClick={exportToCSV}
@@ -198,26 +198,26 @@ const ReportsPage = () => {
 
         {/* Deal List Preview */}
         <div className="card-modern p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Deal Details</h3>
+          <h3 className="text-lg font-semibold text-text-primary mb-4">Deal Details</h3>
           {filteredDeals.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-8">No deals found for the selected period</p>
+            <p className="text-sm text-text-muted text-center py-8">No deals found for the selected period</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-border-subtle">
+                <thead className="bg-surface-2">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-widest">Date</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-widest">Amount</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-widest">Rate</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-widest">Incentive</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-widest">Date</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-widest">Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-widest">Rate</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-widest">Incentive</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-surface-1 divide-y divide-border-subtle">
                   {filteredDeals.map((deal, index) => (
-                    <tr key={deal.id || index} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm text-gray-900">{deal.date}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">₹{deal.amount.toLocaleString('en-IN')}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{deal.rate}%</td>
+                    <tr key={deal.id || index} className="hover:bg-surface-2">
+                      <td className="px-4 py-3 text-sm text-text-primary">{deal.date}</td>
+                      <td className="px-4 py-3 text-sm text-text-primary">₹{deal.amount.toLocaleString('en-IN')}</td>
+                      <td className="px-4 py-3 text-sm text-text-primary">{deal.rate}%</td>
                       <td className="px-4 py-3 text-sm font-semibold text-emerald-600">
                         ₹{deal.incentive.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                       </td>

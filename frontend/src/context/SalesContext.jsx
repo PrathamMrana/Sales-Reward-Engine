@@ -14,10 +14,22 @@ export const SalesProvider = ({ children }) => {
   useEffect(() => {
     if (userId) {
       fetchDeals(userId);
+      fetchPerformance(userId);
     } else {
       setDeals([]);
     }
   }, [userId]);
+
+  const fetchPerformance = async (targetUserId) => {
+    try {
+      const res = await axios.get(`http://localhost:8080/performance?userId=${targetUserId}`);
+      if (res.data && res.data.currentMonthTarget) {
+        setMonthlyTarget(res.data.currentMonthTarget);
+      }
+    } catch (err) {
+      console.error("Failed to fetch performance", err);
+    }
+  };
 
   const fetchDeals = async (targetUserId) => {
     const idToFetch = targetUserId || userId;
@@ -77,9 +89,17 @@ export const SalesProvider = ({ children }) => {
     }
   };
 
-  const updateMonthlyTarget = (target) => {
+  const updateMonthlyTarget = async (target) => {
     setMonthlyTarget(target);
     localStorage.setItem("monthlyTarget", target.toString());
+
+    if (userId) {
+      try {
+        await axios.put("http://localhost:8080/performance/target", { userId, target });
+      } catch (err) {
+        console.error("Failed to save target", err);
+      }
+    }
   };
 
   return (

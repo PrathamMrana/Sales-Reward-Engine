@@ -5,16 +5,19 @@ import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
 import { SalesProvider } from "./context/SalesContext";
 import { NotificationProvider } from "./context/NotificationContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <AuthProvider>
-      <SalesProvider>
-        <NotificationProvider>
-        <App />
-        </NotificationProvider>
-      </SalesProvider>
+      <ThemeProvider>
+        <SalesProvider>
+          <NotificationProvider>
+            <App />
+          </NotificationProvider>
+        </SalesProvider>
+      </ThemeProvider>
     </AuthProvider>
   </BrowserRouter>
 );

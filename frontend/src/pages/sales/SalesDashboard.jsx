@@ -3,10 +3,11 @@ import StatCard from "../../components/common/StatCard";
 import DealHistory from "../../components/tables/DealHistory";
 import GoalTracker from "../../components/common/GoalTracker";
 import PerformanceTrend from "../../components/charts/PerformanceTrend";
-import DealStatusChart from "../../components/charts/DealStatusChart";
+import EarningsBreakdown from "../../components/charts/EarningsBreakdown";
 import MonthlyPerformanceBar from "../../components/charts/MonthlyPerformanceBar";
 import InsightsPanel from "../../components/common/InsightsPanel";
 import PerformanceComparison from "../../components/common/PerformanceComparison";
+import TierBadge from "../../components/common/TierBadge";
 import { useSales } from "../../context/SalesContext";
 
 const SalesDashboard = () => {
@@ -33,13 +34,13 @@ const SalesDashboard = () => {
       } else {
         dealDate = new Date(deal.date);
       }
-      return dealDate.getMonth() === now.getMonth() && 
-             dealDate.getFullYear() === now.getFullYear();
+      return dealDate.getMonth() === now.getMonth() &&
+        dealDate.getFullYear() === now.getFullYear();
     } catch (e) {
       return false;
     }
   });
-  
+
   const thisMonthApprovedDeals = thisMonthAllDeals.filter(d => d.status === "Approved");
   const thisMonthIncentive = thisMonthApprovedDeals.reduce((sum, d) => sum + (d.incentive || 0), 0);
 
@@ -68,7 +69,7 @@ const SalesDashboard = () => {
   const lastMonthIncentive = lastMonthDeals.reduce((sum, d) => sum + (d.incentive || 0), 0);
 
   // Calculate trends
-  const incentiveTrend = lastMonthIncentive > 0 
+  const incentiveTrend = lastMonthIncentive > 0
     ? ((thisMonthIncentive - lastMonthIncentive) / lastMonthIncentive * 100).toFixed(1)
     : null;
   const dealsTrend = lastMonthDeals.length > 0
@@ -89,25 +90,26 @@ const SalesDashboard = () => {
         <section className="space-y-4">
           <div className="flex items-center space-x-2 mb-2">
             <div className="w-1 h-6 bg-gradient-to-b from-primary-500 to-accent-500 rounded-full"></div>
-            <h2 className="text-lg font-semibold text-gray-900">Performance Overview</h2>
+            <h2 className="text-lg font-semibold text-text-primary">Performance Overview</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <StatCard 
-              title="Total Deals" 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <TierBadge totalIncentive={totalIncentive} />
+            <StatCard
+              title="Total Deals"
               value={totalDeals || 0}
               gradient="primary"
               subtitle="All time"
               trend={dealsTrend ? (parseFloat(dealsTrend) > 0 ? "up" : "down") : null}
               trendValue={dealsTrend ? `${Math.abs(parseFloat(dealsTrend))}%` : null}
             />
-        <StatCard
-          title="Total Incentive"
+            <StatCard
+              title="Total Incentive"
               value={`₹${(totalIncentive || 0).toLocaleString('en-IN')}`}
               gradient="emerald"
               subtitle="Approved deals only"
-        />
-            <StatCard 
-              title="This Month Incentive" 
+            />
+            <StatCard
+              title="This Month Incentive"
               value={`₹${(thisMonthIncentive || 0).toLocaleString('en-IN')}`}
               gradient="accent"
               subtitle="Current month"
@@ -121,7 +123,7 @@ const SalesDashboard = () => {
         <section className="space-y-4">
           <div className="flex items-center space-x-2 mb-2">
             <div className="w-1 h-6 bg-gradient-to-b from-primary-500 to-accent-500 rounded-full"></div>
-            <h2 className="text-lg font-semibold text-gray-900">Goal & Progress</h2>
+            <h2 className="text-lg font-semibold text-text-primary">Goal & Progress</h2>
           </div>
           <GoalTracker />
         </section>
@@ -130,7 +132,7 @@ const SalesDashboard = () => {
         <section className="space-y-4">
           <div className="flex items-center space-x-2 mb-2">
             <div className="w-1 h-6 bg-gradient-to-b from-primary-500 to-accent-500 rounded-full"></div>
-            <h2 className="text-lg font-semibold text-gray-900">Trends & Insights</h2>
+            <h2 className="text-lg font-semibold text-text-primary">Trends & Insights</h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Hero Chart - Takes 2 columns */}
@@ -148,10 +150,10 @@ const SalesDashboard = () => {
         <section className="space-y-4">
           <div className="flex items-center space-x-2 mb-2">
             <div className="w-1 h-6 bg-gradient-to-b from-primary-500 to-accent-500 rounded-full"></div>
-            <h2 className="text-lg font-semibold text-gray-900">Deal Status & Monthly Performance</h2>
+            <h2 className="text-lg font-semibold text-text-primary">Deal Status & Monthly Performance</h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <DealStatusChart />
+            <EarningsBreakdown />
             <MonthlyPerformanceBar />
           </div>
         </section>
@@ -160,7 +162,7 @@ const SalesDashboard = () => {
         <section className="space-y-4">
           <div className="flex items-center space-x-2 mb-2">
             <div className="w-1 h-6 bg-gradient-to-b from-primary-500 to-accent-500 rounded-full"></div>
-            <h2 className="text-lg font-semibold text-gray-900">Performance Comparison</h2>
+            <h2 className="text-lg font-semibold text-text-primary">Performance Comparison</h2>
           </div>
           <PerformanceComparison />
         </section>
@@ -169,7 +171,7 @@ const SalesDashboard = () => {
         <section className="space-y-4">
           <div className="flex items-center space-x-2 mb-2">
             <div className="w-1 h-6 bg-gradient-to-b from-primary-500 to-accent-500 rounded-full"></div>
-            <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+            <h2 className="text-lg font-semibold text-text-primary">Recent Activity</h2>
           </div>
           <DealHistory />
         </section>

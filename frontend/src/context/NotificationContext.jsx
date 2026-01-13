@@ -88,9 +88,14 @@ export const NotificationProvider = ({ children }) => {
     }
   }, []);
 
-  const removeNotification = useCallback((id) => {
+  const removeNotification = useCallback(async (id) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
-    // Verify if we should delete from DB? for now local hide.
+    try {
+      if (id > 1700000000000) return; // Skip temp IDs if not synonymous
+      await axios.delete(`http://localhost:8080/notifications/${id}`);
+    } catch (err) {
+      console.error("Delete notification failed", err);
+    }
   }, []);
 
   const markAsRead = useCallback(async (id) => {
@@ -110,14 +115,27 @@ export const NotificationProvider = ({ children }) => {
     } catch (err) { console.error("Mark read failed", err); }
   }, []);
 
-  const markAllAsRead = useCallback(() => {
+  const markAllAsRead = useCallback(async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    // TODO: Loop or bulk API
-  }, []);
+    try {
+      if (userId) {
+        await axios.patch(`http://localhost:8080/notifications/read-all?userId=${userId}`);
+      }
+    } catch (err) {
+      console.error("Mark all read failed", err);
+    }
+  }, [userId]);
 
-  const clearAll = useCallback(() => {
+  const clearAll = useCallback(async () => {
     setNotifications([]);
-  }, []);
+    try {
+      if (userId) {
+        await axios.delete(`http://localhost:8080/notifications?userId=${userId}`);
+      }
+    } catch (err) {
+      console.error("Clear all notifications failed", err);
+    }
+  }, [userId]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 

@@ -21,4 +21,13 @@ public class AuditLogController {
     public List<AuditLog> getAllLogs() {
         return auditLogService.getAllLogs();
     }
+
+    @GetMapping("/search")
+    public List<AuditLog> searchLogs(
+            @RequestParam(required = false) String action,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime startDate,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime endDate) {
+        return auditLogService.searchLogs(action, email, startDate, endDate);
+    }
 }

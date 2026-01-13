@@ -3,71 +3,196 @@
 @tailwind utilities;
 
 @layer base {
-body {
-    @apply font-sans antialiased;
-    background: linear-gradient(to bottom right, #f8fafc, #eff6ff, #eef2ff);
+  :root {
+    /* --- Light Mode Tokens --- */
+    /* Backgrounds */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    /* Slate 50 */
+    --bg-tertiary: #f1f5f9;
+    /* Slate 100 */
+
+    /* Surfaces (Cards, Panels) */
+    --surface-1: #ffffff;
+    --surface-2: #f8fafc;
+    --surface-3: #f1f5f9;
+
+    /* Text */
+    --text-primary: #0f172a;
+    /* Slate 900 */
+    --text-secondary: #475569;
+    /* Slate 600 */
+    --text-muted: #94a3b8;
+    /* Slate 400 */
+    --text-invert: #ffffff;
+
+    /* Borders */
+    --border-subtle: #e2e8f0;
+    /* Slate 200 */
+    --border-strong: #cbd5e1;
+    /* Slate 300 */
+
+    /* Accents (Brand) */
+    --accent-primary: #3b82f6;
+    /* Blue 500 */
+    --accent-secondary: #8b5cf6;
+    /* Violet 500 */
+
+    /* Semantic Colors */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #0ea5e9;
+  }
+
+  .dark {
+    /* --- Dark Mode Tokens --- */
+    /* Backgrounds - Deep Slate/Charcoal */
+    --bg-primary: #020617;
+    /* Slate 950 (Main Body) */
+    --bg-secondary: #0f172a;
+    /* Slate 900 (Sidebar/Panels) */
+    --bg-tertiary: #1e293b;
+    /* Slate 800 (Inputs/Hover) */
+
+    /* Surfaces */
+    --surface-1: #0f172a;
+    /* Darker Cards */
+    --surface-2: #1e293b;
+    /* Lighter Cards */
+    --surface-3: #334155;
+    /* Hover States */
+
+    /* Text */
+    --text-primary: #ffffff;
+    /* Pure White */
+    --text-secondary: #e2e8f0;
+    /* Slate 200 */
+    --text-muted: #94a3b8;
+    /* Slate 400 */
+    --text-heading: #ffffff;
+    /* Explicit Heading White */
+    --text-body: #cbd5e1;
+    /* Slate 300 */
+    --text-invert: #000000;
+
+    /* Borders */
+    --border-subtle: #1e293b;
+    /* Slate 800 */
+    --border-strong: #334155;
+    /* Slate 700 */
+
+    /* Accents - Slightly Brighter/Softer for Dark Mode */
+    --accent-primary: #60a5fa;
+    /* Blue 400 */
+    --accent-secondary: #a78bfa;
+    /* Violet 400 */
+  }
+
+  body {
+    @apply font-sans antialiased transition-colors duration-300;
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+    /* Default background */
   }
 }
 
 @layer components {
-  .btn-primary {
-    @apply text-white font-medium py-2.5 px-6 transition-all duration-200 relative overflow-hidden shadow-lg hover:shadow-xl;
-    background: linear-gradient(to right, #2563eb, #1d4ed8);
+
+  /* Glassmorphism / Panels */
+  .glass-panel {
+    @apply backdrop-blur-xl transition-all duration-300;
+    background-color: rgba(var(--surface-1), 0.7);
+    /* Fallback or specific glass logic if needed, usually css vars are hex. For opacity with hex vars we might need separate rgb vars or color-mix. Using semantic classes below instead. */
+    /* Re-defining using Tailwind extended colors once config is updated. 
+       For now, let's use the semantic vars directly or wait for config update.
+       Let's stick to standard classes that WE WILL define in tailwind config.
+    */
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-subtle);
   }
-  
-  .btn-primary:hover {
-    background: linear-gradient(to right, #1d4ed8, #1e40af);
-  }
-  
-  .btn-primary::before {
-    content: '';
-    @apply absolute inset-0 bg-white opacity-0 transition-opacity duration-200;
-  }
-  
-  .btn-primary:hover::before {
-    @apply opacity-10;
-  }
-  
-  .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-gray-900 font-medium py-2.5 px-6 border border-gray-300 transition-all duration-150 shadow-sm hover:shadow;
-  }
-  
-  .input-modern {
-    @apply w-full px-4 py-3 border-b-2 border-gray-300 bg-transparent transition-all duration-200 text-gray-900 placeholder-gray-400;
-  }
-  
-  .input-modern:focus {
-    border-color: #3b82f6;
-  }
-  
+
+  /* Modern Card - The standard "Surface" */
+  .glass-card,
   .card-modern {
-    @apply bg-white border border-gray-200 relative shadow-sm hover:shadow-lg transition-all duration-300 rounded-lg;
+    @apply relative overflow-hidden rounded-xl transition-all duration-300 shadow-sm hover:shadow-md;
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-subtle);
   }
-  
-  .card-modern::before {
-    content: '';
-    @apply absolute top-0 left-0 w-1 h-full opacity-0 transition-opacity duration-300;
-    background: linear-gradient(to bottom, #3b82f6, #14b8a6);
-    border-radius: 0.5rem 0 0 0.5rem;
+
+  /* If in dark mode, we might want slightly different surface for cards vs panels */
+  .dark .glass-card {
+    background-color: var(--bg-tertiary);
+    /* Slightly lighter than bg-primary */
+    border-color: var(--border-subtle);
   }
-  
-  .card-modern:hover::before {
-    @apply opacity-100;
+
+  /* Buttons */
+  .btn-primary {
+    @apply text-white font-medium py-2.5 px-6 rounded-lg transition-all duration-300 relative overflow-hidden shadow-lg hover:shadow-xl hover:-translate-y-0.5;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   }
-  
-  .card-modern:hover {
-    @apply -translate-y-0.5;
+
+  .btn-secondary {
+    @apply font-medium py-2.5 px-6 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md;
+    background-color: var(--surface-1);
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
   }
-  
+
+  .btn-secondary:hover {
+    background-color: var(--surface-2);
+  }
+
+  /* Form Elements */
+  .input-modern {
+    @apply w-full px-4 py-3 rounded-lg transition-all duration-300 outline-none;
+    background-color: var(--bg-tertiary);
+    /* Input background */
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .input-modern:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    /* Fallback styling or needs rgb var */
+  }
+
+  .input-modern::placeholder {
+    color: var(--text-muted);
+  }
+
+  /* Typography */
   .section-title {
-    @apply text-3xl font-light tracking-tight mb-2;
-    background: linear-gradient(to right, #1e40af, #0d9488);
+    @apply text-3xl font-bold tracking-tight mb-2;
+    background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
-  .section-subtitle {
-    @apply text-sm text-gray-600 uppercase tracking-widest mb-6;
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+  }
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--border-strong);
+    border-radius: 9999px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-muted);
   }
 }

@@ -43,7 +43,7 @@ const NotificationManagement = () => {
                 title: prefixedTitle,
                 message,
                 targetRole,
-                targetUserId: targetRole === 'USER' ? targetUserId : null,
+                targetUserId: targetRole === 'USER' ? parseInt(targetUserId) : null,
                 type: notificationType
             });
             setSuccessMsg("Notification sent successfully!");
@@ -62,29 +62,30 @@ const NotificationManagement = () => {
     return (
         <SalesLayout>
             <div className="max-w-2xl mx-auto">
-                <h1 className="text-2xl font-semibold mb-6">Manage Notifications</h1>
+                <h1 className="text-2xl font-semibold mb-6 text-text-primary">Manage Notifications</h1>
 
-                <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
+                <div className="card-modern p-8">
                     <form onSubmit={handleBroadcast} className="space-y-6">
 
                         {/* Notification Type */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Notification Type</label>
+                            <label className="block text-sm font-medium text-text-secondary mb-2">Notification Type</label>
                             <select
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                className="w-full px-4 py-2 bg-surface-1 border border-border-subtle rounded-lg text-text-primary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
                                 value={notificationType}
                                 onChange={(e) => setNotificationType(e.target.value)}
                             >
                                 <option value="ANNOUNCEMENT">Announcement</option>
                                 <option value="POLICY_UPDATE">Policy Update</option>
                                 <option value="INCENTIVE">Incentive Update</option>
+                                <option value="MONTHLY_TARGET">Monthly Target</option>
                                 <option value="SYSTEM_ALERT">System Alert</option>
                             </select>
                         </div>
 
                         {/* Target Audience */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Target Audience</label>
+                            <label className="block text-sm font-medium text-text-secondary mb-2">Target Audience</label>
                             <div className="grid grid-cols-4 gap-4 mb-4">
                                 {['ALL', 'SALES', 'ADMIN', 'USER'].map((role) => (
                                     <button
@@ -92,8 +93,8 @@ const NotificationManagement = () => {
                                         type="button"
                                         onClick={() => setTargetRole(role)}
                                         className={`py-2 px-2 rounded-lg text-sm font-medium transition-all ${targetRole === role
-                                            ? 'bg-blue-600 text-white shadow-md'
-                                            : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                                            ? 'bg-primary-600 text-white shadow-md'
+                                            : 'bg-surface-2 text-text-secondary hover:bg-surface-3'
                                             }`}
                                     >
                                         {role === 'ALL' ? 'Everyone' : role === 'SALES' ? 'Sales Team' : role === 'ADMIN' ? 'Admins' : 'Specific User'}
@@ -104,15 +105,15 @@ const NotificationManagement = () => {
                             {/* Specific User Selector */}
                             {targetRole === 'USER' && (
                                 <div className="animate-fade-in-down">
-                                    <label className="block text-xs font-medium text-gray-500 mb-1">Select User</label>
+                                    <label className="block text-xs font-medium text-text-muted mb-1">Select User</label>
                                     <select
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                        className="w-full px-4 py-2 bg-surface-1 border border-border-subtle rounded-lg text-text-primary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
                                         value={targetUserId}
                                         onChange={(e) => setTargetUserId(e.target.value)}
                                     >
                                         <option value="">-- Choose User --</option>
                                         {users.map(u => (
-                                            <option key={u.id} value={u.id}>{u.fullName} ({u.username})</option>
+                                            <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
                                         ))}
                                     </select>
                                 </div>
@@ -121,10 +122,10 @@ const NotificationManagement = () => {
 
                         {/* Title */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Subject / Title</label>
+                            <label className="block text-sm font-medium text-text-secondary mb-2">Subject / Title</label>
                             <input
                                 type="text"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                className="w-full px-4 py-2 bg-surface-1 border border-border-subtle rounded-lg text-text-primary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
                                 placeholder="e.g., New Incentive Policy Update"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
@@ -133,10 +134,10 @@ const NotificationManagement = () => {
 
                         {/* Message */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Message Content</label>
+                            <label className="block text-sm font-medium text-text-secondary mb-2">Message Content</label>
                             <textarea
                                 rows="5"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
+                                className="w-full px-4 py-2 bg-surface-1 border border-border-subtle rounded-lg text-text-primary focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all resize-none"
                                 placeholder="Write your notification here..."
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}

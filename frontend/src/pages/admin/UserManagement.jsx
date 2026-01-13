@@ -42,33 +42,33 @@ const UserManagement = () => {
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h1 className="section-title">User Management</h1>
-                    <p className="text-gray-500 text-sm mt-1">Manage Sales Executives Access</p>
+                    <p className="text-text-muted text-sm mt-1">Manage Sales Executives Access</p>
                 </div>
-                <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium">
+                <div className="bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 px-4 py-2 rounded-lg text-sm font-medium">
                     Total Sales Execs: {salesUsers.length}
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow overflow-hidden">
+            <div className="card-modern overflow-hidden">
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="bg-gray-100 border-b">
-                            <th className="p-4 py-3 font-medium text-gray-600">Name</th>
-                            <th className="p-4 py-3 font-medium text-gray-600">Email</th>
-                            <th className="p-4 py-3 font-medium text-gray-600">Status</th>
-                            <th className="p-4 py-3 font-medium text-gray-600 text-right">Actions</th>
+                        <tr className="bg-surface-2 border-b border-border-subtle">
+                            <th className="p-4 py-3 font-medium text-text-secondary">Name</th>
+                            <th className="p-4 py-3 font-medium text-text-secondary">Email</th>
+                            <th className="p-4 py-3 font-medium text-text-secondary">Status</th>
+                            <th className="p-4 py-3 font-medium text-text-secondary text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {salesUsers.length === 0 ? (
                             <tr>
-                                <td colSpan="4" className="p-6 text-center text-gray-500">No sales users found.</td>
+                                <td colSpan="4" className="p-6 text-center text-text-muted">No sales users found.</td>
                             </tr>
                         ) : (
                             salesUsers.map((user) => (
-                                <tr key={user.id} className="border-b hover:bg-gray-50">
-                                    <td className="p-4 font-medium text-gray-900">{user.name}</td>
-                                    <td className="p-4 text-gray-600">{user.email}</td>
+                                <tr key={user.id} className="border-b border-border-subtle hover:bg-surface-2 transition-colors">
+                                    <td className="p-4 font-medium text-text-primary">{user.name}</td>
+                                    <td className="p-4 text-text-secondary">{user.email}</td>
                                     <td className="p-4">
                                         <span className={`px-2 py-1 rounded text-xs font-semibold
                                             ${user.accountStatus === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>

@@ -36,6 +36,26 @@ const GoalTracker = () => {
   const achieved = thisMonthDeals.reduce((sum, d) => sum + (d.incentive || 0), 0);
   const percentage = Math.min((achieved / monthlyTarget) * 100, 100);
 
+  // Forecasting Logic
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const currentDay = now.getDate();
+  // Avoid division by zero, assume at least 1 day passed effectively for projection
+  const effectiveDaysString = Math.max(currentDay, 1);
+  const dailyAverage = achieved / effectiveDaysString;
+  const projected = dailyAverage * daysInMonth;
+
+  // Status Logic
+  let status = "On Track";
+  const requiredDaily = monthlyTarget / daysInMonth;
+
+  if (percentage >= 100) {
+    status = "Completed";
+  } else if (dailyAverage < requiredDaily * 0.8) {
+    status = "Behind";
+  } else if (dailyAverage < requiredDaily) {
+    status = "At Risk";
+  }
+
   // Check for milestone achievements
   useEffect(() => {
     const milestones = [50, 75, 90, 100];
@@ -79,7 +99,8 @@ const GoalTracker = () => {
   };
 
   return (
-    <div className="card-modern p-6 bg-gradient-to-br from-white to-blue-50/30">
+    <div className="card-modern p-6 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary-500/10 to-accent-500/10 rounded-full blur-2xl"></div>
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-sm font-semibold bg-gradient-to-r from-primary-700 to-accent-600 bg-clip-text text-transparent mb-1">Monthly Target</h3>
@@ -88,7 +109,7 @@ const GoalTracker = () => {
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className="text-xs uppercase tracking-widest text-gray-600 hover:text-black transition-colors"
+            className="text-xs uppercase tracking-widest text-text-secondary hover:text-text-primary transition-colors"
           >
             Edit
           </button>
@@ -98,7 +119,7 @@ const GoalTracker = () => {
               type="number"
               value={tempTarget}
               onChange={(e) => setTempTarget(Number(e.target.value))}
-              className="w-32 px-2 py-1 border border-gray-300 text-sm focus:border-black focus:outline-none"
+              className="w-32 px-2 py-1 bg-surface-2 border border-border-strong text-sm focus:border-accent-primary focus:outline-none text-text-primary"
             />
             <button
               onClick={handleSave}
@@ -111,7 +132,7 @@ const GoalTracker = () => {
                 setIsEditing(false);
                 setTempTarget(monthlyTarget);
               }}
-              className="text-xs uppercase tracking-widest text-gray-600 hover:text-black"
+              className="text-xs uppercase tracking-widest text-text-secondary hover:text-text-primary"
             >
               Cancel
             </button>
@@ -119,30 +140,50 @@ const GoalTracker = () => {
         )}
       </div>
 
-      <div className="space-y-3">
-        <div className="flex items-baseline justify-between">
+      <div className="space-y-4">
+        {/* Progress Circle & Status */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="relative w-16 h-16">
+              <svg className="w-full h-full transform -rotate-90">
+                <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-surface-3" />
+                <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="4" fill="transparent"
+                  strokeDasharray={175.93}
+                  strokeDashoffset={175.93 - (175.93 * percentage) / 100}
+                  className={`${percentage >= 100 ? 'text-emerald-500' : 'text-primary-500'} transition-all duration-1000 ease-out`}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xs font-bold text-text-primary">{percentage.toFixed(0)}%</span>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs text-text-muted uppercase tracking-widest mb-0.5">Status</p>
+              <div className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border ${status === 'On Track' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : status === 'At Risk' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-red-100 text-red-700 border-red-200'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${status === 'On Track' ? 'bg-emerald-500' : status === 'At Risk' ? 'bg-amber-500' : 'bg-red-500'}`}></span>
+                <span>{status}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-right">
+            <p className="text-xs text-text-muted uppercase tracking-widest mb-1">Projected</p>
+            <p className="text-xl font-semibold text-text-primary">₹{projected.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+            <p className="text-[10px] text-text-secondary mt-0.5">
+              {projected >= monthlyTarget ? "Target likely to be met" : `Short by ₹${(monthlyTarget - projected).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 pt-2 border-t border-border-subtle">
           <div>
-            <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Target</p>
-            <p className="text-2xl font-light text-gray-900">₹{monthlyTarget.toLocaleString('en-IN')}</p>
+            <p className="text-[10px] text-text-muted uppercase tracking-widest mb-1">Target</p>
+            <p className="text-lg font-medium text-text-primary">₹{monthlyTarget.toLocaleString('en-IN')}</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Achieved</p>
-            <p className="text-2xl font-light text-gray-900">₹{achieved.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            <p className="text-[10px] text-text-muted uppercase tracking-widest mb-1">Achieved</p>
+            <p className="text-lg font-medium text-primary-600 dark:text-primary-400">₹{achieved.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
           </div>
-        </div>
-
-        <div className="relative h-4 bg-gray-200 border border-gray-300 rounded-full overflow-hidden">
-          <div
-            className="absolute top-0 left-0 h-full bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-600 transition-all duration-500 shadow-lg"
-            style={{ width: `${percentage}%` }}
-          ></div>
-        </div>
-
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-600">{percentage.toFixed(1)}% Complete</span>
-          <span className="text-gray-600">
-            ₹{(monthlyTarget - achieved).toLocaleString('en-IN', { maximumFractionDigits: 2 })} remaining
-          </span>
         </div>
       </div>
     </div>

@@ -19,9 +19,9 @@ const DealStatusChart = () => {
       const data = payload[0];
       const percentage = totalDeals > 0 ? ((data.value / totalDeals) * 100).toFixed(1) : 0;
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold text-gray-900">{data.name}</p>
-          <p className="text-sm text-gray-600">
+        <div className="bg-surface-2 p-3 border border-border-subtle rounded-lg shadow-lg">
+          <p className="font-semibold text-text-primary">{data.name}</p>
+          <p className="text-sm text-text-secondary">
             {data.value} deal{data.value !== 1 ? 's' : ''} ({percentage}%)
           </p>
         </div>
@@ -62,8 +62,8 @@ const DealStatusChart = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
-          <h3 className="text-sm font-semibold text-gray-700 mb-2">No Deal Status Data</h3>
-          <p className="text-xs text-gray-500">Create deals to see status distribution</p>
+          <h3 className="text-sm font-semibold text-text-muted mb-2">No Deal Status Data</h3>
+          <p className="text-xs text-text-muted">Create deals to see status distribution</p>
         </div>
       </div>
     );
@@ -72,11 +72,11 @@ const DealStatusChart = () => {
   return (
     <div className="card-modern p-8 relative">
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary-100 to-accent-100 opacity-20 rounded-full -mr-16 -mt-16"></div>
-      
+
       <div className="mb-6 relative z-10">
-        <h3 className="text-lg font-semibold text-gray-900 mb-1">Deal Status Overview</h3>
+        <h3 className="text-lg font-semibold text-text-primary mb-1">Deal Status Overview</h3>
         <div className="h-0.5 bg-gradient-to-r from-primary-500 to-accent-500 w-16"></div>
-        <p className="text-sm text-gray-600 mt-2">Distribution of deals across workflow stages</p>
+        <p className="text-sm text-text-secondary mt-2">Distribution of deals across workflow stages</p>
       </div>
 
       <div className="relative z-10">
@@ -112,7 +112,7 @@ const DealStatusChart = () => {
       </div>
 
       {/* Summary Stats */}
-      <div className="mt-6 pt-6 border-t border-gray-200 relative z-10">
+      <div className="mt-6 pt-6 border-t border-border-subtle relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {statusData.map((status) => {
             const percentage = totalDeals > 0 ? ((status.value / totalDeals) * 100).toFixed(1) : 0;
@@ -123,12 +123,12 @@ const DealStatusChart = () => {
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: status.color }}
                   ></div>
-                  <p className="text-xs font-semibold text-gray-700 uppercase tracking-widest">
+                  <p className="text-xs font-semibold text-text-secondary uppercase tracking-widest">
                     {status.name}
                   </p>
                 </div>
-                <p className="text-lg font-bold text-gray-900">{status.value}</p>
-                <p className="text-xs text-gray-500">{percentage}%</p>
+                <p className="text-lg font-bold text-text-primary">{status.value}</p>
+                <p className="text-xs text-text-muted">{percentage}%</p>
               </div>
             );
           })}

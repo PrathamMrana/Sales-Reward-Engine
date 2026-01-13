@@ -32,8 +32,8 @@ const PerformanceComparison = () => {
     if (deal.status !== "Approved") return false;
     const dealDate = parseDate(deal.date);
     if (!dealDate || isNaN(dealDate.getTime())) return false;
-    return dealDate.getMonth() === currentMonth && 
-           dealDate.getFullYear() === currentYear;
+    return dealDate.getMonth() === currentMonth &&
+      dealDate.getFullYear() === currentYear;
   });
 
   const currentMonthIncentive = currentMonthDeals.reduce((sum, d) => sum + (d.incentive || 0), 0);
@@ -44,8 +44,8 @@ const PerformanceComparison = () => {
     if (deal.status !== "Approved") return false;
     const dealDate = parseDate(deal.date);
     if (!dealDate || isNaN(dealDate.getTime())) return false;
-    return dealDate.getMonth() === lastMonth && 
-           dealDate.getFullYear() === lastMonthYear;
+    return dealDate.getMonth() === lastMonth &&
+      dealDate.getFullYear() === lastMonthYear;
   });
 
   const lastMonthIncentive = lastMonthDeals.reduce((sum, d) => sum + (d.incentive || 0), 0);
@@ -55,7 +55,7 @@ const PerformanceComparison = () => {
   const incentiveGrowth = lastMonthIncentive > 0
     ? ((currentMonthIncentive - lastMonthIncentive) / lastMonthIncentive * 100)
     : (currentMonthIncentive > 0 ? 100 : 0);
-  
+
   const dealsGrowth = lastMonthCount > 0
     ? ((currentMonthCount - lastMonthCount) / lastMonthCount * 100)
     : (currentMonthCount > 0 ? 100 : 0);
@@ -90,22 +90,22 @@ const PerformanceComparison = () => {
     return null;
   };
 
-  const monthNames = ["January", "February", "March", "April", "May", "June", 
+  const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"];
 
   return (
     <div className="card-modern p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-1">Performance Comparison</h3>
+        <h3 className="text-lg font-semibold text-text-primary mb-1">Performance Comparison</h3>
         <div className="h-0.5 bg-gradient-to-r from-primary-500 to-accent-500 w-16"></div>
-        <p className="text-xs text-gray-500 mt-2">Month-over-month growth analysis</p>
+        <p className="text-xs text-text-muted mt-2">Month-over-month growth analysis</p>
       </div>
 
       <div className="space-y-6">
         {/* Incentive Comparison */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-medium text-gray-700">Total Incentive</p>
+            <p className="text-sm font-medium text-text-secondary">Total Incentive</p>
             <div className={`flex items-center space-x-1 ${getGrowthColor(incentiveGrowth)}`}>
               {getGrowthIcon(incentiveGrowth)}
               <span className="text-sm font-semibold">
@@ -114,19 +114,19 @@ const PerformanceComparison = () => {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-xs text-gray-500 mb-1">This Month</p>
-              <p className="text-lg font-bold text-gray-900">
+            <div className="p-3 bg-surface-2 rounded-lg border border-border-strong">
+              <p className="text-xs text-text-muted mb-1">This Month</p>
+              <p className="text-lg font-bold text-text-primary">
                 ₹{currentMonthIncentive.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               </p>
-              <p className="text-xs text-gray-500 mt-1">{monthNames[currentMonth]}</p>
+              <p className="text-xs text-text-muted mt-1">{monthNames[currentMonth]}</p>
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-xs text-gray-500 mb-1">Last Month</p>
-              <p className="text-lg font-bold text-gray-900">
+            <div className="p-3 bg-surface-2 rounded-lg border border-border-strong">
+              <p className="text-xs text-text-muted mb-1">Last Month</p>
+              <p className="text-lg font-bold text-text-primary">
                 ₹{lastMonthIncentive.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               </p>
-              <p className="text-xs text-gray-500 mt-1">{monthNames[lastMonth]}</p>
+              <p className="text-xs text-text-muted mt-1">{monthNames[lastMonth]}</p>
             </div>
           </div>
         </div>
@@ -134,7 +134,7 @@ const PerformanceComparison = () => {
         {/* Deals Comparison */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-medium text-gray-700">Deals Count</p>
+            <p className="text-sm font-medium text-text-secondary">Deals Count</p>
             <div className={`flex items-center space-x-1 ${getGrowthColor(dealsGrowth)}`}>
               {getGrowthIcon(dealsGrowth)}
               <span className="text-sm font-semibold">
@@ -143,15 +143,15 @@ const PerformanceComparison = () => {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-xs text-gray-500 mb-1">This Month</p>
-              <p className="text-lg font-bold text-gray-900">{currentMonthCount}</p>
-              <p className="text-xs text-gray-500 mt-1">{monthNames[currentMonth]}</p>
+            <div className="p-3 bg-surface-2 rounded-lg border border-border-strong">
+              <p className="text-xs text-text-muted mb-1">This Month</p>
+              <p className="text-lg font-bold text-text-primary">{currentMonthCount}</p>
+              <p className="text-xs text-text-muted mt-1">{monthNames[currentMonth]}</p>
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-xs text-gray-500 mb-1">Last Month</p>
-              <p className="text-lg font-bold text-gray-900">{lastMonthCount}</p>
-              <p className="text-xs text-gray-500 mt-1">{monthNames[lastMonth]}</p>
+            <div className="p-3 bg-surface-2 rounded-lg border border-border-strong">
+              <p className="text-xs text-text-muted mb-1">Last Month</p>
+              <p className="text-lg font-bold text-text-primary">{lastMonthCount}</p>
+              <p className="text-xs text-text-muted mt-1">{monthNames[lastMonth]}</p>
             </div>
           </div>
         </div>
@@ -159,7 +159,7 @@ const PerformanceComparison = () => {
         {/* Average Incentive per Deal */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-medium text-gray-700">Avg Incentive/Deal</p>
+            <p className="text-sm font-medium text-text-secondary">Avg Incentive/Deal</p>
             <div className={`flex items-center space-x-1 ${getGrowthColor(avgGrowth)}`}>
               {getGrowthIcon(avgGrowth)}
               <span className="text-sm font-semibold">
@@ -174,9 +174,9 @@ const PerformanceComparison = () => {
                 ₹{avgIncentiveCurrent.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               </p>
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-xs text-gray-500 mb-1">Last Month</p>
-              <p className="text-lg font-bold text-gray-900">
+            <div className="p-3 bg-surface-2 rounded-lg border border-border-strong">
+              <p className="text-xs text-text-muted mb-1">Last Month</p>
+              <p className="text-lg font-bold text-text-primary">
                 ₹{avgIncentiveLast.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               </p>
             </div>

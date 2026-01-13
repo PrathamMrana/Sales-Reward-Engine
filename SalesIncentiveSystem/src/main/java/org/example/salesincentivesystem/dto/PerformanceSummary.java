@@ -11,13 +11,97 @@ public class PerformanceSummary {
     private double approvalRate; // percentage
     private double totalIncentiveEarned;
     private double averageDealValue;
+    private double consistencyScore; // New Analytic
+    private String email;
+    private String role;
+    private String employeeCode;
+    private String joiningDate;
+    private String currentTier;
+    private String nextTier;
+    private double progressToNextTier;
+    private String bestMonth;
+
     private List<MonthlyTrend> monthlyTrend;
 
+    // Getters and Setters
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getEmployeeCode() {
+        return employeeCode;
+    }
+
+    public void setEmployeeCode(String employeeCode) {
+        this.employeeCode = employeeCode;
+    }
+
+    public String getJoiningDate() {
+        return joiningDate;
+    }
+
+    public void setJoiningDate(String joiningDate) {
+        this.joiningDate = joiningDate;
+    }
+
+    public String getCurrentTier() {
+        return currentTier;
+    }
+
+    public void setCurrentTier(String currentTier) {
+        this.currentTier = currentTier;
+    }
+
+    public String getNextTier() {
+        return nextTier;
+    }
+
+    public void setNextTier(String nextTier) {
+        this.nextTier = nextTier;
+    }
+
+    public double getProgressToNextTier() {
+        return progressToNextTier;
+    }
+
+    public void setProgressToNextTier(double progressToNextTier) {
+        this.progressToNextTier = progressToNextTier;
+    }
+
+    public String getBestMonth() {
+        return bestMonth;
+    }
+
+    public void setBestMonth(String bestMonth) {
+        this.bestMonth = bestMonth;
+    }
+
     // getters and setters
+    public double getConsistencyScore() {
+        return consistencyScore;
+    }
+
+    public void setConsistencyScore(double consistencyScore) {
+        this.consistencyScore = consistencyScore;
+    }
+
     public static class MonthlyTrend {
         private String month; // Format: YYYY-MM
         private int dealCount;
         private double incentiveSum;
+        private double averageDealSize; // New Analytic
 
         // getters and setters
         public String getMonth() {
@@ -42,6 +126,14 @@ public class PerformanceSummary {
 
         public void setIncentiveSum(double incentiveSum) {
             this.incentiveSum = incentiveSum;
+        }
+
+        public double getAverageDealSize() {
+            return averageDealSize;
+        }
+
+        public void setAverageDealSize(double averageDealSize) {
+            this.averageDealSize = averageDealSize;
         }
     }
 

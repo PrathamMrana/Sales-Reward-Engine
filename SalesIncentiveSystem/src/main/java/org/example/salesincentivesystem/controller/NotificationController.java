@@ -5,7 +5,7 @@ import org.example.salesincentivesystem.entity.User;
 import org.example.salesincentivesystem.repository.NotificationRepository;
 import org.example.salesincentivesystem.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @RestController
@@ -47,9 +47,30 @@ public class NotificationController {
         });
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteNotification(@PathVariable Long id) {
+        notificationRepository.deleteById(id);
+    }
+
+    @DeleteMapping
+    @Transactional
+    public void clearAllNotifications(@RequestParam Long userId) {
+        notificationRepository.deleteByUserId(userId);
+    }
+
+    @PatchMapping("/read-all")
+    public void markAllAsRead(@RequestParam Long userId) {
+        List<Notification> notifications = notificationRepository.findByUser_Id(userId);
+        notifications.forEach(n -> n.setRead(true));
+        notificationRepository.saveAll(notifications);
+    }
+
     @PostMapping("/broadcast")
     public void broadcastNotification(@RequestBody BroadcastRequest request) {
-        if ("USER".equals(request.targetRole) && request.targetUserId != null) {
+        System.out.println("DEBUG: Broadcast initiated. Role=" + request.targetRole + ", UserId=" + request.targetUserId
+                + ", Title=" + request.title);
+
+        if ("USER".equalsIgnoreCase(request.targetRole) && request.targetUserId != null) {
             // Target specific user
             User targetUser = userRepository.findById(request.targetUserId)
                     .orElseThrow(() -> new RuntimeException("Target user not found"));
@@ -59,6 +80,7 @@ public class NotificationController {
 
             Notification n = new Notification(targetUser, notifType, finalTitle, request.message);
             notificationRepository.save(n);
+            System.out.println("DEBUG: Sent direct notification to user: " + targetUser.getEmail());
 
             // Audit Log
             auditLogService.logAction(
@@ -71,13 +93,17 @@ public class NotificationController {
         } else {
             // Target Group (ALL or Role)
             List<User> targetUsers;
-            if ("ALL".equals(request.targetRole)) {
+            if ("ALL".equalsIgnoreCase(request.targetRole)) {
                 targetUsers = userRepository.findAll();
             } else {
+                // Use case-insensitive match for roles
+                String targetRoleNormalized = request.targetRole.toUpperCase();
                 targetUsers = userRepository.findAll().stream()
-                        .filter(u -> request.targetRole.equals(u.getRole()))
+                        .filter(u -> u.getRole() != null && targetRoleNormalized.equals(u.getRole().toUpperCase()))
                         .collect(java.util.stream.Collectors.toList());
             }
+
+            System.out.println("DEBUG: Found " + targetUsers.size() + " target users for broadcast.");
 
             String notifType = request.type != null && !request.type.isEmpty() ? request.type : "ANNOUNCEMENT";
 

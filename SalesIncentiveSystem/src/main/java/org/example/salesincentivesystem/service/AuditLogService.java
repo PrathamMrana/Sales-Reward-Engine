@@ -39,4 +39,8 @@ public class AuditLogService {
         return auditLogRepository.findAll(org.springframework.data.domain.Sort
                 .by(org.springframework.data.domain.Sort.Direction.DESC, "timestamp"));
     }
+
+    public List<AuditLog> searchLogs(String action, String email, LocalDateTime start, LocalDateTime end) {
+        return auditLogRepository.searchLogs(action, email, start, end);
+    }
 }

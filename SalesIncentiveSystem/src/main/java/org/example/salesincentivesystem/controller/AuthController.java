@@ -126,21 +126,27 @@ public class AuthController {
                                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Admin account must exist");
                         }
 
+                        if (email == null || email.trim().isEmpty() || !email.contains("@")) {
+                                return ResponseEntity.badRequest().body("Invalid email format");
+                        }
+
                         String namePart = email.split("@")[0];
-                        String name = namePart.substring(0, 1).toUpperCase() + namePart.substring(1);
+                        String name = "User";
+                        if (namePart != null && !namePart.isEmpty()) {
+                                name = namePart.substring(0, 1).toUpperCase() + namePart.substring(1);
+                        }
 
                         User newUser = new User(email, password, "SALES", name);
                         User savedUser = userRepository.save(newUser);
 
                         // Seed Default Profile Data
                         org.example.salesincentivesystem.entity.SalesProfile profile = new org.example.salesincentivesystem.entity.SalesProfile(
-                            savedUser, "N/A", "General Sales", "EMP-" + savedUser.getId(), java.time.LocalDate.now()
-                        );
+                                        savedUser, "N/A", "General Sales", "EMP-" + savedUser.getId(),
+                                        java.time.LocalDate.now());
                         salesProfileRepository.save(profile);
 
                         org.example.salesincentivesystem.entity.UserPreference pref = new org.example.salesincentivesystem.entity.UserPreference(
-                            savedUser, "LIGHT", "INR", "EN"
-                        );
+                                        savedUser, "LIGHT", "INR", "EN");
                         userPreferenceRepository.save(pref);
 
                         org.example.salesincentivesystem.entity.SalesPerformance perf = new org.example.salesincentivesystem.entity.SalesPerformance();
@@ -149,7 +155,6 @@ public class AuthController {
                         perf.setCurrentMonthTarget(100000.0);
                         perf.setPerformanceRating(0.0);
                         salesPerformanceRepository.save(perf);
-
 
                         auditLogRepository.save(
                                         new org.example.salesincentivesystem.entity.AuditLog(savedUser.getId(), email,

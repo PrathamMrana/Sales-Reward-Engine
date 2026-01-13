@@ -59,7 +59,7 @@ const IncentivePolicyPage = () => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="section-title">Incentive Policy</h1>
-            <div className="h-px bg-black w-24 mt-2"></div>
+            <div className="h-1 w-24 mt-2 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full"></div>
             <p className="section-subtitle mt-4">Rules & Calculation Methods</p>
           </div>
           {isAdmin && (
@@ -74,28 +74,31 @@ const IncentivePolicyPage = () => {
 
         {/* ADMIN EDIT FORM */}
         {isAdmin && isEditing && (
-          <div className="bg-white p-6 rounded shadow-lg border border-blue-200 mb-6">
-            <h3 className="font-semibold mb-4">Add New Policy Rule</h3>
+          <div className="glass-card p-6 mb-6">
+            <h3 className="font-semibold mb-4 text-text-primary">Add New Policy Rule</h3>
             <form onSubmit={handleAddPolicy} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium">Title</label>
-                <input className="border p-2 w-full rounded" required value={newPolicy.title} onChange={e => setNewPolicy({ ...newPolicy, title: e.target.value })} placeholder="e.g. Standard Commission" />
+                <label className="block text-sm font-medium text-text-secondary">Title</label>
+                <input className="input-modern" required value={newPolicy.title} onChange={e => setNewPolicy({ ...newPolicy, title: e.target.value })} placeholder="e.g. Standard Commission" />
               </div>
               <div>
-                <label className="block text-sm font-medium">Description</label>
-                <input className="border p-2 w-full rounded" required value={newPolicy.description} onChange={e => setNewPolicy({ ...newPolicy, description: e.target.value })} placeholder="Short description" />
+                <label className="block text-sm font-medium text-text-secondary">Description</label>
+                <input className="input-modern" required value={newPolicy.description} onChange={e => setNewPolicy({ ...newPolicy, description: e.target.value })} placeholder="Short description" />
               </div>
               <div className="flex space-x-4">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium">Rate Display</label>
-                  <input className="border p-2 w-full rounded" required value={newPolicy.rate} onChange={e => setNewPolicy({ ...newPolicy, rate: e.target.value })} placeholder="e.g. 5%" />
+                  <label className="block text-sm font-medium text-text-secondary">Rate Display</label>
+                  <input className="input-modern" required value={newPolicy.rate} onChange={e => setNewPolicy({ ...newPolicy, rate: e.target.value })} placeholder="e.g. 5%" />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm font-medium">Example Text</label>
-                  <input className="border p-2 w-full rounded" value={newPolicy.example} onChange={e => setNewPolicy({ ...newPolicy, example: e.target.value })} placeholder="Optional example" />
+                  <label className="block text-sm font-medium text-text-secondary">Example Text</label>
+                  <input className="input-modern" value={newPolicy.example} onChange={e => setNewPolicy({ ...newPolicy, example: e.target.value })} placeholder="Optional example" />
                 </div>
               </div>
-              <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded">Save Rule</button>
+              <div className="flex justify-end space-x-3">
+                <button type="button" onClick={() => setIsEditing(false)} className="px-4 py-2 text-text-secondary hover:text-text-primary">Cancel</button>
+                <button type="submit" className="btn-primary">Save Rule</button>
+              </div>
             </form>
           </div>
         )}
@@ -103,7 +106,7 @@ const IncentivePolicyPage = () => {
         {/* POLICY GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {policies.length === 0 && !loading && (
-            <p className="text-gray-500">No active policies found currently.</p>
+            <p className="text-text-muted">No active policies found currently.</p>
           )}
 
           {policies.map((rule) => (
@@ -112,12 +115,12 @@ const IncentivePolicyPage = () => {
 
               <div className="relative z-10">
                 <div className="flex justify-between items-start">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{rule.title}</h3>
+                  <h3 className="text-lg font-semibold text-text-primary mb-2">{rule.title}</h3>
                   {isAdmin && (
                     <button onClick={() => handleDelete(rule.id)} className="text-red-400 hover:text-red-600 text-sm">Delete</button>
                   )}
                 </div>
-                <p className="text-sm text-gray-600 mb-4">{rule.description}</p>
+                <p className="text-sm text-text-secondary mb-4">{rule.description}</p>
 
                 {rule.rate && (
                   <div className="mb-4">
@@ -130,7 +133,7 @@ const IncentivePolicyPage = () => {
                 )}
 
                 {rule.example && (
-                  <p className="text-xs text-gray-500 italic">Example: {rule.example}</p>
+                  <p className="text-xs text-text-muted italic">Example: {rule.example}</p>
                 )}
               </div>
             </div>

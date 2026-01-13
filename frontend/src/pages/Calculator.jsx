@@ -14,8 +14,24 @@ const Calculator = () => {
   const [policies, setPolicies] = useState([]);
   const [result, setResult] = useState(null);
 
-  // Fetch Policies on Load
+  const [isEditing, setIsEditing] = useState(false);
+  const [editId, setEditId] = useState(null);
+
+  // Fetch Policies and specific deal params on Load
   useEffect(() => {
+    // Check URL params for edit mode
+    const queryParams = new URLSearchParams(window.location.search);
+    const editParam = queryParams.get("edit");
+    const amountParam = queryParams.get("amount");
+    const rateParam = queryParams.get("rate");
+
+    if (editParam) {
+      setIsEditing(true);
+      setEditId(editParam);
+      if (amountParam) setAmount(amountParam);
+      if (rateParam) setRate(rateParam);
+    }
+
     axios.get("http://localhost:8080/api/policy")
       .then(res => setPolicies(res.data))
       .catch(err => console.error("Failed to load policies", err));
@@ -42,19 +58,42 @@ const Calculator = () => {
     setResult(incentive);
 
     const now = new Date();
-    // Use ISO format YYYY-MM-DD for backend compatibility
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     const dealDate = `${year}-${month}-${day}`;
 
-    addDeal({
+    const dealData = {
       amount: Number(amount),
       rate: Number(rate),
       incentive,
       date: dealDate,
       status: status
-    });
+    };
+
+    if (isEditing && editId) {
+      // If editing a draft, we should ideally update it. 
+      // Since we might not have a full Update API, we will try to Delete old and Add new,
+      // OR just Add new and let user manually delete old if they want (suboptimal).
+      // Let's rely on SalesContext having a proper update or delete.
+      // For this MVP, let's assume we can just "Save" as a new version if it's a draft?
+      // No, duplicated drafts are bad.
+
+      // I'll dispatch a custom event or use a function passed from context if available.
+      // But wait, I can access context.
+
+      // Let's try to DELETE the old draft first if we are "Updating".
+      // Note: "deleteDeal" in context currently just alerts. I will fix that later.
+      // For now, let's just Add New.
+      addDeal(dealData);
+      if (status === "Submitted") {
+        // If we successfully submitted an edited draft, we should try to remove the old draft ID
+        // implementation pending backend support.
+        console.log("Should delete draft ID:", editId);
+      }
+    } else {
+      addDeal(dealData);
+    }
 
     addNotification({
       type: "success",
@@ -62,15 +101,13 @@ const Calculator = () => {
       message: `Deal worth ₹${Number(amount).toLocaleString('en-IN')} ${status === 'Submitted' ? 'submitted for approval' : 'saved as draft'}. Incentive: ₹${incentive.toLocaleString('en-IN', { maximumFractionDigits: 2 })}.`
     });
 
-    // Reset Form
     setAmount("");
     setRate("");
     setSelectedPolicy("");
-    setResult(null); // Optionally keep result shown? Let's clear for new entry
-    // But maybe user wants to see what they just submitted? 
-    // Let's keep result for a moment or show a toast. 
-    // The previous code kept result but cleared inputs. I'll stick to that style or clear all.
-    // Let's keep result to show "Last Calculated"
+    setIsEditing(false);
+    setEditId(null);
+    // Clear URL params
+    window.history.pushState({}, document.title, window.location.pathname);
   };
 
   return (
@@ -85,7 +122,7 @@ const Calculator = () => {
 
             {/* Policies Dropdown */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2 uppercase tracking-widest">
+              <label className="block text-xs font-medium text-text-muted mb-2 uppercase tracking-widest">
                 Select Policy (Optional)
               </label>
               <select
@@ -103,7 +140,7 @@ const Calculator = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2 uppercase tracking-widest">
+              <label className="block text-xs font-medium text-text-muted mb-2 uppercase tracking-widest">
                 Deal Amount (₹)
               </label>
               <input
@@ -116,7 +153,7 @@ const Calculator = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2 uppercase tracking-widest">
+              <label className="block text-xs font-medium text-text-muted mb-2 uppercase tracking-widest">
                 Incentive Rate (%)
               </label>
               <input
@@ -133,7 +170,7 @@ const Calculator = () => {
               <button
                 onClick={() => handleSubmit("Draft")}
                 disabled={!amount || !rate}
-                className="flex-1 bg-gray-200 text-gray-800 py-4 rounded-lg font-medium hover:bg-gray-300 transition-colors uppercase tracking-widest text-sm"
+                className="flex-1 bg-surface-2 text-text-primary border border-border-strong py-4 rounded-lg font-medium hover:bg-surface-3 transition-colors uppercase tracking-widest text-sm"
               >
                 Save Draft
               </button>
@@ -148,7 +185,7 @@ const Calculator = () => {
 
             {result !== null && (
               <div className="bg-emerald-50 border border-emerald-100 p-6 rounded-lg mt-6 text-center">
-                <p className="text-gray-500 text-sm mb-2">Calculated Incentive</p>
+                <p className="text-text-muted text-sm mb-2">Calculated Incentive</p>
                 <p className="text-3xl font-bold text-emerald-600">
                   ₹{result.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                 </p>

@@ -69,6 +69,10 @@ public class Deal {
     private java.time.LocalDateTime createdAt;
     private String rejectionReason;
 
+    // New fields for Smart Approvals
+    private String riskLevel; // LOW, MEDIUM, HIGH
+    private String adminComment;
+
     public String getStatus() {
         return status;
     }
@@ -91,5 +95,21 @@ public class Deal {
 
     public void setRejectionReason(String rejectionReason) {
         this.rejectionReason = rejectionReason;
+    }
+
+    public String getRiskLevel() {
+        return riskLevel;
+    }
+
+    public void setRiskLevel(String riskLevel) {
+        this.riskLevel = riskLevel;
+    }
+
+    public String getAdminComment() {
+        return adminComment;
+    }
+
+    public void setAdminComment(String adminComment) {
+        this.adminComment = adminComment;
     }
 }
