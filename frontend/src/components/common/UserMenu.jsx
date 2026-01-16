@@ -21,17 +21,13 @@ const UserMenu = ({ showName = true }) => {
     }, []);
 
     const handleAvatarClick = () => {
+        setIsOpen(!isOpen);
+    };
+
+    const handleProfileClick = () => {
+        setIsOpen(false);
         const role = auth?.user?.role || auth?.role;
         if (role === "ADMIN") {
-            // Admin profile (reuse same page but different data view)
-            // Navigate to Sales Profile? Or Admin Profile?
-            // Since route is /sales/profile, maybe admins don't have one?
-            // User request: "Admin Profile must show...".
-            // So I should map a route for Admin Profile too.
-            // For now, let's assume /sales/profile logic handles generic Profile.
-            // But admin might not have access to /sales/* in `App.jsx`?
-            // App.jsx: Sales routes are sales only.
-            // I need to add /admin/profile route in App.jsx.
             navigate("/admin/profile");
         } else {
             navigate("/sales/profile");
@@ -68,6 +64,16 @@ const UserMenu = ({ showName = true }) => {
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">{auth.name}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">{auth.role}</p>
                     </div>
+
+                    <button
+                        onClick={handleProfileClick}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50 flex items-center space-x-2 transition-colors"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span>My Profile</span>
+                    </button>
 
                     <button
                         onClick={() => {

@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/profile")
-@CrossOrigin(origins = "*")
 public class ProfileController {
 
     private final UserRepository userRepository;

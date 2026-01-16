@@ -1,61 +1,41 @@
 package org.example.salesincentivesystem.controller;
 
-import org.example.salesincentivesystem.entity.IncentivePolicy;
-import org.example.salesincentivesystem.repository.IncentivePolicyRepository;
+import org.example.salesincentivesystem.entity.Policy;
+import org.example.salesincentivesystem.repository.PolicyRepository;
 import org.springframework.web.bind.annotation.*;
-
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/policy")
-@CrossOrigin(origins = "*") // Allow Frontend
+@RequestMapping("/policies")
 public class PolicyController {
 
-    private final IncentivePolicyRepository policyRepository;
-    private final org.example.salesincentivesystem.repository.UserRepository userRepository;
-    private final org.example.salesincentivesystem.repository.NotificationRepository notificationRepository;
+    private final PolicyRepository policyRepository;
 
-    public PolicyController(IncentivePolicyRepository policyRepository,
-                            org.example.salesincentivesystem.repository.UserRepository userRepository,
-                            org.example.salesincentivesystem.repository.NotificationRepository notificationRepository) {
+    public PolicyController(PolicyRepository policyRepository) {
         this.policyRepository = policyRepository;
-        this.userRepository = userRepository;
-        this.notificationRepository = notificationRepository;
     }
 
-    // ✅ GET - Fetch all policies
+    // Public/Sales: Get all active policies
     @GetMapping
-    public List<IncentivePolicy> getPolicies() {
-        return policyRepository.findAllByOrderByDisplayOrderAsc();
+    public List<Policy> getActivePolicies() {
+        return policyRepository.findByIsActiveTrue();
     }
 
-    // ✅ POST - Create/Update Policy (Admin Only)
+    // Admin: Get all (including inactive/drafts)
+    @GetMapping("/admin")
+    public List<Policy> getAllPolicies() {
+        return policyRepository.findAll();
+    }
+
+    // Admin: Create or Update Policy
     @PostMapping
-    public IncentivePolicy savePolicy(@RequestBody IncentivePolicy policy) {
-        // Simple security: In real app, check if User is Admin
-        if (policy.getDisplayOrder() == null) {
-            policy.setDisplayOrder(0);
-        }
-        IncentivePolicy savedPolicy = policyRepository.save(policy);
-
-        // Notify All Sales Users
-        userRepository.findAll().stream()
-            .filter(u -> "SALES".equals(u.getRole()))
-            .forEach(user -> {
-                org.example.salesincentivesystem.entity.Notification n = new org.example.salesincentivesystem.entity.Notification();
-                n.setUser(user);
-                n.setTitle("New Policy Update");
-                n.setMessage("A new incentive policy '" + savedPolicy.getTitle() + "' has been added/updated.");
-                n.setType("ANNOUNCEMENT");
-                n.setTimestamp(java.time.LocalDateTime.now());
-                n.setRead(false);
-                notificationRepository.save(n);
-            });
-
-        return savedPolicy;
+    public Policy savePolicy(@RequestBody Policy policy) {
+        policy.setLastUpdated(LocalDateTime.now());
+        return policyRepository.save(policy);
     }
 
-    // ✅ DELETE - Remove Policy (Admin Only)
+    // Admin: Delete (Soft or Hard)
     @DeleteMapping("/{id}")
     public void deletePolicy(@PathVariable Long id) {
         policyRepository.deleteById(id);

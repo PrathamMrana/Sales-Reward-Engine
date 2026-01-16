@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/performance")
-@CrossOrigin(origins = "http://localhost:5173")
 public class SalesPerformanceController {
 
     private final SalesPerformanceRepository performanceRepository;

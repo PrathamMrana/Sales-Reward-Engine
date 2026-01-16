@@ -2,7 +2,7 @@ import { useSales } from "../../context/SalesContext";
 import { useNotifications } from "../../context/NotificationContext";
 import { useState, useEffect, useRef } from "react";
 
-const GoalTracker = () => {
+const GoalTracker = ({ readOnly = false, compact = false }) => {
   const { monthlyTarget, updateMonthlyTarget, deals } = useSales();
   const { addNotification, notifications } = useNotifications();
   const [isEditing, setIsEditing] = useState(false);
@@ -10,6 +10,7 @@ const GoalTracker = () => {
   const previousPercentage = useRef(0);
   const milestoneNotified = useRef(new Set());
 
+  // ... (calculations remain same)
   const now = new Date();
   const thisMonthDeals = deals.filter(deal => {
     try {
@@ -39,12 +40,10 @@ const GoalTracker = () => {
   // Forecasting Logic
   const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
   const currentDay = now.getDate();
-  // Avoid division by zero, assume at least 1 day passed effectively for projection
   const effectiveDaysString = Math.max(currentDay, 1);
   const dailyAverage = achieved / effectiveDaysString;
   const projected = dailyAverage * daysInMonth;
 
-  // Status Logic
   let status = "On Track";
   const requiredDaily = monthlyTarget / daysInMonth;
 
@@ -56,16 +55,15 @@ const GoalTracker = () => {
     status = "At Risk";
   }
 
-  // Check for milestone achievements
+  // Effect (omitted for brevity, keep existing logic)
   useEffect(() => {
+    // ... same milestone logic
     const milestones = [50, 75, 90, 100];
     const currentMilestone = milestones.find(m => percentage >= m && !milestoneNotified.current.has(m));
 
     if (currentMilestone) {
       milestoneNotified.current.add(currentMilestone);
       const title = currentMilestone === 100 ? "🎉 Target Achieved!" : `Milestone: ${currentMilestone}% Complete`;
-
-      // Prevent duplicate notifications (check history too so we don't re-notify on refresh)
       const alreadyNotified = notifications.some(n => n.title === title);
 
       if (!alreadyNotified) {
@@ -84,14 +82,11 @@ const GoalTracker = () => {
         }
       }
     }
-
-    // Reset milestones if percentage drops (e.g., new month)
     if (percentage < previousPercentage.current) {
       milestoneNotified.current.clear();
     }
-
     previousPercentage.current = percentage;
-  }, [percentage, monthlyTarget, addNotification]);
+  }, [percentage, monthlyTarget, addNotification, notifications]);
 
   const handleSave = () => {
     updateMonthlyTarget(tempTarget);
@@ -99,21 +94,23 @@ const GoalTracker = () => {
   };
 
   return (
-    <div className="card-modern p-6 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary-500/10 to-accent-500/10 rounded-full blur-2xl"></div>
-      <div className="flex items-center justify-between mb-4">
+    <div className={`card-modern ${compact ? 'p-4' : 'p-6'} relative overflow-hidden`}>
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary-500/10 to-accent-500/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div className="flex items-center justify-between mb-4 relative z-10">
         <div>
           <h3 className="text-sm font-semibold bg-gradient-to-r from-primary-700 to-accent-600 bg-clip-text text-transparent mb-1">Monthly Target</h3>
-          <div className="h-0.5 bg-gradient-to-r from-primary-500 to-accent-500 w-16"></div>
+          {!compact && <div className="h-0.5 bg-gradient-to-r from-primary-500 to-accent-500 w-16"></div>}
         </div>
-        {!isEditing ? (
+        {!readOnly && !isEditing && (
           <button
             onClick={() => setIsEditing(true)}
             className="text-xs uppercase tracking-widest text-text-secondary hover:text-text-primary transition-colors"
           >
             Edit
           </button>
-        ) : (
+        )}
+        {/* Editing UI logic same... */}
+        {!readOnly && isEditing && (
           <div className="flex items-center space-x-2">
             <input
               type="number"
@@ -191,4 +188,3 @@ const GoalTracker = () => {
 };
 
 export default GoalTracker;
-

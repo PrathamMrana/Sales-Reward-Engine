@@ -30,31 +30,56 @@ public class PerformanceService {
 
     public PerformanceSummary getPerformanceSummary(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        // Filter deals: must have user, correct ID, and a valid date
-        List<Deal> deals = dealRepository.findAll().stream()
+        // Filter deals: ALL deals for the user (for Totals)
+        List<Deal> allUserDeals = dealRepository.findAll().stream()
                 .filter(d -> d.getUser() != null && d.getUser().getId() != null && d.getUser().getId().equals(userId))
+                .collect(Collectors.toList());
+
+        // Filter deals: Only valid dates (for Graphs)
+        List<Deal> datedDeals = allUserDeals.stream()
                 .filter(d -> d.getDate() != null)
                 .collect(Collectors.toList());
 
         PerformanceSummary summary = new PerformanceSummary();
         summary.setUserId(userId);
         summary.setUserName(user.getName());
-        summary.setTotalDeals(deals.size());
-        long approved = deals.stream().filter(d -> "APPROVED".equalsIgnoreCase(d.getStatus())).count();
-        long rejected = deals.stream().filter(d -> "REJECTED".equalsIgnoreCase(d.getStatus())).count();
+        summary.setTotalDeals(allUserDeals.size());
+
+        // --- Calculate Global Rank ---
+        // 1. Get all deals from repository (or optimized query)
+        List<Deal> allDealsGlobal = dealRepository.findAll();
+        // 2. Group by User ID and sum incentives
+        Map<Long, Double> userIncentives = allDealsGlobal.stream()
+                .filter(d -> d.getUser() != null && "APPROVED".equalsIgnoreCase(d.getStatus()))
+                .collect(Collectors.groupingBy(
+                        d -> d.getUser().getId(),
+                        Collectors.summingDouble(Deal::getIncentive)));
+        // 3. Sort User IDs by incentive descending
+        List<Long> rankedUserIds = userIncentives.entrySet().stream()
+                .sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue())) // Descending
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        // 4. Find current user's rank (1-based index)
+        int rank = rankedUserIds.indexOf(userId) + 1;
+        summary.setRank(rank > 0 ? rank : rankedUserIds.size() + 1); // If no deals, rank last
+
+        // Calculate Totals based on ALL deals
+        long approved = allUserDeals.stream().filter(d -> "APPROVED".equalsIgnoreCase(d.getStatus())).count();
+        long rejected = allUserDeals.stream().filter(d -> "REJECTED".equalsIgnoreCase(d.getStatus())).count();
         summary.setApprovedDeals((int) approved);
         summary.setRejectedDeals((int) rejected);
         summary.setApprovalRate(approved + rejected == 0 ? 0 : (double) approved / (approved + rejected) * 100);
-        double totalIncentive = deals.stream()
+
+        double totalIncentive = allUserDeals.stream()
                 .filter(d -> "APPROVED".equalsIgnoreCase(d.getStatus()))
                 .mapToDouble(Deal::getIncentive).sum();
         summary.setTotalIncentiveEarned(totalIncentive);
-        double avgDeal = deals.isEmpty() ? 0 : deals.stream().mapToDouble(Deal::getAmount).average().orElse(0);
+        double avgDeal = allUserDeals.isEmpty() ? 0
+                : allUserDeals.stream().mapToDouble(Deal::getAmount).average().orElse(0);
         summary.setAverageDealValue(avgDeal);
 
-        // Monthly trend - Group by Deal Date (YYYY-MM)
-        Map<YearMonth, List<Deal>> byMonth = deals.stream()
-                .filter(d -> d.getDate() != null)
+        // Monthly trend - Group by Deal Date (YYYY-MM) using ONLY dated deals
+        Map<YearMonth, List<Deal>> byMonth = datedDeals.stream()
                 .collect(Collectors.groupingBy(d -> YearMonth.from(d.getDate())));
 
         List<MonthlyTrend> trends = new ArrayList<>();
@@ -113,7 +138,14 @@ public class PerformanceService {
                 .orElse(null);
         if (profile != null) {
             summary.setEmployeeCode(profile.getEmployeeCode());
-            summary.setJoiningDate(profile.getJoiningDate() != null ? profile.getJoiningDate().toString() : "N/A");
+            summary.setEmployeeCode(profile.getEmployeeCode());
+            if (profile.getJoiningDate() != null) {
+                java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
+                        .ofPattern("dd MMM yyyy");
+                summary.setJoiningDate(profile.getJoiningDate().format(formatter));
+            } else {
+                summary.setJoiningDate("N/A");
+            }
         } else {
             summary.setEmployeeCode("N/A");
             summary.setJoiningDate("N/A");

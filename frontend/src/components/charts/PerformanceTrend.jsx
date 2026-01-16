@@ -15,7 +15,7 @@ const PerformanceTrend = () => {
         if (isNaN(dealDate.getTime())) {
           const parts = deal.date.split('/');
           if (parts.length === 3) {
-            dealDate = new Date(parts[2], parts[0] - 1, parts[1]);
+            dealDate = new Date(parts[2], parts[1] - 1, parts[0]);
           }
         }
       } else {
@@ -55,12 +55,31 @@ const PerformanceTrend = () => {
   const totalDeals = chartData.reduce((sum, d) => sum + d.deals, 0);
   const avgIncentivePerDeal = totalDeals > 0 ? totalIncentive / totalDeals : 0;
 
+  /* 
+   * FIX: If we only have 1 data point (e.g. current month), a Line Chart shows just a dot.
+   * To show a trend line, we inject a "dummy" previous month with 0 values.
+   * This forces the line to draw from 0 up to the current value.
+   */
+  if (chartData.length === 1) {
+    const singleMonth = chartData[0];
+    // Calculate previous month strictly for display
+    const [year, month] = singleMonth.monthKey.split('-').map(Number);
+    const prevDate = new Date(year, month - 2, 1); // JS months are 0-indexed, so -2 gives prev month
+
+    chartData.unshift({
+      monthKey: `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`,
+      month: prevDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+      deals: 0,
+      incentive: 0
+    });
+  }
+
   const highestMonth = chartData.reduce((max, current) =>
     current.incentive > (max?.incentive || 0) ? current : max, null
   );
 
-  // Use bar chart for low data (≤2 points), line chart for trends (3+ points)
-  const useBarChart = chartData.length <= 2;
+  // Always use Line Chart (we now ensure at least 2 points exist)
+  const useBarChart = false;
 
   // Custom Tooltip for dark mode support
   const CustomTooltip = ({ active, payload, label }) => {

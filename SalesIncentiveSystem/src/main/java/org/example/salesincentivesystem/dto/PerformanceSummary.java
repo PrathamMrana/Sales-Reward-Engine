@@ -20,6 +20,7 @@ public class PerformanceSummary {
     private String nextTier;
     private double progressToNextTier;
     private String bestMonth;
+    private Integer rank;
 
     private List<MonthlyTrend> monthlyTrend;
 
@@ -207,5 +208,13 @@ public class PerformanceSummary {
 
     public void setMonthlyTrend(List<MonthlyTrend> monthlyTrend) {
         this.monthlyTrend = monthlyTrend;
+    }
+
+    public Integer getRank() {
+        return rank;
+    }
+
+    public void setRank(Integer rank) {
+        this.rank = rank;
     }
 }

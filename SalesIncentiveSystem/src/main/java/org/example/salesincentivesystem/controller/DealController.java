@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.example.salesincentivesystem.entity.Deal;
 import org.example.salesincentivesystem.repository.DealRepository;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/deals")
-@CrossOrigin(origins = "*")
 public class DealController {
 
     private final DealRepository dealRepository;
@@ -23,17 +21,20 @@ public class DealController {
     private final org.example.salesincentivesystem.repository.NotificationRepository notificationRepository;
     private final org.example.salesincentivesystem.service.AuditLogService auditLogService;
     private final org.example.salesincentivesystem.service.RiskAssessmentService riskAssessmentService;
+    private final org.example.salesincentivesystem.service.RuleEvaluatorService ruleEvaluatorService;
 
     public DealController(DealRepository dealRepository,
             org.example.salesincentivesystem.repository.UserRepository userRepository,
             org.example.salesincentivesystem.repository.NotificationRepository notificationRepository,
             org.example.salesincentivesystem.service.AuditLogService auditLogService,
-            org.example.salesincentivesystem.service.RiskAssessmentService riskAssessmentService) {
+            org.example.salesincentivesystem.service.RiskAssessmentService riskAssessmentService,
+            org.example.salesincentivesystem.service.RuleEvaluatorService ruleEvaluatorService) {
         this.dealRepository = dealRepository;
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository;
         this.auditLogService = auditLogService;
         this.riskAssessmentService = riskAssessmentService;
+        this.ruleEvaluatorService = ruleEvaluatorService;
     }
 
     // ✅ POST - create deal
@@ -85,6 +86,9 @@ public class DealController {
 
         Deal savedDeal = dealRepository.save(deal);
 
+        // Evaluate Rules
+        ruleEvaluatorService.evaluate(savedDeal);
+
         // Notify Admins
         String finalUserName = userName; // effective final for stream
         userRepository.findAll().stream()
@@ -94,7 +98,7 @@ public class DealController {
                     n.setUser(admin);
                     n.setTitle("New Deal Submitted (" + savedDeal.getRiskLevel() + " Risk)");
                     n.setMessage("Sales Exec " + finalUserName + " submitted a deal of ₹" + savedDeal.getAmount());
-                    n.setType("ALERT");
+                    n.setType("INFO"); // Changed to INFO to avoid confusion with Alerts
                     n.setTimestamp(java.time.LocalDateTime.now());
                     notificationRepository.save(n);
                 });

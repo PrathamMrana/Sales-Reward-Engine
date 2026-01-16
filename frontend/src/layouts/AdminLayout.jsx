@@ -1,35 +1,41 @@
-import Navbar from "../components/common/Navbar";
+import Sidebar from "../components/common/Sidebar";
 import AppIcon from "../components/common/AppIcon";
 import NotificationPanel from "../components/common/NotificationPanel";
 import UserMenu from "../components/common/UserMenu";
 
 const AdminLayout = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* App Name at Top */}
-      <div className="w-full border-b-2 border-primary-200 bg-gradient-to-r from-white via-blue-50/30 to-indigo-50/30 py-4 px-8 shadow-sm">
+    <div className="min-h-screen bg-surface-1 flex flex-col">
+      {/* Top Header */}
+      <div className="w-full border-b border-border-subtle bg-surface-2 py-3 px-6 shadow-sm z-30 relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <AppIcon size="w-12 h-12" />
-            <h1 className="font-semibold text-lg uppercase tracking-widest" style={{
-              background: 'linear-gradient(to right, #1e40af, #0d9488)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}>
+            <div className="bg-gradient-to-br from-primary-500 to-indigo-600 text-white p-2 rounded-lg shadow-lg shadow-primary-500/30">
+              <AppIcon size="w-6 h-6" />
+            </div>
+            <h1 className="font-bold text-lg tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
               Sales Reward Engine
             </h1>
           </div>
           <div className="flex items-center space-x-4">
             <NotificationPanel />
-            <div className="h-6 w-px bg-primary-300/50"></div>
-            <UserMenu showName={false} />
+            <div className="h-6 w-px bg-border-subtle"></div>
+            <UserMenu />
           </div>
         </div>
       </div>
 
-      <Navbar />
-      <div className="flex-1 p-6">{children}</div>
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Sidebar */}
+        <Sidebar />
+
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-y-auto relative z-10 p-6 scroll-smooth">
+          <div className="max-w-7xl mx-auto pb-20">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 };

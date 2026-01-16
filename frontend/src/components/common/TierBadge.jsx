@@ -1,6 +1,6 @@
 import React from 'react';
 
-const TierBadge = ({ totalIncentive }) => {
+const TierBadge = ({ totalIncentive, rank }) => {
     let tier = "Bronze";
     let color = "from-amber-700 to-amber-900"; // Bronze
     let nextThreshold = 50000;
@@ -25,6 +25,11 @@ const TierBadge = ({ totalIncentive }) => {
 
     return (
         <div className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${color} p-4 shadow-lg text-white w-full h-full min-h-[140px] flex flex-col justify-between`}>
+            {rank && (
+                <div className="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-bl-lg shadow-md z-20">
+                    #{rank} GLOBAL
+                </div>
+            )}
             <div className="flex justify-between items-start z-10 relative">
                 <div>
                     <p className="text-[10px] uppercase tracking-widest opacity-80 font-semibold">Club Status</p>

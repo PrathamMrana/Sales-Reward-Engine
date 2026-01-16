@@ -105,6 +105,25 @@ public class Deal {
         this.riskLevel = riskLevel;
     }
 
+    private String payoutStatus = "PENDING"; // PENDING, PROCESSING, PAID
+    private java.time.LocalDate payoutDate;
+
+    public String getPayoutStatus() {
+        return payoutStatus;
+    }
+
+    public void setPayoutStatus(String payoutStatus) {
+        this.payoutStatus = payoutStatus;
+    }
+
+    public java.time.LocalDate getPayoutDate() {
+        return payoutDate;
+    }
+
+    public void setPayoutDate(java.time.LocalDate payoutDate) {
+        this.payoutDate = payoutDate;
+    }
+
     public String getAdminComment() {
         return adminComment;
     }

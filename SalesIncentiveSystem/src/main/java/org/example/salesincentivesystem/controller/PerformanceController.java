@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin/performance")
-@CrossOrigin(origins = "*")
 public class PerformanceController {
 
     private final PerformanceService performanceService;

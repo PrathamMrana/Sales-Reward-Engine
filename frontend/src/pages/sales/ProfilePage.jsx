@@ -59,6 +59,12 @@ const ProfilePage = () => {
             <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-green-500 border-4 border-slate-900 flex items-center justify-center">
               <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
             </div>
+            {/* Rank Badge */}
+            {profileData.rank && (
+              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg border-2 border-slate-900 transform rotate-12 z-20">
+                #{profileData.rank} Global
+              </div>
+            )}
           </div>
 
           {/* Basic Info */}
@@ -81,7 +87,7 @@ const ProfilePage = () => {
           {isSales && (
             <div className="flex gap-8 border-t md:border-t-0 md:border-l border-white/10 pt-6 md:pt-0 md:pl-10">
               <div className="text-center">
-                <p className="text-white/50 text-xs font-bold uppercase tracking-widest mb-1">Total Earned</p>
+                <p className="text-white/50 text-xs font-bold uppercase tracking-widest mb-1">Lifetime Incentive Earned</p>
                 <p className="text-2xl md:text-3xl font-bold text-white">
                   ₹{profileData.totalIncentiveEarned.toLocaleString('en-IN', { notation: 'compact' })}
                 </p>
@@ -112,8 +118,9 @@ const ProfilePage = () => {
             </div>
             <div className="p-6 space-y-6">
               <DetailRow label="Employee ID" value={profileData.employeeCode} icon="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0c0 .667.333 1 1 1v1m0 0v1m0-1h3m-3 0H7" />
-              <DetailRow label="Joined Team" value={profileData.joiningDate} icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              <DetailRow label="Role" value={profileData.role} icon="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <DetailRow label="Date Joined" value={profileData.joiningDate} icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <DetailRow label="Global Rank" value={`#${profileData.rank || "N/A"}`} icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <DetailRow label="Current Incentive Tier" value={profileData.currentTier + " Tier"} icon="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </div>
           </div>
 
@@ -158,7 +165,7 @@ const ProfilePage = () => {
             <>
               {/* Tier Badge Integration */}
               <div className="transform hover:-translate-y-1 transition-transform duration-300">
-                <TierBadge totalIncentive={profileData.totalIncentiveEarned} />
+                <TierBadge totalIncentive={profileData.totalIncentiveEarned} rank={profileData.rank} />
               </div>
 
               {/* Performance Metrics Grid */}

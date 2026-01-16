@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/simulation")
-@CrossOrigin(origins = "*")
 public class SimulationController {
 
     private final DealRepository dealRepository;
