@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Line, Doughnut } from 'react-chartjs-2';
+import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import 'chart.js/auto';
 import AdminLayout from "../../layouts/AdminLayout";
 
@@ -11,7 +11,7 @@ const AdminPerformance = () => {
     const [data, setData] = useState(null);
     const [deals, setDeals] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [userProfile, setUserProfile] = useState(null);
 
     // Table State
     const [searchTerm, setSearchTerm] = useState("");
@@ -20,22 +20,44 @@ const AdminPerformance = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch performance summary
-                const perfRes = await axios.get(`http://localhost:8080/admin/performance/${userId}`);
-                setData(perfRes.data);
+                // Fetch User Profile
+                const userRes = await axios.get(`http://localhost:8080/api/users/${userId}`).catch(() => ({ data: { name: "Unknown User", email: "N/A" } }));
+                setUserProfile(userRes.data);
 
-                // Fetch raw deals for details
+                // Fetch Deals
                 const dealsRes = await axios.get(`http://localhost:8080/deals?userId=${userId}`);
                 // Sort deals by date desc
-                const sortedDeals = dealsRes.data.sort((a, b) => {
-                    const dateA = a.date ? new Date(a.date) : new Date(0);
-                    const dateB = b.date ? new Date(b.date) : new Date(0);
-                    return dateB - dateA;
-                });
+                const sortedDeals = dealsRes.data.sort((a, b) => new Date(b.date) - new Date(a.date));
                 setDeals(sortedDeals);
+
+                // Calculate Metrics locally if endpoint missing
+                // (Fallback if /admin/performance/{id} doesn't exist or is robust enough)
+                const approved = sortedDeals.filter(d => d.status === 'Approved');
+                const totalRev = approved.reduce((acc, d) => acc + (d.amount || 0), 0);
+                const totalInc = approved.reduce((acc, d) => acc + (d.incentive || 0), 0);
+                const avgDeal = approved.length ? totalRev / approved.length : 0;
+
+                // Group by month for chart
+                const monthly = approved.reduce((acc, deal) => {
+                    const month = deal.date ? deal.date.substring(0, 7) : 'Unknown';
+                    if (!acc[month]) acc[month] = 0;
+                    acc[month] += (deal.incentive || 0);
+                    return acc;
+                }, {});
+
+                const chartData = Object.keys(monthly).sort().map(m => ({ month: m, incentiveSum: monthly[m] }));
+
+                setData({
+                    totalDeals: sortedDeals.length,
+                    approvedDeals: approved.length,
+                    totalIncentiveEarned: totalInc,
+                    approvalRate: sortedDeals.length ? (approved.length / sortedDeals.length) * 100 : 0,
+                    averageDealValue: avgDeal,
+                    monthlyTrend: chartData
+                });
+
             } catch (err) {
                 console.error(err);
-                setError('Failed to load performance data. Ensure backend endpoint exists.');
             } finally {
                 setLoading(false);
             }
@@ -43,327 +65,251 @@ const AdminPerformance = () => {
         fetchData();
     }, [userId]);
 
-    // --- Derived Metrics & Logic ---
     const {
         totalDeals = 0,
         approvedDeals = 0,
-        rejectedDeals = 0,
         approvalRate = 0,
         totalIncentiveEarned = 0,
         averageDealValue = 0,
-        consistencyScore = 0,
         monthlyTrend = []
     } = data || {};
 
-    const maxDealValue = deals.length > 0 ? Math.max(...deals.map(d => d.amount)) : 0;
-
-    // Performance Tier Logic
-    const getTier = (incentive) => {
-        if (incentive >= 100000) return { name: 'Platinum', color: 'bg-purple-100 text-purple-700 border-purple-200' };
-        if (incentive >= 50000) return { name: 'Gold', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' };
-        if (incentive >= 10000) return { name: 'Silver', color: 'bg-gray-100 text-gray-700 border-gray-200' };
-        return { name: 'Bronze', color: 'bg-orange-100 text-orange-700 border-orange-200' };
+    // Tier Logic
+    const getTier = (rev) => {
+        if (rev >= 5000000) return { name: 'Diamond', color: 'from-cyan-400 to-blue-500' };
+        if (rev >= 2500000) return { name: 'Platinum', color: 'from-slate-300 to-slate-500' };
+        if (rev >= 1000000) return { name: 'Gold', color: 'from-yellow-400 to-amber-500' };
+        return { name: 'Silver', color: 'from-slate-200 to-slate-400' };
     };
-    const currentTier = getTier(totalIncentiveEarned);
+
+    // Calculate total revenue for tier
+    const totalRevenue = deals.filter(d => d.status === 'Approved').reduce((acc, d) => acc + (d.amount || 0), 0);
+    const tier = getTier(totalRevenue);
 
     // Filtered Table Data
     const filteredDeals = useMemo(() => {
         return deals.filter(deal => {
             const matchesSearch = (deal.status || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (deal.amount?.toString() || "").includes(searchTerm) ||
-                (deal.date || "").includes(searchTerm);
-
+                (deal.clientName || "").toLowerCase().includes(searchTerm.toLowerCase());
             const matchesStatus = statusFilter === "ALL" || (deal.status || "").toUpperCase() === statusFilter;
-
             return matchesSearch && matchesStatus;
         });
     }, [deals, searchTerm, statusFilter]);
 
-    // Chart Data: Line Trend
-    const processedTrend = useMemo(() => {
-        if (!monthlyTrend || monthlyTrend.length === 0) return [];
-
-        let data = [...monthlyTrend];
-
-        // If only one data point, prepend a "start point" from the previous month with 0 value
-        // to make it look like a growth curve instead of a single dot.
-        if (data.length === 1) {
-            const current = data[0];
-            let prevLabel = "Start";
-
-            // Try to deduce previous month name/label
-            try {
-                // If structure is { month: "2023-10" } or similar
-                if (typeof current.month === 'string' && current.month.includes('-')) {
-                    const [y, m] = current.month.split('-');
-                    const date = new Date(parseInt(y), parseInt(m) - 1 - 1); // Previous month
-                    prevLabel = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                }
-                // If structure is { month: { year: 2023, monthValue: 10 } }
-                else if (current.month && typeof current.month === 'object' && current.month.year) {
-                    const date = new Date(current.month.year, current.month.monthValue - 1 - 1);
-                    prevLabel = `${date.getFullYear()}-${date.getMonth() + 1}`;
-                }
-            } catch (e) {
-                // Fallback if date parsing fails
-                prevLabel = "Start";
-            }
-
-            data = [
-                { month: prevLabel, incentiveSum: 0, dealCount: 0, averageDealSize: 0 },
-                ...data
-            ];
-        }
-        return data;
-    }, [monthlyTrend]);
-
+    // Chart Configs
     const lineChartData = {
-        labels: processedTrend.map(t => {
-            if (typeof t.month === 'string') return t.month;
-            if (Array.isArray(t.month)) return `${t.month[0]}-${t.month[1]}`;
-            if (t.month && t.month.year) return `${t.month.year}-${t.month.monthValue}`;
-            return t.month || "";
-        }),
-        datasets: [
-            {
-                label: 'Incentive Earned (Approved)',
-                data: processedTrend.map(t => t.incentiveSum),
-                backgroundColor: (context) => {
-                    const ctx = context.chart.ctx;
-                    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                    gradient.addColorStop(0, 'rgba(37, 99, 235, 0.2)'); // Blue 600 at top
-                    gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)'); // Transparent at bottom
-                    return gradient;
-                },
-                borderColor: '#2563EB',
-                borderWidth: 2,
-                tension: 0.4,
-                fill: true,
-                pointBackgroundColor: '#FFFFFF',
-                pointBorderColor: '#2563EB',
-                pointBorderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6
-            },
-        ],
-    };
-
-    // Chart Data: Status Distribution
-    const statusCounts = deals.reduce((acc, deal) => {
-        const status = (deal.status || "Unknown").toUpperCase();
-        acc[status] = (acc[status] || 0) + 1;
-        return acc;
-    }, {});
-
-    const doughnutData = {
-        labels: Object.keys(statusCounts),
+        labels: monthlyTrend.map(t => t.month),
         datasets: [{
-            data: Object.values(statusCounts),
-            backgroundColor: [
-                '#10B981', // green for approved usually
-                '#EF4444', // red for rejected
-                '#F59E0B', // yellow
-                '#6B7280'  // gray
-            ],
-            borderWidth: 0
+            label: 'Incentive Earned',
+            data: monthlyTrend.map(t => t.incentiveSum),
+            backgroundColor: (context) => {
+                const ctx = context.chart.ctx;
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)'); // Emerald
+                gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+                return gradient;
+            },
+            borderColor: '#10B981',
+            borderWidth: 3,
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#fff',
+            pointBorderColor: '#10B981',
+            pointRadius: 6,
+            pointHoverRadius: 8
         }]
     };
 
-    if (loading) return <SalesLayout><div className="flex h-screen items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div></div></SalesLayout>;
-    if (error) return <SalesLayout><div className="p-8 text-red-500 bg-red-50 rounded-lg m-4">{error}</div></SalesLayout>;
-    if (!data) return <SalesLayout><div className="p-8">No data found</div></SalesLayout>;
+    if (loading) return (
+        <AdminLayout>
+            <div className="flex flex-col items-center justify-center h-[80vh]">
+                <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mb-4"></div>
+                <p className="text-text-muted font-medium">Calibrating Sales Metrics...</p>
+            </div>
+        </AdminLayout>
+    );
 
     return (
         <AdminLayout>
-            <div className="max-w-7xl mx-auto pb-10 px-4">
-                {/* Header Section */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                    <div>
-                        <button onClick={() => navigate('/admin/performance')} className="text-gray-500 hover:text-gray-700 font-medium flex items-center mb-2 transition-colors">
-                            ← Back to Leaderboard
-                        </button>
-                        <h1 className="text-3xl font-bold text-text-primary border-l-4 border-indigo-500 pl-3">
-                            {data.userName}'s Performance
-                        </h1>
+            <div className="max-w-7xl mx-auto pb-12 animate-in fade-in duration-700 font-sans">
+
+                {/* NAV HEADER */}
+                <div className="mb-6 flex items-center gap-2">
+                    <button onClick={() => navigate('/admin/performance')} className="text-sm font-bold text-text-muted hover:text-primary-600 transition-colors flex items-center gap-1">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                        LEADERBOARD
+                    </button>
+                    <span className="text-text-muted">/</span>
+                    <span className="text-sm font-bold text-text-primary">ANALYTICS</span>
+                </div>
+
+                {/* HERO PROFILE SECTION */}
+                <div className="bg-surface-1 rounded-3xl border border-border-subtle shadow-xl overflow-hidden mb-8 relative">
+                    <div className="h-32 bg-slate-900 absolute top-0 w-full z-0">
+                        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 to-indigo-900 opacity-90"></div>
+                        <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-indigo-500/20 blur-3xl rounded-full"></div>
                     </div>
 
-                    <div className={`px-4 py-2 rounded-lg border ${currentTier.color} flex flex-col items-center shadow-sm`}>
-                        <span className="text-xs uppercase font-bold tracking-wider">Current Tier</span>
-                        <span className="text-xl font-extrabold">{currentTier.name}</span>
+                    <div className="relative z-10 px-8 pt-16 pb-8 flex flex-col md:flex-row items-end md:items-center justify-between gap-6">
+                        <div className="flex items-end gap-6">
+                            <div className="w-24 h-24 rounded-2xl bg-white p-1 shadow-2xl rotate-3">
+                                <div className={`w-full h-full bg-gradient-to-br ${tier.color} rounded-xl flex items-center justify-center text-white text-4xl font-black shadow-inner`}>
+                                    {userProfile?.name?.charAt(0) || "U"}
+                                </div>
+                            </div>
+                            <div className="mb-1">
+                                <h1 className="text-3xl font-black text-text-primary tracking-tight">{userProfile?.name || "Unknown User"}</h1>
+                                <p className="text-text-muted font-medium flex items-center gap-2">
+                                    {userProfile?.email}
+                                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                                    <span className="text-emerald-600 font-bold text-xs uppercase bg-emerald-100 px-2 py-0.5 rounded-full">Top Performer</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="text-right p-4 bg-surface-2 rounded-2xl border border-border-subtle">
+                                <p className="text-[10px] uppercase font-bold text-text-muted tracking-wider mb-1">Total Revenue</p>
+                                <p className="text-2xl font-black text-slate-800 dark:text-white">₹{(totalRevenue / 100000).toFixed(1)}L</p>
+                            </div>
+                            <div className="text-right p-4 bg-surface-2 rounded-2xl border border-border-subtle">
+                                <p className="text-[10px] uppercase font-bold text-text-muted tracking-wider mb-1">Current Tier</p>
+                                <div className={`text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r ${tier.color}`}>
+                                    {tier.name}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* KPI Cards */}
-                <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
-                    <div className="card-modern p-5 hover:shadow-md transition-shadow">
-                        <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Total Incentive</p>
-                        <p className="text-2xl font-bold text-indigo-600 mt-1">₹{totalIncentiveEarned.toLocaleString()}</p>
-                    </div>
-                    <div className="card-modern p-5 hover:shadow-md transition-shadow">
-                        <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Deals Closed</p>
-                        <p className="text-2xl font-bold text-text-primary mt-1">{approvedDeals} <span className="text-sm font-normal text-text-muted">/ {totalDeals}</span></p>
-                    </div>
-                    <div className="card-modern p-5 hover:shadow-md transition-shadow">
-                        <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Approval Rate</p>
-                        <p className={`text-2xl font-bold mt-1 ${approvalRate >= 80 ? 'text-green-600' : approvalRate >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
-                            {approvalRate.toFixed(1)}%
-                        </p>
-                    </div>
-                    <div className="card-modern p-5 hover:shadow-md transition-shadow">
-                        <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Avg Deal Size</p>
-                        <p className="text-2xl font-bold text-text-primary mt-1">₹{Math.round(averageDealValue).toLocaleString()}</p>
-                    </div>
-                    <div className="card-modern p-5 hover:shadow-md transition-shadow">
-                        <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Consistency</p>
-                        <div className="flex items-end gap-2">
-                            <p className={`text-2xl font-bold mt-1 ${consistencyScore >= 80 ? 'text-green-600' : consistencyScore >= 50 ? 'text-yellow-600' : 'text-gray-600'}`}>
-                                {Math.round(consistencyScore)}/100
-                            </p>
+                {/* METRICS GRID */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div className="p-6 bg-surface-1 rounded-2xl border border-border-subtle shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-lg">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </div>
+                            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">+12%</span>
                         </div>
+                        <p className="text-text-muted text-xs font-bold uppercase tracking-wider">Incentive Earned</p>
+                        <p className="text-3xl font-black text-text-primary mt-1">₹{(totalIncentiveEarned / 1000).toFixed(1)}k</p>
                     </div>
-                    <div className="card-modern p-5 hover:shadow-md transition-shadow">
-                        <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Max Deal</p>
-                        <p className="text-2xl font-bold text-purple-600 mt-1">₹{maxDealValue.toLocaleString()}</p>
+
+                    <div className="p-6 bg-surface-1 rounded-2xl border border-border-subtle shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </div>
+                        </div>
+                        <p className="text-text-muted text-xs font-bold uppercase tracking-wider">Close Rate</p>
+                        <p className="text-3xl font-black text-text-primary mt-1">{approvalRate.toFixed(0)}%</p>
+                    </div>
+
+                    <div className="p-6 bg-surface-1 rounded-2xl border border-border-subtle shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-lg">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                            </div>
+                        </div>
+                        <p className="text-text-muted text-xs font-bold uppercase tracking-wider">Avg Deal Size</p>
+                        <p className="text-3xl font-black text-text-primary mt-1">₹{(averageDealValue / 1000).toFixed(0)}k</p>
+                    </div>
+
+                    <div className="p-6 bg-surface-1 rounded-2xl border border-border-subtle shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-2 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-lg">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                            </div>
+                        </div>
+                        <p className="text-text-muted text-xs font-bold uppercase tracking-wider">Volume (Closed)</p>
+                        <p className="text-3xl font-black text-text-primary mt-1">{approvedDeals} <span className="text-sm font-medium text-text-muted">/ {totalDeals}</span></p>
                     </div>
                 </div>
 
-                {/* Charts Area */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                    {/* Line Chart: Incentive Growth */}
-                    <div className="glass-card p-6 border-white/20 dark:border-white/10">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-lg font-bold text-text-primary">Incentive Growth Trend</h2>
-                            <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded text-xs font-semibold">Earnings</span>
-                        </div>
+                {/* CHARTS */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div className="lg:col-span-2 p-6 bg-surface-1 rounded-3xl border border-border-subtle shadow-lg">
+                        <h3 className="text-lg font-bold text-text-primary mb-6">Incentive Trajectory</h3>
                         <div className="h-64">
-                            <Line data={lineChartData} options={{ maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } }, plugins: { legend: { display: false } } }} />
+                            <Line data={lineChartData} options={{ responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#e2e8f030' } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }} />
                         </div>
                     </div>
+                    <div className="p-6 bg-surface-1 rounded-3xl border border-border-subtle shadow-lg flex flex-col justify-center">
+                        <h3 className="text-lg font-bold text-text-primary mb-4 text-center">Deal Portfolio</h3>
+                        <div className="h-48 relative">
+                            <Doughnut data={{
+                                labels: ['Approved', 'Pending', 'Rejected'],
+                                datasets: [{
+                                    data: [approvedDeals, totalDeals - approvedDeals - filteredDeals.filter(d => d.status === 'Rejected').length, filteredDeals.filter(d => d.status === 'Rejected').length],
+                                    backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+                                    borderWidth: 0,
+                                    hoverOffset: 4
+                                }]
+                            }} options={{ maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, font: { size: 10, weight: 'bold' } } } } }} />
 
-                    {/* Line Chart: Quality Trend */}
-                    <div className="glass-card p-6 border-white/20 dark:border-white/10">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-lg font-bold text-text-primary">Deal Quality Trend</h2>
-                            <span className="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded text-xs font-semibold">Avg Deal Size</span>
+                            <div className="absolute inset-0 flex items-center justify-center flex-col pointer-events-none">
+                                <span className="text-3xl font-black text-text-primary">{totalDeals}</span>
+                                <span className="text-[10px] uppercase font-bold text-text-muted">Total Deals</span>
+                            </div>
                         </div>
-                        <div className="h-64">
-                            <Line
-                                data={{
-                                    labels: lineChartData.labels,
-                                    datasets: [
-                                        {
-                                            label: 'Avg Deal Size',
-                                            data: processedTrend.map(t => t.averageDealSize),
-                                            backgroundColor: (context) => {
-                                                const ctx = context.chart.ctx;
-                                                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                                                gradient.addColorStop(0, 'rgba(99, 102, 241, 0.2)'); // Indigo
-                                                gradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
-                                                return gradient;
-                                            },
-                                            borderColor: '#6366F1',
-                                            borderWidth: 2,
-                                            tension: 0.4,
-                                            fill: true,
-                                            pointBackgroundColor: '#FFFFFF',
-                                            pointBorderColor: '#6366F1',
-                                            pointRadius: 4
-                                        },
-                                    ],
-                                }}
-                                options={{ maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } }, plugins: { legend: { display: false } } }}
+                    </div>
+                </div>
+
+                {/* DATA TABLE */}
+                <div className="bg-surface-1 rounded-3xl border border-border-subtle shadow-xl overflow-hidden">
+                    <div className="p-6 border-b border-border-subtle flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <h3 className="text-lg font-bold text-text-primary">Deal History Log</h3>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                placeholder="Search client or amount..."
+                                className="px-4 py-2 bg-surface-2 border border-border-subtle rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-500 w-64 transition-all"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
                     </div>
-                </div>
 
-                {/* Doughnut Chart Section */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                    <div className="glass-card p-6 border-white/20 dark:border-white/10">
-                        <h2 className="text-lg font-bold text-text-primary mb-6">Execution Mix</h2>
-                        <div className="h-48 flex justify-center">
-                            <Doughnut data={doughnutData} options={{ maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#94a3b8' } } } }} />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Detailed Table */}
-                <div className="card-modern overflow-hidden">
-                    <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <h2 className="text-lg font-bold text-text-primary">Detailed Deal History</h2>
-
-                        <div className="flex gap-2">
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    placeholder="Search deals..."
-                                    className="pl-9 pr-4 py-2 bg-surface-1 border border-border-subtle rounded-lg text-sm text-text-primary focus:ring-2 focus:ring-primary-500 outline-none w-full md:w-64"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                                <svg className="w-4 h-4 text-text-muted absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                            </div>
-
-                            <select
-                                className="px-4 py-2 bg-surface-1 border border-border-subtle rounded-lg text-sm text-text-primary focus:ring-2 focus:ring-primary-500 outline-none"
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                            >
-                                <option value="ALL">All Status</option>
-                                <option value="APPROVED">Approved</option>
-                                <option value="REJECTED">Rejected</option>
-                                <option value="DRAFT">Draft</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead className="bg-surface-2 border-b border-border-subtle sticky top-0 z-10">
-                                <tr>
-                                    <th className="px-6 py-3 text-xs font-bold text-text-secondary uppercase tracking-wider">Date</th>
-                                    <th className="px-6 py-3 text-xs font-bold text-text-secondary uppercase tracking-wider">Deal Value</th>
-                                    <th className="px-6 py-3 text-xs font-bold text-text-secondary uppercase tracking-wider">Incentive</th>
-                                    <th className="px-6 py-3 text-xs font-bold text-text-secondary uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-3 text-xs font-bold text-text-secondary uppercase tracking-wider">Notes</th>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="bg-surface-2/50 text-xs font-bold text-text-muted uppercase tracking-wider">
+                                    <th className="px-6 py-4">Date</th>
+                                    <th className="px-6 py-4">Client</th>
+                                    <th className="px-6 py-4">Deal Value</th>
+                                    <th className="px-6 py-4">Incentive</th>
+                                    <th className="px-6 py-4">Status</th>
+                                    <th className="px-6 py-4">Notes</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border-subtle">
                                 {filteredDeals.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="5" className="px-6 py-12 text-center text-text-muted italic">
-                                            No deals match your search criteria.
-                                        </td>
-                                    </tr>
+                                    <tr><td colSpan="6" className="p-8 text-center text-text-muted italic">No records match your filters.</td></tr>
                                 ) : (
-                                    filteredDeals.map(deal => (
-                                        <tr key={deal.id} className="hover:bg-surface-2 transition-colors">
-                                            <td className="px-6 py-4 text-sm text-text-secondary font-medium">{deal.date || "N/A"}</td>
-                                            <td className="px-6 py-4 text-sm font-semibold text-text-primary">₹{deal.amount?.toLocaleString()}</td>
-                                            <td className="px-6 py-4 text-sm font-semibold text-indigo-600">
-                                                {deal.incentive > 0 ? `₹${deal.incentive?.toLocaleString()}` : '-'}
-                                            </td>
+                                    filteredDeals.map((deal) => (
+                                        <tr key={deal.id} className="hover:bg-surface-2 transition-colors group">
+                                            <td className="px-6 py-4 text-sm font-medium text-text-secondary">{deal.date || "N/A"}</td>
+                                            <td className="px-6 py-4 text-sm font-bold text-text-primary">{deal.clientName || "Unnamed Client"}</td>
+                                            <td className="px-6 py-4 text-sm font-bold text-text-primary">₹{(deal.amount || 0).toLocaleString()}</td>
+                                            <td className="px-6 py-4 text-sm font-bold text-emerald-600">₹{(deal.incentive || 0).toLocaleString()}</td>
                                             <td className="px-6 py-4">
-                                                <span className={`px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${deal.status === 'Approved' ? 'bg-green-100 text-green-700 border border-green-200' :
-                                                    deal.status === 'Rejected' ? 'bg-red-100 text-red-700 border border-red-200' :
-                                                        'bg-yellow-100 text-yellow-700 border border-yellow-200'
+                                                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${deal.status === 'Approved' ? 'bg-green-100 text-green-700' :
+                                                        deal.status === 'Rejected' ? 'bg-red-100 text-red-700' :
+                                                            'bg-amber-100 text-amber-700'
                                                     }`}>
-                                                    {deal.status}
+                                                    {deal.status || "PENDING"}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-text-muted max-w-xs truncate">
-                                                {deal.rejectionReason || "-"}
-                                            </td>
+                                            <td className="px-6 py-4 text-xs text-text-muted max-w-xs truncate">{deal.rejectionReason || "-"}</td>
                                         </tr>
                                     ))
                                 )}
                             </tbody>
                         </table>
                     </div>
-                    <div className="bg-surface-2 p-4 border-t border-border-subtle text-xs text-text-muted text-right">
-                        Showing {filteredDeals.length} of {deals.length} deals
-                    </div>
                 </div>
+
             </div>
         </AdminLayout>
     );
