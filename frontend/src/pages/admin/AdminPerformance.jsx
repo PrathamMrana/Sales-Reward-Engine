@@ -12,9 +12,12 @@ const AdminPerformance = () => {
     const [deals, setDeals] = useState([]);
     const [loading, setLoading] = useState(true);
     const [userProfile, setUserProfile] = useState(null);
+    const [debugLog, setDebugLog] = useState([]);
 
     // Filter State
     const [searchTerm, setSearchTerm] = useState("");
+
+    const addLog = (msg) => setDebugLog(prev => [...prev, msg]);
 
     // --- Helper for Date Ranges ---
     const getLast6MonthsLabels = () => {
@@ -32,21 +35,49 @@ const AdminPerformance = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // 1. Fetch User Profile
-                const userRes = await axios.get(`http://localhost:8080/api/users/${userId}`)
-                    .catch(() => ({ data: { name: "Sales Executive", email: "N/A" } }));
-                setUserProfile(userRes.data);
+                addLog(`Starting fetch for userId: ${userId}`);
+
+                // 1. Fetch User Profile (Strategy: Specific -> All -> Deal-embedded)
+                let userObj = { name: "Loading...", email: "..." };
+                try {
+                    const uRes = await axios.get(`http://localhost:8080/api/users/${userId}`);
+                    userObj = uRes.data;
+                    addLog("User fetched via ID endpoint");
+                } catch (e) {
+                    addLog("User ID endpoint failed, trying list...");
+                    try {
+                        const allUsers = await axios.get("http://localhost:8080/api/users");
+                        const found = allUsers.data.find(u => u.id == userId);
+                        if (found) {
+                            userObj = found;
+                            addLog("User found in list");
+                        }
+                    } catch (e2) {
+                        addLog("User list fetch failed");
+                    }
+                }
+                setUserProfile(userObj);
 
                 // 2. Fetch Deals
-                // Fallback to fetching all deals and filtering in JS if query param specific to user fails
                 let allDeals = [];
                 try {
                     const dealsRes = await axios.get(`http://localhost:8080/deals?userId=${userId}`);
                     allDeals = dealsRes.data || [];
+                    addLog(`Deals fetched via filter: ${allDeals.length}`);
                 } catch (e) {
-                    // Fallback: fetch all and filter locally
+                    addLog("Deals filter endpoint failed, fetching all...");
                     const dealsRes = await axios.get(`http://localhost:8080/deals`);
-                    allDeals = (dealsRes.data || []).filter(d => d.user?.id == userId || d.userId == userId);
+                    allDeals = (dealsRes.data || []).filter(d => d.user?.id == userId || d.userId == userId || (d.user && d.user.id && d.user.id.toString() === userId.toString()));
+                    addLog(`Deals filtered manually: ${allDeals.length}`);
+                }
+
+                // If user name still unknown, try to find in deals
+                if ((!userObj.name || userObj.name === "Loading...") && allDeals.length > 0) {
+                    const firstUserDeal = allDeals.find(d => d.user && d.user.name);
+                    if (firstUserDeal) {
+                        setUserProfile(prev => ({ ...prev, name: firstUserDeal.user.name, email: firstUserDeal.user.email || "" }));
+                        addLog("User name recovered from deal data");
+                    }
                 }
 
                 // Sort deals by date desc
@@ -58,33 +89,33 @@ const AdminPerformance = () => {
                 setDeals(sortedDeals);
 
                 // 3. Compute Metrics
-                // Robust parsing of amount/incentive
                 const approved = sortedDeals.filter(d => (d.status || "").toLowerCase() === 'approved');
                 const totalRev = approved.reduce((acc, d) => acc + (parseFloat(d.amount) || 0), 0);
                 const totalInc = approved.reduce((acc, d) => acc + (parseFloat(d.incentive) || 0), 0);
                 const avgDeal = approved.length ? totalRev / approved.length : 0;
 
-                // 4. Compute Monthly Trend (Robust Date Parsing)
+                // 4. Compute Monthly Trend
                 const monthLabels = getLast6MonthsLabels();
                 const trendMap = {};
-
-                // Initialize with 0
                 monthLabels.forEach(m => trendMap[m] = 0);
 
-                // Populate with data
                 approved.forEach(deal => {
-                    const rawDate = deal.date || deal.createdAt;
+                    // Try multiple date fields
+                    const rawDate = deal.date || deal.createdAt; // e.g. "2023-10-25" or ISO
                     if (rawDate) {
                         try {
                             const d = new Date(rawDate);
                             if (!isNaN(d.getTime())) {
-                                const yyyyMM = d.toISOString().slice(0, 7);
+                                const yyyyMM = d.toISOString().slice(0, 7); // "2023-10"
                                 if (trendMap.hasOwnProperty(yyyyMM)) {
                                     trendMap[yyyyMM] += (parseFloat(deal.incentive) || 0);
+                                } else {
+                                    // Handle dates outside 6-month window or slight format mismatch
+                                    // addLog(`Date ${yyyyMM} outside range`);
                                 }
                             }
                         } catch (e) {
-                            console.warn("Invalid date format", rawDate);
+                            addLog(`Date parse error: ${rawDate}`);
                         }
                     }
                 });
@@ -102,22 +133,13 @@ const AdminPerformance = () => {
 
             } catch (err) {
                 console.error("Error fetching performance details:", err);
+                addLog(`CRITICAL ERROR: ${err.message}`);
             } finally {
                 setLoading(false);
             }
         };
         fetchData();
     }, [userId]);
-
-    // Derived Data Safe Access
-    const {
-        totalDeals = 0,
-        approvedDeals = 0,
-        approvalRate = 0,
-        totalIncentiveEarned = 0,
-        averageDealValue = 0,
-        monthlyTrend = []
-    } = data || {};
 
     // Tier Logic
     const getTier = (rev) => {
@@ -127,18 +149,26 @@ const AdminPerformance = () => {
         return { name: 'Silver', color: 'from-slate-200 to-slate-400', bg: 'bg-slate-50', text: 'text-slate-500', border: 'border-slate-200' };
     };
 
-    // Total Revenue for Tier Calculation
+    const {
+        totalDeals = 0,
+        approvedDeals = 0,
+        approvalRate = 0,
+        totalIncentiveEarned = 0,
+        averageDealValue = 0,
+        monthlyTrend = []
+    } = data || {};
+
     const totalRevenue = deals
         .filter(d => (d.status || "").toLowerCase() === 'approved')
         .reduce((acc, d) => acc + (parseFloat(d.amount) || 0), 0);
 
     const tier = getTier(totalRevenue);
 
-    // Filtered Table Data
+    // Filtered Table
     const filteredDeals = useMemo(() => {
         return deals.filter(deal => {
             const searchLower = searchTerm.toLowerCase();
-            const dealDate = deal.date || deal.createdAt || "N/A";
+            const dealDate = deal.date || deal.createdAt || "";
             return (
                 (deal.clientName || "").toLowerCase().includes(searchLower) ||
                 (deal.status || "").toLowerCase().includes(searchLower) ||
@@ -148,34 +178,31 @@ const AdminPerformance = () => {
         });
     }, [deals, searchTerm]);
 
-    // --- Chart Data Configuration ---
+    // Chart Config
     const lineChartData = {
         labels: monthlyTrend.map(t => {
-            // Convert YYYY-MM
             const [y, m] = t.month.split('-');
             const date = new Date(parseInt(y), parseInt(m) - 1);
             return date.toLocaleString('default', { month: 'short' });
         }),
         datasets: [{
-            label: 'Incentive Earned',
+            label: 'Incentive',
             data: monthlyTrend.map(t => t.incentiveSum),
             backgroundColor: (context) => {
                 const ctx = context.chart.ctx;
                 const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-                gradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
-                gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+                gradient.addColorStop(0, 'rgba(79, 70, 229, 0.4)'); // Indigo
+                gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
                 return gradient;
             },
-            borderColor: '#10B981',
+            borderColor: '#4F46E5', // Indigo 600
             borderWidth: 3,
             tension: 0.4,
             fill: true,
-            pointBackgroundColor: '#FFFFFF',
-            pointBorderColor: '#10B981',
-            pointRadius: 6,
-            pointHoverRadius: 8,
-            pointHoverBackgroundColor: '#10B981',
-            pointHoverBorderColor: '#FFFFFF'
+            pointBackgroundColor: '#fff',
+            pointBorderColor: '#4F46E5',
+            pointRadius: 5,
+            pointHoverRadius: 7
         }]
     };
 
@@ -187,7 +214,7 @@ const AdminPerformance = () => {
                 totalDeals - approvedDeals - deals.filter(d => (d.status || "").toLowerCase() === 'rejected').length,
                 deals.filter(d => (d.status || "").toLowerCase() === 'rejected').length
             ],
-            backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+            backgroundColor: ['#10B981', '#F59E0B', '#EF4444'], // Emerald, Amber, Red
             borderWidth: 0,
             hoverOffset: 10
         }]
@@ -196,8 +223,8 @@ const AdminPerformance = () => {
     if (loading) return (
         <AdminLayout>
             <div className="flex flex-col items-center justify-center h-[80vh]">
-                <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mb-4"></div>
-                <p className="text-text-muted font-medium">Calibrating Sales Metrics...</p>
+                <div className="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+                <p className="text-slate-500 font-bold tracking-wide animate-pulse">ANALYZING PERFORMANCE DATA...</p>
             </div>
         </AdminLayout>
     );
@@ -206,98 +233,125 @@ const AdminPerformance = () => {
         <AdminLayout>
             <div className="max-w-7xl mx-auto pb-12 animate-in fade-in duration-700 font-sans">
 
-                {/* NAV HEADER */}
-                <div className="mb-6 flex items-center gap-2">
-                    <button onClick={() => navigate('/admin/performance')} className="text-sm font-bold text-text-muted hover:text-primary-600 transition-colors flex items-center gap-1 group">
-                        <span className="p-1 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-primary-100 dark:group-hover:bg-primary-900/30 transition-colors">
+                {/* NAV */}
+                <div className="mb-8 flex items-center justify-between">
+                    <button onClick={() => navigate('/admin/performance')} className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors group">
+                        <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm group-hover:border-indigo-200 group-hover:bg-indigo-50">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                        </span>
-                        <span>Performance Roster</span>
+                        </div>
+                        <span className="font-bold text-sm uppercase tracking-wide">Back to Roster</span>
                     </button>
-                    <span className="text-text-muted/50">/</span>
-                    <span className="text-sm font-bold text-text-primary uppercase tracking-wide">Analyst View</span>
+                    {/* <div className="text-[10px] text-slate-300 font-mono">ID: {userId}</div> */}
                 </div>
 
-                {/* HERO PROFILE SECTION */}
-                <div className="bg-surface-1 rounded-3xl border border-border-subtle shadow-xl overflow-hidden mb-8 relative group">
-                    <div className="h-40 bg-slate-900 absolute top-0 w-full z-0 overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-900/80 opacity-100"></div>
-                        <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-indigo-500/20 blur-3xl rounded-full mix-blend-screen opacity-70 animate-pulse"></div>
-                        <div className="absolute top-10 left-10 w-32 h-32 bg-emerald-500/10 blur-2xl rounded-full mix-blend-screen"></div>
+                {/* HERO CARD */}
+                <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl overflow-hidden mb-8 relative group">
+                    <div className="absolute top-0 w-full h-32 bg-slate-900 overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-900 via-slate-900 to-slate-900 opacity-90"></div>
+                        <div className="absolute -right-10 -top-10 w-64 h-64 bg-indigo-500/30 rounded-full blur-3xl"></div>
+                        <div className="absolute left-10 top-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-2xl"></div>
                     </div>
 
-                    <div className="relative z-10 px-8 pt-20 pb-8 flex flex-col md:flex-row items-end md:items-center justify-between gap-6">
+                    <div className="relative px-8 pt-16 pb-8 flex flex-col md:flex-row items-end justify-between gap-6">
                         <div className="flex items-end gap-6">
-                            <div className="w-32 h-32 rounded-3xl bg-surface-1 p-1.5 shadow-2xl rotate-2 transition-transform duration-500 hover:rotate-0">
-                                <div className={`w-full h-full bg-gradient-to-br ${tier.color} rounded-2xl flex items-center justify-center text-white text-5xl font-black shadow-inner relative overflow-hidden`}>
-                                    <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity"></div>
-                                    {userProfile?.name?.charAt(0) || "U"}
+                            <div className="w-32 h-32 rounded-3xl bg-white p-2 shadow-2xl relative mb-2">
+                                <div className={`w-full h-full bg-gradient-to-br ${tier.color} rounded-2xl flex items-center justify-center text-white text-5xl font-black shadow-inner`}>
+                                    {userProfile?.name ? userProfile.name.charAt(0) : "?"}
+                                </div>
+                                <div className="absolute -bottom-3 -right-3 w-10 h-10 bg-white rounded-xl shadow-lg flex items-center justify-center border-2 border-slate-50" title={`Tier: ${tier.name}`}>
+                                    {tier.name === 'Diamond' && '💎'}
+                                    {tier.name === 'Platinum' && '🏆'}
+                                    {tier.name === 'Gold' && '🥇'}
+                                    {tier.name === 'Silver' && '🥈'}
+                                    {tier.name === 'Bronze' && '🥉'}
                                 </div>
                             </div>
                             <div className="mb-2">
-                                <h1 className="text-4xl font-black text-text-primary tracking-tight mb-2">{userProfile?.name || "Unknown User"}</h1>
-                                <div className="flex flex-wrap items-center gap-3">
-                                    <span className="text-text-muted font-medium bg-surface-2 px-3 py-1 rounded-full text-xs border border-border-subtle flex items-center gap-2">
+                                <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-none mb-2">
+                                    {userProfile?.name || "Unknown Associate"}
+                                </h1>
+                                <div className="flex items-center gap-3">
+                                    <span className="px-3 py-1 bg-slate-100 rounded-full text-xs font-bold text-slate-500 flex items-center gap-2 border border-slate-200">
                                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                        {userProfile?.email}
+                                        {userProfile?.email || "No Email"}
                                     </span>
-                                    <span className={`font-bold text-xs uppercase ${tier.bg} ${tier.text} ${tier.border} border px-3 py-1 rounded-full flex items-center gap-1`}>
-                                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.699-3.181a1 1 0 011.827.954L16.25 7l2.163 1.583a1 1 0 01-1.127 1.832L15 10l2.286.415a1 1 0 01-1.127 1.832L14 13l2.81 5.28a1 1 0 01-1.827.954L10 16.323V17a1 1 0 11-2 0v-.677l-4.983 2.912a1 1 0 01-1.827-.954L6 13l-2.286-.415a1 1 0 01-1.127-1.832L4.75 10 2.587 8.417a1 1 0 01-1.127-1.832l2.163-1.583L1.828 2.553a1 1 0 011.827-.954L5.606 4.777 9.56 3.195a1 1 0 01.386-.118V2a1 1 0 011-1z" clipRule="evenodd" /></svg>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border ${tier.bg} ${tier.text} ${tier.border}`}>
                                         {tier.name} Tier
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex gap-4 w-full md:w-auto">
-                            <div className="flex-1 md:flex-none text-right p-5 bg-surface-2/50 backdrop-blur-sm rounded-2xl border border-border-subtle group-hover:bg-surface-2 transition-colors">
-                                <p className="text-[10px] uppercase font-bold text-text-muted tracking-wide mb-1 opacity-70">Lifetime Revenue</p>
-                                <p className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">₹{(totalRevenue / 100000).toFixed(2)}<span className="text-lg text-text-muted font-bold">L</span></p>
+                        <div className="flex gap-4">
+                            <div className="text-right">
+                                <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Lifetime Revenue</p>
+                                <p className="text-4xl font-black text-slate-800">
+                                    <span className="text-lg text-slate-400 font-bold mr-1">₹</span>
+                                    {(totalRevenue / 100000).toFixed(2)}
+                                    <span className="text-lg text-slate-400 font-bold ml-1">L</span>
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* METRICS GRID */}
+                {/* KPI CARDS */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    {[
-                        { label: "Incentive Earned", value: `₹${(totalIncentiveEarned / 1000).toFixed(1)}k`, icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z", color: "text-emerald-600", bg: "bg-emerald-100", trend: "+15% vs L3M" },
-                        { label: "Close Rate", value: `${approvalRate.toFixed(0)}%`, icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z", color: "text-blue-600", bg: "bg-blue-100", trend: "High Conv." },
-                        { label: "Avg Deal Size", value: `₹${(averageDealValue / 1000).toFixed(0)}k`, icon: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6", color: "text-purple-600", bg: "bg-purple-100", trend: "Premium" },
-                        { label: "Volume (Closed)", value: approvedDeals, sub: `/ ${totalDeals}`, icon: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10", color: "text-amber-600", bg: "bg-amber-100", trend: "Active" }
-                    ].map((metric, i) => (
-                        <div key={i} className="p-6 bg-surface-1 rounded-2xl border border-border-subtle shadow-sm hover:shadow-md transition-all hover:-translate-y-1 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity transform group-hover:scale-110">
-                                <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"><path d={metric.icon} /></svg>
+                    <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all group">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl group-hover:bg-emerald-100 transition-colors">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
-                            <div className="relative z-10">
-                                <div className="flex justify-between items-center mb-4">
-                                    <div className={`p-2.5 ${metric.bg} dark:${metric.bg.replace('100', '900/30')} ${metric.color} rounded-xl`}>
-                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={metric.icon} /></svg>
-                                    </div>
-                                    <span className="text-[10px] font-bold bg-surface-2 px-2 py-1 rounded-md text-text-muted uppercase tracking-wider">{metric.trend}</span>
-                                </div>
-                                <p className="text-text-muted text-[10px] font-bold uppercase tracking-widest mb-1">{metric.label}</p>
-                                <div className="flex items-baseline gap-1">
-                                    <p className="text-3xl font-black text-text-primary tracking-tight">{metric.value}</p>
-                                    {metric.sub && <span className="text-sm font-medium text-text-muted">{metric.sub}</span>}
-                                </div>
-                            </div>
+                            <span className="px-2 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase rounded-md tracking-wider">Earned</span>
                         </div>
-                    ))}
+                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Total Incentive</p>
+                        <p className="text-3xl font-black text-slate-900 mt-1">₹{(totalIncentiveEarned / 1000).toFixed(1)}k</p>
+                    </div>
+
+                    <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all group">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-100 transition-colors">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </div>
+                            <span className="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold uppercase rounded-md tracking-wider">Efficiency</span>
+                        </div>
+                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Conversion Rate</p>
+                        <p className="text-3xl font-black text-slate-900 mt-1">{approvalRate.toFixed(0)}%</p>
+                    </div>
+
+                    <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all group">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-2.5 bg-purple-50 text-purple-600 rounded-xl group-hover:bg-purple-100 transition-colors">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                            </div>
+                            <span className="px-2 py-1 bg-purple-50 text-purple-700 text-[10px] font-bold uppercase rounded-md tracking-wider">Quality</span>
+                        </div>
+                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Avg Deal Size</p>
+                        <p className="text-3xl font-black text-slate-900 mt-1">₹{(averageDealValue / 1000).toFixed(0)}k</p>
+                    </div>
+
+                    <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all group">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-2.5 bg-amber-50 text-amber-600 rounded-xl group-hover:bg-amber-100 transition-colors">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
+                            </div>
+                            <span className="px-2 py-1 bg-amber-50 text-amber-700 text-[10px] font-bold uppercase rounded-md tracking-wider">Volume</span>
+                        </div>
+                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Deals Closed</p>
+                        <p className="text-3xl font-black text-slate-900 mt-1">{approvedDeals} <span className="text-xs text-slate-400 font-bold">/ {totalDeals}</span></p>
+                    </div>
                 </div>
 
                 {/* CHARTS */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    <div className="lg:col-span-2 p-8 bg-surface-1 rounded-3xl border border-border-subtle shadow-lg relative">
-                        <div className="flex justify-between items-center mb-6">
+                    <div className="lg:col-span-2 p-8 bg-white rounded-[2rem] border border-slate-200 shadow-xl">
+                        <div className="flex justify-between items-center mb-8">
                             <div>
-                                <h3 className="text-lg font-bold text-text-primary">Incentive Performance</h3>
-                                <p className="text-sm text-text-muted">6-month earnings trajectory</p>
+                                <h3 className="text-lg font-black text-slate-900">Earnings Velocity</h3>
+                                <p className="text-sm text-slate-500 font-medium">6-month incentive performance trend</p>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
-                                <span className="text-xs font-bold text-text-muted">Incentives</span>
+                            <div className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold border border-indigo-100">
+                                Live Data
                             </div>
                         </div>
                         <div className="h-72 w-full">
@@ -307,131 +361,102 @@ const AdminPerformance = () => {
                                     responsive: true,
                                     maintainAspectRatio: false,
                                     scales: {
-                                        y: {
-                                            beginAtZero: true,
-                                            grid: { color: '#e2e8f030', display: true },
-                                            ticks: { font: { weight: 'bold' }, color: '#94a3b8' }
-                                        },
-                                        x: {
-                                            grid: { display: false },
-                                            ticks: { font: { weight: 'bold' }, color: '#94a3b8' }
-                                        }
+                                        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { weight: 'bold', size: 10 }, color: '#94a3b8' } },
+                                        x: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 11 }, color: '#64748b' } }
                                     },
-                                    plugins: {
-                                        legend: { display: false },
-                                        tooltip: {
-                                            backgroundColor: '#1e293b',
-                                            padding: 12,
-                                            titleFont: { size: 13, weight: 'bold' },
-                                            bodyFont: { size: 12 },
-                                            cornerRadius: 8,
-                                            displayColors: false
-                                        }
-                                    }
+                                    plugins: { legend: { display: false } }
                                 }}
                             />
                         </div>
                     </div>
 
-                    <div className="p-8 bg-surface-1 rounded-3xl border border-border-subtle shadow-lg flex flex-col items-center justify-center">
-                        <h3 className="text-lg font-bold text-text-primary mb-2 w-full text-center">Deal Portfolio</h3>
-                        <p className="text-xs text-text-muted mb-8 w-full text-center uppercase tracking-wide">Status Distribution</p>
+                    <div className="p-8 bg-white rounded-[2rem] border border-slate-200 shadow-xl flex flex-col items-center">
+                        <h3 className="text-lg font-black text-slate-900 mb-2">Deal Composition</h3>
+                        <p className="text-xs text-slate-400 font-bold uppercase tracking-wide mb-6">Status Breakdown</p>
 
-                        <div className="h-56 w-56 relative flex items-center justify-center">
+                        <div className="h-56 w-56 relative flex items-center justify-center mb-6">
                             <Doughnut
                                 data={doughnutData}
                                 options={{
                                     maintainAspectRatio: false,
-                                    cutout: '75%',
-                                    plugins: {
-                                        legend: { display: false },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: (item) => ` ${item.label}: ${item.raw}`
-                                            }
-                                        }
-                                    }
+                                    cutout: '80%',
+                                    plugins: { legend: { display: false } }
                                 }}
                             />
-
-                            <div className="absolute inset-0 flex items-center justify-center flex-col pointer-events-none">
-                                <span className="text-4xl font-black text-text-primary">{totalDeals}</span>
-                                <span className="text-[10px] uppercase font-bold text-text-muted tracking-wider">Total Deals</span>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                <span className="text-4xl font-black text-slate-900">{totalDeals}</span>
+                                <span className="text-[10px] uppercase font-bold text-slate-400">Total Deals</span>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2 w-full mt-8">
-                            <div className="text-center p-2 rounded-xl bg-surface-2 border border-border-subtle">
-                                <div className="w-2 h-2 rounded-full bg-emerald-500 mx-auto mb-1"></div>
-                                <span className="text-[10px] font-bold text-text-muted block">APPR</span>
-                                <span className="font-bold text-text-primary">{approvedDeals}</span>
+                        <div className="w-full space-y-2">
+                            <div className="flex justify-between items-center p-2 rounded-lg bg-emerald-50/50">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    <span className="text-xs font-bold text-slate-700">Approved</span>
+                                </div>
+                                <span className="text-xs font-black text-emerald-700">{approvedDeals}</span>
                             </div>
-                            <div className="text-center p-2 rounded-xl bg-surface-2 border border-border-subtle">
-                                <div className="w-2 h-2 rounded-full bg-amber-500 mx-auto mb-1"></div>
-                                <span className="text-[10px] font-bold text-text-muted block">PEND</span>
-                                <span className="font-bold text-text-primary">{totalDeals - approvedDeals - deals.filter(d => (d.status || "").toLowerCase() === 'rejected').length}</span>
-                            </div>
-                            <div className="text-center p-2 rounded-xl bg-surface-2 border border-border-subtle">
-                                <div className="w-2 h-2 rounded-full bg-red-500 mx-auto mb-1"></div>
-                                <span className="text-[10px] font-bold text-text-muted block">REJ</span>
-                                <span className="font-bold text-text-primary">{deals.filter(d => (d.status || "").toLowerCase() === 'rejected').length}</span>
+                            <div className="flex justify-between items-center p-2 rounded-lg bg-amber-50/50">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                                    <span className="text-xs font-bold text-slate-700">Pending</span>
+                                </div>
+                                <span className="text-xs font-black text-amber-700">{totalDeals - approvedDeals - deals.filter(d => (d.status || "").toLowerCase() === 'rejected').length}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* DATA TABLE */}
-                <div className="bg-surface-1 rounded-3xl border border-border-subtle shadow-xl overflow-hidden">
-                    <div className="p-6 border-b border-border-subtle flex flex-col sm:flex-row justify-between items-center gap-4 bg-surface-1">
+                {/* LOGS */}
+                <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl overflow-hidden">
+                    <div className="p-8 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
                         <div>
-                            <h3 className="text-lg font-bold text-text-primary">Transaction History</h3>
-                            <p className="text-xs text-text-muted mt-1">Full record of all deals engaged by this executive</p>
+                            <h3 className="text-lg font-black text-slate-900">Transaction Ledger</h3>
+                            <p className="text-sm text-slate-500 font-medium">Detailed log of all assigned deals</p>
                         </div>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Search client logs..."
-                                className="pl-10 pr-4 py-2.5 bg-surface-2 border border-border-subtle rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-primary-500 w-full sm:w-64 transition-all"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                            <svg className="w-4 h-4 text-text-muted absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search ledger..."
+                            className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-64 transition-all placeholder:text-slate-400"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead>
-                                <tr className="bg-surface-2/50 text-[10px] font-bold text-text-muted uppercase tracking-wider border-b border-border-subtle">
-                                    <th className="px-6 py-4">Date Logged</th>
-                                    <th className="px-6 py-4">Client Entity</th>
-                                    <th className="px-6 py-4">Deal Value</th>
-                                    <th className="px-6 py-4">Incentive</th>
-                                    <th className="px-6 py-4 text-center">Status</th>
-                                    <th className="px-6 py-4">Remarks</th>
+                            <thead className="bg-slate-50 border-b border-slate-100">
+                                <tr>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Client</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Value</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Incentive</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Notes</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-border-subtle">
+                            <tbody className="divide-y divide-slate-100">
                                 {filteredDeals.length === 0 ? (
-                                    <tr><td colSpan="6" className="p-12 text-center text-text-muted italic">No records match your filters.</td></tr>
+                                    <tr><td colSpan="6" className="p-10 text-center text-slate-400 font-bold italic">No entries found</td></tr>
                                 ) : (
                                     filteredDeals.map((deal) => (
-                                        <tr key={deal.id} className="hover:bg-surface-2 transition-colors group">
-                                            <td className="px-6 py-4 text-xs font-bold text-text-secondary font-mono">
-                                                {deal.date || deal.createdAt ? new Date(deal.date || deal.createdAt).toLocaleDateString() : "N/A"}
+                                        <tr key={deal.id} className="hover:bg-slate-50/50 transition-colors">
+                                            <td className="px-6 py-4 text-xs font-bold text-slate-500 font-mono">
+                                                {deal.date ? new Date(deal.date).toLocaleDateString() : (deal.createdAt ? new Date(deal.createdAt).toLocaleDateString() : "N/A")}
                                             </td>
-                                            <td className="px-6 py-4 text-sm font-bold text-text-primary">{deal.clientName || "Unnamed Client"}</td>
-                                            <td className="px-6 py-4 text-sm font-bold text-text-primary font-mono tracking-tight">₹{(deal.amount || 0).toLocaleString()}</td>
-                                            <td className="px-6 py-4 text-sm font-bold text-emerald-600 font-mono tracking-tight">₹{(deal.incentive || 0).toLocaleString()}</td>
+                                            <td className="px-6 py-4 text-sm font-bold text-slate-900">{deal.clientName || "Unknown Client"}</td>
+                                            <td className="px-6 py-4 text-sm font-bold text-slate-600 font-mono">₹{(parseFloat(deal.amount) || 0).toLocaleString()}</td>
+                                            <td className="px-6 py-4 text-sm font-bold text-emerald-600 font-mono">₹{(parseFloat(deal.incentive) || 0).toLocaleString()}</td>
                                             <td className="px-6 py-4 text-center">
-                                                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${(deal.status || "").toLowerCase() === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                                                    (deal.status || "").toLowerCase() === 'rejected' ? 'bg-red-50 text-red-700 border-red-100' :
-                                                        'bg-amber-50 text-amber-700 border-amber-100'
+                                                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${(deal.status || "").toLowerCase() === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+                                                        (deal.status || "").toLowerCase() === 'rejected' ? 'bg-red-100 text-red-700' :
+                                                            'bg-amber-100 text-amber-700'
                                                     }`}>
                                                     {(deal.status || "PENDING").toUpperCase()}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-xs text-text-muted max-w-xs truncate">{deal.rejectionReason || "-"}</td>
+                                            <td className="px-6 py-4 text-xs text-slate-400 max-w-xs truncate">{deal.rejectionReason || "-"}</td>
                                         </tr>
                                     ))
                                 )}
@@ -440,6 +465,11 @@ const AdminPerformance = () => {
                     </div>
                 </div>
 
+                {/* DEBUG SECTION (Uncomment if needed) */}
+                {/* <div className="mt-8 p-4 bg-gray-100 rounded-xl text-xs font-mono text-gray-600">
+                    <p className="font-bold mb-2">DEBUG INFO:</p>
+                    {debugLog.map((log, i) => <div key={i}>{log}</div>)}
+                </div> */}
             </div>
         </AdminLayout>
     );
