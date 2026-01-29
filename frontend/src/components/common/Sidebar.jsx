@@ -1,153 +1,248 @@
+import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  LayoutDashboard,
+  Briefcase,
+  TrendingUp,
+  Target,
+  Trophy,
+  FileText,
+  History,
+  Calculator,
+  ShieldCheck,
+  BadgeDollarSign,
+  BookOpen,
+  CheckCircle2,
+  Users,
+  Settings,
+  Activity,
+  FileClock,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
+  ShieldAlert,
+  Wallet
+} from "lucide-react";
+import AppIcon from "../common/AppIcon";
 
 const Sidebar = () => {
   const { auth, logout } = useAuth();
   const isAdmin = auth?.user?.role === "ADMIN";
   const location = useLocation();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const salesItems = [
-    { path: "/sales", label: "Dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
-    { path: "/sales/my-deals", label: "My Assigned Deals", icon: "M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" },
-    { path: "/sales/performance", label: "Performance", icon: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" },
-    { path: "/sales/targets", label: "Targets & Progress", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
-    { path: "/sales/leaderboard", label: "Leaderboard", icon: "M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" },
-    { path: "/sales/reports", label: "Reports", icon: "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" },
-    { path: "/sales/history", label: "Deal History", icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" },
-    { path: "/sales/simulator", label: "Incentive Simulator", icon: "M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" },
-    { path: "/sales/policy", label: "My Incentives Policy", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
-    { path: "/sales/policies", label: "Company Policies", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
-    { path: "/sales/payouts", label: "My Earnings", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
+  // Persist collapse state
+  useEffect(() => {
+    const savedState = localStorage.getItem("sidebarCollapsed");
+    if (savedState) setIsCollapsed(JSON.parse(savedState));
+  }, []);
+
+  const toggleCollapse = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem("sidebarCollapsed", JSON.stringify(newState));
+  };
+
+  // --- Configuration ---
+
+  const salesGroups = [
+    {
+      title: "Primary",
+      items: [
+        { path: "/sales", label: "Dashboard", icon: LayoutDashboard },
+        { path: "/sales/my-deals", label: "My Assigned Deals", icon: Briefcase },
+        { path: "/sales/performance", label: "Performance", icon: Activity },
+        { path: "/sales/targets", label: "Targets & Progress", icon: Target },
+      ]
+    },
+    {
+      title: "Secondary",
+      items: [
+        { path: "/sales/leaderboard", label: "Leaderboard", icon: Trophy },
+        { path: "/sales/reports", label: "Reports", icon: FileText },
+        { path: "/sales/history", label: "Deal History", icon: History },
+        { path: "/sales/simulator", label: "Incentive Simulator", icon: Calculator },
+      ]
+    },
+    {
+      title: "Resources",
+      items: [
+        { path: "/sales/policy", label: "My Incentive Policy", icon: ShieldCheck },
+        { path: "/sales/policies", label: "Company Policies", icon: BookOpen },
+        { path: "/sales/payouts", label: "My Earnings", icon: Wallet },
+      ]
+    }
   ];
 
-  const adminItems = [
-    { path: "/admin", label: "Overview", icon: "M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" },
-    { path: "/admin/deals", label: "Manage Deals", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" },
-    { path: "/admin/approvals", label: "Deal Approvals", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
-    { path: "/admin/users", label: "User Management", icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" },
-    { path: "/admin/incentive-policies", label: "Incentive Policies", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
-    { path: "/admin/policy", label: "General Policies", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" },
-    { path: "/admin/performance", label: "Performance Audit", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
-    { path: "/admin/audit-logs", label: "System Logs", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" },
-    { path: "/admin/settings", label: "Platform Settings", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" },
+  const adminGroups = [
+    {
+      title: "Primary",
+      items: [
+        { path: "/admin", label: "Overview", icon: LayoutDashboard },
+        { path: "/admin/deals", label: "Manage Deals", icon: Briefcase },
+        { path: "/admin/approvals", label: "Deal Approvals", icon: CheckCircle2 },
+      ]
+    },
+    {
+      title: "Secondary",
+      items: [
+        { path: "/admin/performance", label: "Performance Audit", icon: TrendingUp },
+      ]
+    },
+    {
+      title: "Governance",
+      items: [
+        { path: "/admin/users", label: "User Management", icon: Users },
+        { path: "/admin/incentive-policies", label: "Incentive Policies", icon: BadgeDollarSign },
+        { path: "/admin/policy", label: "General Policies", icon: BookOpen },
+        { path: "/admin/audit-logs", label: "Audit Logs", icon: FileClock },
+        { path: "/admin/settings", label: "Platform Settings", icon: Settings },
+      ]
+    }
   ];
 
-  const navItems = isAdmin ? adminItems : salesItems;
+  const menuGroups = isAdmin ? adminGroups : salesGroups;
 
   return (
-    <aside className="w-72 h-[calc(100vh-2rem)] flex flex-col relative z-20 m-4 rounded-3xl overflow-hidden glass-panel transition-all duration-300 shadow-2xl">
-      {/* Dynamic Background: Lighter for Light Mode, Deep for Dark Mode */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/10 dark:from-slate-800/50 dark:to-slate-900/50 pointer-events-none opacity-50"></div>
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 blur-[80px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen opacity-50"></div>
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-violet-500/10 blur-[80px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen opacity-50"></div>
-
-      {/* Header Profile Section */}
-      <div className="p-6 pb-4 relative z-10">
-        <motion.button
-          onClick={logout}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="w-full flex items-center gap-3 p-3 rounded-2xl bg-white/40 dark:bg-white/5 hover:bg-white/60 dark:hover:bg-white/10 border border-white/20 dark:border-white/10 shadow-lg group transition-all duration-300"
-        >
-          <div className="relative">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold text-white shadow-inner ${isAdmin
-              ? "bg-gradient-to-br from-indigo-500 to-violet-600 shadow-indigo-500/20"
-              : "bg-gradient-to-br from-blue-500 to-cyan-500 shadow-blue-500/20"
-              }`}>
-              {auth?.user?.name ? auth.user.name.charAt(0).toUpperCase() : (isAdmin ? "A" : "S")}
-            </div>
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white/50 dark:border-slate-900 flex items-center justify-center">
-              <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>
-            </div>
+    <aside
+      className={`
+        relative flex flex-col h-screen bg-bg-secondary border-r border-border-subtle transition-all duration-300 ease-in-out z-30
+        ${isCollapsed ? "w-20" : "w-64"}
+      `}
+    >
+      {/* --- Header --- */}
+      <div className="h-16 flex items-center justify-between px-4 border-b border-border-subtle bg-bg-secondary/50 backdrop-blur-sm">
+        <div className={`flex items-center gap-3 overflow-hidden ${isCollapsed ? "justify-center w-full" : ""}`}>
+          <div className="flex-shrink-0 text-primary-600 dark:text-primary-400">
+            <AppIcon size="w-8 h-8" />
           </div>
-
-          <div className="flex-1 text-left overflow-hidden">
-            <h1 className="font-bold text-slate-800 dark:text-white text-base tracking-tight truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-              {auth?.user?.name || (isAdmin ? "Administrator" : "Sales Executive")}
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 truncate uppercase tracking-wider font-semibold">
+          {!isCollapsed && (
+            <span className="font-bold text-lg tracking-tight text-text-primary whitespace-nowrap">
               {isAdmin ? "Admin Portal" : "Sales Portal"}
-            </p>
-          </div>
+            </span>
+          )}
+        </div>
 
-          <div className="text-slate-400 dark:text-slate-500 group-hover:text-rose-500 transition-colors">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-          </div>
-        </motion.button>
+        {!isCollapsed && (
+          <button
+            onClick={toggleCollapse}
+            className="p-1.5 rounded-lg text-text-muted hover:bg-surface-2 hover:text-text-primary transition-colors"
+          >
+            <ChevronLeft size={18} />
+          </button>
+        )}
       </div>
 
-      <div className="mx-6 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-2"></div>
-
-      {/* Navigation Items */}
-      <nav className="flex-1 px-4 py-2 space-y-1 overflow-y-auto custom-scrollbar relative z-10">
-        <AnimatePresence mode='wait'>
-          {navItems.map((item, index) => (
-            <motion.div
-              key={item.path}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05, duration: 0.3 }}
-            >
-              <NavLink
-                to={item.path}
-                end={item.path === "/sales" || item.path === "/admin"}
-                className={({ isActive }) =>
-                  `relative flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group overflow-hidden ${isActive
-                    ? "text-white shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5"
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute inset-0 bg-gradient-to-r from-primary-600/90 to-indigo-600/90"
-                        initial={false}
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                      />
-                    )}
-
-                    <span className="relative z-10 flex items-center justify-center w-6 h-6">
-                      <svg className={`w-5 h-5 transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-                      </svg>
-                    </span>
-
-                    <span className="relative z-10 font-medium tracking-wide truncate">{item.label}</span>
-
-                    {isActive && (
-                      <div className="absolute right-3 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white] animate-pulse relative z-10"></div>
-                    )}
-                  </>
-                )}
-              </NavLink>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </nav>
-
-      {/* Footer System Status */}
-      <div className="p-5 mt-auto relative z-10">
-        <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-2)] border border-[var(--border-subtle)] p-4 text-center group backdrop-blur-sm">
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/5 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-
-          <div className="relative z-10 flex flex-col items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Online</span>
+      {/* --- User Profile (Compact) --- */}
+      <div className={`px-3 py-4 border-b border-border-subtle/50 ${isCollapsed ? "flex justify-center" : ""}`}>
+        <div className={`
+           flex items-center gap-3 p-2 rounded-xl transition-colors
+           ${!isCollapsed ? "bg-surface-2 border border-border-subtle hover:border-primary-500/30" : "bg-transparent"}
+        `}>
+          <div className="relative">
+            <div className={`
+              w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-md
+              ${isAdmin
+                ? "bg-gradient-to-br from-indigo-500 to-violet-600"
+                : "bg-gradient-to-br from-blue-500 to-cyan-500"
+              }
+            `}>
+              {auth?.user?.name ? auth.user.name.charAt(0).toUpperCase() : (isAdmin ? "A" : "S")}
             </div>
-
-            <p className="text-[10px] text-slate-500 font-medium group-hover:text-slate-400 transition-colors">
-              Enterprise Suite v3.0
-            </p>
+            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
           </div>
+
+          {!isCollapsed && (
+            <div className="flex-1 overflow-hidden">
+              <h3 className="text-sm font-semibold text-text-primary truncate">{auth?.user?.name || "User"}</h3>
+              <p className="text-[10px] uppercase tracking-wider font-medium text-text-muted truncate">
+                {isAdmin ? "Administrator" : "Sales Exec"}
+              </p>
+            </div>
+          )}
         </div>
+      </div>
+
+      {/* --- Navigation --- */}
+      <div className="flex-1 overflow-y-auto py-4 custom-scrollbar space-y-6">
+        {menuGroups.map((group, groupIdx) => (
+          <div key={groupIdx} className="px-3">
+            {/* Group Label */}
+            {!isCollapsed && group.title && (
+              <h4 className="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-text-muted/70">
+                {group.title}
+              </h4>
+            )}
+
+            <div className="space-y-0.5">
+              {group.items.map((item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  end={item.path === "/sales" || item.path === "/admin"}
+                  className={({ isActive }) => `
+                    group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
+                    ${isActive
+                      ? "bg-primary-50 dark:bg-primary-500/10 text-primary-700 dark:text-primary-300 font-medium"
+                      : "text-text-secondary hover:bg-surface-2 hover:text-text-primary"
+                    }
+                    ${isCollapsed ? "justify-center" : ""}
+                  `}
+                >
+                  {({ isActive }) => (
+                    <>
+                      {isActive && (
+                        <div className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-primary-600 dark:bg-primary-400"></div>
+                      )}
+
+                      <item.icon
+                        size={20}
+                        className={`
+                          flex-shrink-0 transition-colors
+                          ${isActive ? "text-primary-600 dark:text-primary-400" : "text-text-muted group-hover:text-text-secondary"}
+                        `}
+                        strokeWidth={1.75}
+                      />
+
+                      {!isCollapsed && (
+                        <span className="truncate text-sm">{item.label}</span>
+                      )}
+
+                      {/* Tooltip for collapsed state */}
+                      {isCollapsed && (
+                        <div className="absolute left-full ml-4 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-lg">
+                          {item.label}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* --- Footer / Collapse Trigger (if centered at bottom) --- */}
+      <div className="p-3 border-t border-border-subtle bg-bg-secondary/50 backdrop-blur-sm">
+        {isCollapsed ? (
+          <button
+            onClick={toggleCollapse}
+            className="w-full flex justify-center p-2 rounded-lg hover:bg-surface-2 text-text-muted hover:text-text-primary transition-colors"
+          >
+            <ChevronRight size={20} />
+          </button>
+        ) : (
+          <button
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-text-muted hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+          >
+            <LogOut size={18} />
+            <span className="text-sm font-medium">Sign Out</span>
+          </button>
+        )}
       </div>
     </aside>
   );
