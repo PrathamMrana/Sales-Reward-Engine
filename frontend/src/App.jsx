@@ -57,11 +57,7 @@ const App = () => {
       {/* ROOT */}
       <Route
         path="/"
-        element={
-          auth
-            ? <Navigate to={getLastVisited()} replace />
-            : <LandingPage />
-        }
+        element={<LandingPage />}
       />
 
       <Route path="/login" element={<Login />} />

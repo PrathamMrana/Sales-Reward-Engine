@@ -36,7 +36,7 @@ const Sidebar = () => {
   const navItems = isAdmin ? adminItems : salesItems;
 
   return (
-    <aside className="w-72 h-[calc(100vh-2rem)] flex flex-col relative z-20 m-4 rounded-3xl overflow-hidden glass-panel transition-all duration-300 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-2xl">
+    <aside className="w-72 h-[calc(100vh-2rem)] flex flex-col relative z-20 m-4 rounded-3xl overflow-hidden glass-panel transition-all duration-300 shadow-2xl">
       {/* Dynamic Background: Lighter for Light Mode, Deep for Dark Mode */}
       <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/10 dark:from-slate-800/50 dark:to-slate-900/50 pointer-events-none opacity-50"></div>
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 blur-[80px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen opacity-50"></div>

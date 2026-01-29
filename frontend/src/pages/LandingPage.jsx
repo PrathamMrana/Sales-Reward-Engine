@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   ArrowRight,
   Shield,
@@ -20,6 +21,7 @@ import {
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { auth } = useAuth();
 
   const scrollToFeatures = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
@@ -54,10 +56,17 @@ const LandingPage = () => {
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
-                onClick={() => navigate('/login')}
+                onClick={() => {
+                  if (auth?.user) {
+                    const role = auth.user.role;
+                    navigate(role === "ADMIN" ? "/admin" : "/sales");
+                  } else {
+                    navigate('/login');
+                  }
+                }}
                 className="btn-primary px-8 py-4 text-lg font-semibold flex items-center gap-2 group"
               >
-                Login
+                {auth?.user ? "Enter App" : "Login"}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
               <button
@@ -348,10 +357,17 @@ const LandingPage = () => {
             Join modern sales organizations that leverage our platform to drive performance, ensure accuracy, and scale with confidence.
           </p>
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => {
+              if (auth?.user) {
+                const role = auth.user.role;
+                navigate(role === "ADMIN" ? "/admin" : "/sales");
+              } else {
+                navigate('/login');
+              }
+            }}
             className="btn-primary px-10 py-4 text-lg font-semibold flex items-center gap-2 mx-auto group"
           >
-            Login to Get Started
+            {auth?.user ? "Return to Dashboard" : "Login to Get Started"}
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
