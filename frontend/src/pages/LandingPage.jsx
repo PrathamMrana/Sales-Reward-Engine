@@ -32,12 +32,7 @@ const LandingPage = () => {
   const y = useTransform(scrollYProgress, [0, 1], [0, -50]);
 
   const handleGetStarted = () => {
-    if (auth?.user) {
-      const role = auth.user.role;
-      navigate(role === "ADMIN" ? "/admin" : "/sales");
-    } else {
-      navigate('/register');
-    }
+    navigate('/register');
   };
 
   const fadeInUp = {
@@ -197,11 +192,11 @@ const LandingPage = () => {
               className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto justify-center"
             >
               <button
-                onClick={handleGetStarted}
+                onClick={() => window.location.href = 'mailto:sales@salesrewardengine.com'}
                 className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-semibold shadow-[0_0_40px_-10px_rgba(37,99,235,0.5)] transition-all hover:scale-105 active:scale-95 ring-1 ring-white/10"
               >
                 <span className="flex items-center gap-2">
-                  Start Free Trial
+                  Schedule Demo
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
                 <div className="absolute inset-0 rounded-xl ring-2 ring-white/20 group-hover:ring-white/40 transition-all" />
