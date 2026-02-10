@@ -22,6 +22,9 @@ public class User {
     @Column(nullable = false)
     private String accountStatus = "ACTIVE"; // ACTIVE, DISABLED, LOCKED
 
+    @Column(columnDefinition = "boolean default true") // Existing users are considered onboarded
+    private Boolean onboardingCompleted = false; // New objects start as false
+
     public User() {
     }
 
@@ -40,6 +43,14 @@ public class User {
 
     public void setAccountStatus(String accountStatus) {
         this.accountStatus = accountStatus;
+    }
+
+    public Boolean getOnboardingCompleted() {
+        return onboardingCompleted;
+    }
+
+    public void setOnboardingCompleted(Boolean onboardingCompleted) {
+        this.onboardingCompleted = onboardingCompleted;
     }
 
     // Getters and Setters

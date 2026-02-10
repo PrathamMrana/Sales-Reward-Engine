@@ -90,6 +90,7 @@ public class AuthController {
                                 response.put("profile", userProfile);
                                 response.put("preferences", pref);
                                 response.put("performance", perf);
+                                response.put("onboardingCompleted", user.getOnboardingCompleted());
 
                                 return ResponseEntity.ok(response);
                         } else {
@@ -123,6 +124,7 @@ public class AuthController {
                 }
 
                 User newUser = new User(email, password, "SALES", name);
+                newUser.setOnboardingCompleted(false);
                 User savedUser = userRepository.save(newUser);
 
                 // Seed Default Profile Data
@@ -153,6 +155,14 @@ public class AuthController {
                 response.put("token", "dummy-jwt-token-" + savedUser.getId());
                 response.put("user", savedUser);
                 response.put("role", savedUser.getRole());
+                response.put("name", savedUser.getName());
+                response.put("email", savedUser.getEmail());
+                response.put("status", savedUser.getAccountStatus());
+                response.put("onboardingCompleted", savedUser.getOnboardingCompleted());
+
+                response.put("profile", profile);
+                response.put("preferences", pref);
+                response.put("performance", perf);
 
                 return ResponseEntity.ok(response);
         }
