@@ -3,19 +3,21 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import SalesLayout from "../../layouts/SalesLayout";
+import OnboardingBanner from "../../components/common/OnboardingBanner";
 import { useSales } from "../../context/SalesContext";
 
 const SalesDashboard = () => {
-  const { deals } = useSales();
+  const { deals = [] } = useSales(); // Default to empty array to prevent crash
   const { auth } = useAuth();
   const navigate = useNavigate();
   const userId = auth?.user?.id || auth?.id;
 
   // Data Processing
-  const assignedDeals = deals.filter(d => (d.status || "").toUpperCase() === "ASSIGNED" || (d.status || "").toUpperCase() === "IN_PROGRESS");
-  const approvedDeals = deals.filter(d => (d.status || "").toUpperCase() === "APPROVED");
-  const pendingDeals = deals.filter(d => (d.status || "").toUpperCase() === "SUBMITTED");
-  const rejectedDeals = deals.filter(d => (d.status || "").toUpperCase() === "REJECTED");
+  const safeDeals = Array.isArray(deals) ? deals : [];
+  const assignedDeals = safeDeals.filter(d => (d.status || "").toUpperCase() === "ASSIGNED" || (d.status || "").toUpperCase() === "IN_PROGRESS");
+  const approvedDeals = safeDeals.filter(d => (d.status || "").toUpperCase() === "APPROVED");
+  const pendingDeals = safeDeals.filter(d => (d.status || "").toUpperCase() === "SUBMITTED");
+  const rejectedDeals = safeDeals.filter(d => (d.status || "").toUpperCase() === "REJECTED");
 
   // This Month Incentive
   const now = new Date();
@@ -77,6 +79,9 @@ const SalesDashboard = () => {
   return (
     <SalesLayout>
       <div className="space-y-6 animate-in fade-in duration-500">
+
+        {/* Onboarding Banner */}
+        <OnboardingBanner />
 
         {/* Hero Welcome Banner with Glassmorphism */}
         <div className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-8 md:p-10 text-white shadow-2xl overflow-hidden">

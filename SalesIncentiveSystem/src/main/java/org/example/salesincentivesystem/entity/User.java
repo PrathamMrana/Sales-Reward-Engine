@@ -22,7 +22,7 @@ public class User {
     @Column(nullable = false)
     private String accountStatus = "ACTIVE"; // ACTIVE, DISABLED, LOCKED
 
-    @Column(columnDefinition = "boolean default true") // Existing users are considered onboarded
+    @Column // Let Hibernate handle type
     private Boolean onboardingCompleted = false; // New objects start as false
 
     public User() {
@@ -46,7 +46,7 @@ public class User {
     }
 
     public Boolean getOnboardingCompleted() {
-        return onboardingCompleted;
+        return onboardingCompleted == null ? true : onboardingCompleted;
     }
 
     public void setOnboardingCompleted(Boolean onboardingCompleted) {

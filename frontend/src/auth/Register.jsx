@@ -46,6 +46,7 @@ const Register = () => {
             });
 
             const data = res.data;
+            console.log("Registration Response:", data); // DEBUG
 
             // Auto-login after registration
             login(data);

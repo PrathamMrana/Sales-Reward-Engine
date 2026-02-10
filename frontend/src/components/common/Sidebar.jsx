@@ -29,7 +29,7 @@ import AppIcon from "../common/AppIcon";
 
 const Sidebar = () => {
   const { auth, logout } = useAuth();
-  const isAdmin = auth?.user?.role === "ADMIN";
+  const isAdmin = (auth?.user?.role || auth?.role) === "ADMIN";
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
 

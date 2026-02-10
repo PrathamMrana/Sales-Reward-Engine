@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     setAuth(data);
 
     // Apply Theme directly
-    if (data.preferences?.theme === "DARK") {
+    if (data?.preferences?.theme === "DARK") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
