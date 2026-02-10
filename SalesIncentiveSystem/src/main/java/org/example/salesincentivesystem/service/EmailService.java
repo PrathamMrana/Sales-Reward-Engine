@@ -61,7 +61,7 @@ public class EmailService {
             mailSender.send(message);
             System.out.println("Welcome email sent to " + to);
 
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             System.err.println("Failed to send email: " + e.getMessage());
             // Don't block registration if email fails
         }
