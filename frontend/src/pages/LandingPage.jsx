@@ -21,7 +21,8 @@ import {
   CreditCard,
   Lock,
   Settings,
-  FileCheck
+  FileCheck,
+  Trophy
 } from 'lucide-react';
 
 const LandingPage = () => {
@@ -345,17 +346,31 @@ const LandingPage = () => {
             <div className="absolute -inset-10 bg-gradient-to-r from-blue-600 to-violet-600 opacity-20 blur-3xl -z-10 rounded-[4rem]" />
           </motion.div>
 
-          {/* Trusted By / Social Proof */}
-          <div className="py-10 border-y border-slate-800/50 mb-32">
-            <p className="text-center text-sm font-semibold text-slate-500 uppercase tracking-widest mb-8">
-              Trusted by revenue leaders at
-            </p>
-            <div className="flex flex-wrap justify-center gap-12 md:gap-20 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-              {['Acme Corp', 'GlobalTech', 'Nebula Inc.', 'Vertex Solutions', 'Quantum'].map((brand, i) => (
-                <div key={i} className="text-xl font-bold font-mono text-white flex items-center gap-2">
-                  <div className="w-6 h-6 bg-slate-600 rounded-full" /> {brand}
-                </div>
-              ))}
+          {/* Advanced Capabilities Strip */}
+          <div className="py-12 border-y border-slate-800/50 mb-32 bg-slate-900/20 backdrop-blur-sm">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {[
+                  { title: 'AI Forecasting', icon: '✨', desc: 'Predict emerging trends' },
+                  { title: 'Gamification', icon: '🏆', desc: 'Boost rep engagement' },
+                  { title: 'Real-time Sync', icon: '⚡', desc: 'Instant data updates' },
+                  { title: 'Bank Grade', icon: '🔒', desc: 'SOC2 Type II Secure' }
+                ].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    whileHover={{ y: -5, backgroundColor: "rgba(30, 41, 59, 0.8)" }}
+                    className="p-4 rounded-xl border border-slate-800 bg-slate-900/40 flex items-center gap-4 cursor-default transition-colors group"
+                  >
+                    <div className="w-12 h-12 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                      {item.icon}
+                    </div>
+                    <div>
+                      <div className="font-bold text-white text-sm">{item.title}</div>
+                      <div className="text-xs text-slate-500 group-hover:text-indigo-400 transition-colors">{item.desc}</div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -423,18 +438,70 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Integration List (More Density) */}
-          <div className="py-20 bg-slate-900/20 border-y border-slate-800/30 mb-32" id="integrations">
-            <div className="max-w-7xl mx-auto px-6 text-center">
-              <h3 className="text-2xl font-bold text-white mb-12">Seamlessly Integrates with Your Stack</h3>
-              <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
-                {['Salesforce', 'HubSpot', 'Stripe', 'Slack', 'QuickBooks', 'Xero'].map((tool, i) => (
-                  <div key={i} className="flex flex-col items-center gap-3 p-4 rounded-xl hover:bg-slate-800/50 transition-colors cursor-pointer group">
-                    <div className="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Layers className="w-6 h-6 text-slate-400 group-hover:text-blue-400" />
+          {/* Powerful Features Grid (Replaces Integrations) */}
+          <div className="py-24 border-y border-slate-800/30 bg-slate-900/10 mb-32 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />
+            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="text-center mb-16">
+                <h3 className="text-3xl font-bold text-white mb-4">Complete Visibility & Control</h3>
+                <p className="text-slate-400 max-w-2xl mx-auto">Everything you need to manage complex incentives at scale.</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {[
+                  {
+                    title: 'Smart Auditing',
+                    icon: Shield,
+                    desc: 'Full traceability of every commission calculation with granular logs.',
+                    color: 'text-emerald-400',
+                    badge: 'Compliant'
+                  },
+                  {
+                    title: 'Dynamic Tiers',
+                    icon: BarChart3,
+                    desc: 'Adjust commission rates automatically based on live performance.',
+                    color: 'text-blue-400',
+                    badge: 'Automated'
+                  },
+                  {
+                    title: 'Live Leaderboards',
+                    icon: Trophy,
+                    desc: 'Motivate teams with real-time rankings and achievement tracking.',
+                    color: 'text-amber-400',
+                    badge: 'Engagement'
+                  },
+                  {
+                    title: 'Mobile Access',
+                    icon: Smartphone,
+                    desc: 'Reps can check their earnings and targets from anywhere, anytime.',
+                    color: 'text-violet-400',
+                    badge: 'Anywhere'
+                  }
+                ].map((feature, i) => (
+                  <motion.div
+                    key={i}
+                    whileHover={{ y: -5 }}
+                    className="group relative p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all hover:shadow-xl hover:shadow-indigo-500/10"
+                  >
+                    <div className="absolute top-4 right-4 text-[10px] font-bold tracking-wider uppercase bg-slate-800 text-slate-400 px-2 py-1 rounded-md border border-slate-700/50">
+                      {feature.badge}
                     </div>
-                    <span className="text-sm font-medium text-slate-400">{tool}</span>
-                  </div>
+
+                    <div className={`w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform ${feature.color}`}>
+                      <feature.icon className="w-6 h-6" />
+                    </div>
+
+                    <h4 className="text-lg font-bold text-white mb-2">{feature.title}</h4>
+                    <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                      {feature.desc}
+                    </p>
+
+                    <div className="flex items-center text-xs font-medium text-slate-500 group-hover:text-white transition-colors">
+                      Learn more <ArrowRight className="w-3 h-3 ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
