@@ -48,7 +48,7 @@ const Register = () => {
             const data = res.data;
 
             // Auto-login after registration
-            login(data.user);
+            login(data);
 
             if (data.role === "ADMIN") navigate("/admin");
             else navigate("/sales");
