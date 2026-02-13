@@ -8,10 +8,18 @@ services:
     dockerfilePath: Dockerfile
     healthCheckPath: /actuator/health
     envVars:
-      - key: DB_URL
+      - key: DB_HOST
         fromDatabase:
           name: sales-db
-          property: connectionString
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: sales-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: sales-db
+          property: database
       - key: DB_USERNAME
         fromDatabase:
           name: sales-db
