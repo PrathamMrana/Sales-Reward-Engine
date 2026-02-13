@@ -32,14 +32,28 @@ export const SalesProvider = ({ children }) => {
   };
 
   const fetchDeals = async (targetUserId) => {
-    const idToFetch = targetUserId || userId;
-    if (!idToFetch) {
-      setDeals([]);
-      return;
+    // If targetUserId is provided, we fetch deals for THAT user (e.g. My Deals)
+    // If NOT provided, we might be an Admin fetching ALL deals.
+
+    let url = "http://localhost:8080/api/deals";
+    const params = new URLSearchParams();
+
+    // 1. If we want a SPECIFIC user's deals
+    if (targetUserId) {
+      params.append("userId", targetUserId);
+    }
+
+    // 2. ALWAYS pass the CURRENT USER ID as the Requestor for Security Context
+    if (userId) {
+      params.append("requestorId", userId);
+    }
+
+    if (params.toString()) {
+      url += `?${params.toString()}`;
     }
 
     try {
-      const res = await axios.get(`http://localhost:8080/deals?userId=${idToFetch}`);
+      const res = await axios.get(url);
       setDeals(res.data);
     } catch (err) {
       console.error("Failed to fetch deals", err);
@@ -55,8 +69,9 @@ export const SalesProvider = ({ children }) => {
 
     try {
       const payload = { ...deal, user: { id: userId } };
-      const res = await axios.post("http://localhost:8080/deals", payload);
+      const res = await axios.post("http://localhost:8080/api/deals", payload);
       setDeals([...deals, res.data]);
+      fetchPerformance(userId); // Refresh performance data to update targets/tier
     } catch (err) {
       console.error("Failed to save deal", err);
       // Alert user if the error is likely due to stale session (User not found)
@@ -82,7 +97,8 @@ export const SalesProvider = ({ children }) => {
     ));
 
     try {
-      await axios.patch(`http://localhost:8080/deals/${id}/status`, { status: newStatus });
+      await axios.patch(`http://localhost:8080/api/deals/${id}/status`, { status: newStatus });
+      fetchPerformance(userId); // Refresh performance data
     } catch (err) {
       console.error("Failed to update status", err);
       // Revert on failure? For MVP, we just log.

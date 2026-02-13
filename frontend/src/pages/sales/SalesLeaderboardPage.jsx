@@ -14,100 +14,26 @@ const SalesLeaderboardPage = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get("http://localhost:8080/deals").then(res => {
-            const allDeals = res.data;
-            const approved = allDeals.filter(d => d.status === "Approved");
 
-            // Calculate current period stats
-            const now = new Date();
-            const currentPeriodDeals = approved.filter(d => {
-                if (!d.date) return false;
-                const dealDate = new Date(d.date);
+        // Map filter to backend period parameter
+        const periodMap = {
+            "This Month": "THIS_MONTH",
+            "Last Month": "LAST_MONTH",
+            "This Year": "THIS_YEAR"
+        };
 
-                if (filter === "This Month") {
-                    return dealDate.getMonth() === now.getMonth() && dealDate.getFullYear() === now.getFullYear();
-                } else if (filter === "Last Month") {
-                    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-                    return dealDate.getMonth() === lastMonth.getMonth() && dealDate.getFullYear() === lastMonth.getFullYear();
-                } else if (filter === "This Year") {
-                    return dealDate.getFullYear() === now.getFullYear();
-                }
-                return true;
+        const period = periodMap[filter] || "THIS_MONTH";
+
+        axios.get(`http://localhost:8080/api/leaderboard?period=${period}`)
+            .then(res => {
+                setLeaders(res.data || []);
+            })
+            .catch(err => {
+                console.error("Failed to load leaderboard", err);
+            })
+            .finally(() => {
+                setLoading(false);
             });
-
-            // Calculate previous period for trend
-            const previousPeriodDeals = approved.filter(d => {
-                if (!d.date) return false;
-                const dealDate = new Date(d.date);
-
-                if (filter === "This Month") {
-                    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-                    return dealDate.getMonth() === lastMonth.getMonth() && dealDate.getFullYear() === lastMonth.getFullYear();
-                } else if (filter === "Last Month") {
-                    const twoMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-                    return dealDate.getMonth() === twoMonthsAgo.getMonth() && dealDate.getFullYear() === twoMonthsAgo.getFullYear();
-                } else if (filter === "This Year") {
-                    return dealDate.getFullYear() === now.getFullYear() - 1;
-                }
-                return false;
-            });
-
-            const userStats = {};
-            const previousUserStats = {};
-
-            currentPeriodDeals.forEach(d => {
-                if (!d.user) return;
-                const uid = d.user.id;
-                if (!userStats[uid]) {
-                    userStats[uid] = {
-                        id: uid,
-                        name: d.user.name,
-                        totalIncentive: 0,
-                        deals: 0,
-                        totalAmount: 0
-                    };
-                }
-                userStats[uid].totalIncentive += (d.incentive || 0);
-                userStats[uid].totalAmount += (d.amount || 0);
-                userStats[uid].deals += 1;
-            });
-
-            previousPeriodDeals.forEach(d => {
-                if (!d.user) return;
-                const uid = d.user.id;
-                if (!previousUserStats[uid]) {
-                    previousUserStats[uid] = { totalIncentive: 0 };
-                }
-                previousUserStats[uid].totalIncentive += (d.incentive || 0);
-            });
-
-            const sorted = Object.values(userStats)
-                .map((user, idx) => {
-                    const prevRank = Object.values(previousUserStats)
-                        .sort((a, b) => b.totalIncentive - a.totalIncentive)
-                        .findIndex(u => previousUserStats[user.id] && u.totalIncentive === previousUserStats[user.id].totalIncentive);
-
-                    const currentRank = idx;
-                    let trend = 0;
-                    if (prevRank !== -1) {
-                        trend = prevRank - currentRank; // Positive = moved up
-                    }
-
-                    return {
-                        ...user,
-                        avgDealSize: user.deals > 0 ? user.totalAmount / user.deals : 0,
-                        winRate: user.deals > 0 ? ((user.deals / currentPeriodDeals.length) * 100).toFixed(1) : 0,
-                        trend: trend
-                    };
-                })
-                .sort((a, b) => b.totalIncentive - a.totalIncentive);
-
-            setLeaders(sorted);
-            setLoading(false);
-        }).catch(err => {
-            console.error("Failed to load leaderboard", err);
-            setLoading(false);
-        });
     }, [filter]);
 
     return (

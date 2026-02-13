@@ -158,6 +158,22 @@ public class AdminDealController {
 
             Deal savedDeal = dealRepository.save(deal);
 
+            // AUTO-TRACK ONBOARDING: Mark firstDealCreated for the admin who created this
+            // deal
+            if (payload.containsKey("createdBy")) {
+                try {
+                    Long adminId = Long.parseLong(payload.get("createdBy").toString());
+                    userRepository.findById(adminId).ifPresent(admin -> {
+                        if (Boolean.FALSE.equals(admin.getFirstDealCreated())) {
+                            admin.setFirstDealCreated(true);
+                            userRepository.save(admin);
+                        }
+                    });
+                } catch (Exception ignored) {
+                    // Silently fail if onboarding tracking fails
+                }
+            }
+
             // Notify
             try {
                 org.example.salesincentivesystem.entity.Notification notification = new org.example.salesincentivesystem.entity.Notification();

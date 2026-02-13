@@ -22,7 +22,10 @@ const DealApproval = () => {
 
     const fetchDeals = useCallback(async () => {
         try {
-            const res = await axios.get("http://localhost:8080/deals");
+            const userId = localStorage.getItem("userId") || "1";
+            const res = await axios.get("http://localhost:8080/api/deals", {
+                params: { requestorId: userId }
+            });
             setDeals(res.data);
         } catch (err) {
             console.error("Failed to fetch deals", err);
@@ -39,7 +42,7 @@ const DealApproval = () => {
             if (reason) payload.reason = reason;
             if (comment) payload.comment = comment;
 
-            const res = await axios.patch(`http://localhost:8080/deals/${dealId}/status`, payload);
+            const res = await axios.patch(`http://localhost:8080/api/deals/${dealId}/status`, payload);
             setDeals(prev => prev.map(d => d.id === dealId ? res.data : d));
         } catch (err) {
             console.error("Failed to update status", err);
@@ -211,8 +214,8 @@ const DealApproval = () => {
 
                                     <div className="flex items-center justify-between pt-4 border-t border-white/5">
                                         <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${deal.status === 'Approved' ? 'bg-green-500/10 text-green-500' :
-                                                deal.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
-                                                    'bg-amber-500/10 text-amber-500'
+                                            deal.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
+                                                'bg-amber-500/10 text-amber-500'
                                             }`}>
                                             {deal.status}
                                         </div>

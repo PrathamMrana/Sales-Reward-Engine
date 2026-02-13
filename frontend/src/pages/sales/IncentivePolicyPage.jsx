@@ -37,6 +37,20 @@ const IncentivePolicyPage = () => {
         displayOrder: policies.length + 1,
         type: "INCENTIVE"
       });
+
+      // Onboarding Progress: Mark 'First Rule' as complete
+      try {
+        const userId = localStorage.getItem("userId");
+        if (userId) {
+          await axios.post("http://localhost:8080/api/onboarding/progress/update", {
+            userId: userId,
+            task: "firstRule"
+          });
+        }
+      } catch (err) {
+        console.error("Failed to update onboarding progress", err);
+      }
+
       setNewPolicy({ title: "", description: "", commissionRate: "", example: "" });
       setIsEditing(false);
       fetchPolicies();

@@ -20,6 +20,7 @@ public class Deal {
 
     @jakarta.persistence.ManyToOne
     @jakarta.persistence.JoinColumn(name = "user_id")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "deals", "password", "notifications" })
     private User user;
 
     // NEW FIELDS - Deal Assignment Workflow (Sprint 1)

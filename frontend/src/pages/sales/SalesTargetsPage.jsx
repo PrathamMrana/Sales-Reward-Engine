@@ -28,6 +28,21 @@ const SalesTargetsPage = () => {
     const totalIncentive = performanceData ? performanceData.totalIncentiveEarned : localTotalIncentive;
     const rank = performanceData ? performanceData.rank : null;
 
+    // Calculate This Month's Incentive (Approved + Submitted)
+    const now = new Date();
+    const currentMonthDeals = deals.filter(d => {
+        const status = (d.status || "").toUpperCase();
+        if (status !== 'APPROVED' && status !== 'SUBMITTED') return false;
+
+        try {
+            if (!d.date) return false;
+            const [year, month, day] = d.date.split('-').map(Number);
+            const dealDate = new Date(year, month - 1, day);
+            return dealDate.getMonth() === now.getMonth() && dealDate.getFullYear() === now.getFullYear();
+        } catch { return false; }
+    });
+    const thisMonthIncentive = currentMonthDeals.reduce((sum, d) => sum + (d.incentive || 0), 0);
+
     // Simulator State
     const [simDealValue, setSimDealValue] = useState(50000);
     const [simDealCount, setSimDealCount] = useState(1);
@@ -36,11 +51,10 @@ const SalesTargetsPage = () => {
 
     // Monthly target and progress
     const { monthlyTarget } = useSales();
-    const progressPercentage = monthlyTarget > 0 ? Math.min((totalIncentive / monthlyTarget) * 100, 100) : 0;
-    const remaining = Math.max(0, monthlyTarget - totalIncentive);
+    const progressPercentage = monthlyTarget > 0 ? Math.min((thisMonthIncentive / monthlyTarget) * 100, 100) : 0;
+    const remaining = Math.max(0, monthlyTarget - thisMonthIncentive);
 
     // Days remaining in month
-    const now = new Date();
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     const daysRemaining = Math.max(0, lastDay.getDate() - now.getDate());
 
@@ -121,7 +135,7 @@ const SalesTargetsPage = () => {
                                 <div className="grid grid-cols-3 gap-4 w-full">
                                     <div className="text-center">
                                         <p className="text-xs text-text-muted uppercase tracking-wider">Current</p>
-                                        <p className="text-lg font-bold text-text-primary">₹{totalIncentive.toLocaleString()}</p>
+                                        <p className="text-lg font-bold text-text-primary">₹{thisMonthIncentive.toLocaleString()}</p>
                                     </div>
                                     <div className="text-center">
                                         <p className="text-xs text-text-muted uppercase tracking-wider">Target</p>
@@ -316,8 +330,8 @@ const SalesTargetsPage = () => {
                                     {/* Calculating gap and deals needed */}
                                     {(() => {
                                         const { monthlyTarget } = useSales(); // Access context directly or pass as prop
-                                        // Note: reusing localTotalIncentive if performanceData not ready
-                                        const current = totalIncentive > 0 ? totalIncentive : 0;
+                                        // Use thisMonthIncentive for Gap analysis
+                                        const current = thisMonthIncentive > 0 ? thisMonthIncentive : 0;
                                         const gap = Math.max(0, monthlyTarget - current); // Target from Context
                                         // Assume avg incentive from deals or default 5000
                                         const avgIncentive = approvedDeals.length > 0 ? (current / approvedDeals.length) : 5000;

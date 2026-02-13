@@ -11,7 +11,7 @@ const SalesPolicies = () => {
     useEffect(() => {
         const fetchPolicies = async () => {
             try {
-                const res = await axios.get("http://localhost:8080/policies?type=COMPANY");
+                const res = await axios.get("http://localhost:8080/api/policy?type=COMPANY");
                 setPolicies(res.data);
                 if (res.data.length > 0) setSelectedPolicy(res.data[0]);
             } catch (err) {

@@ -14,7 +14,7 @@ const SalesIncentivePolicyView = () => {
     const fetchPolicies = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("http://localhost:8080/policies?type=INCENTIVE");
+            const response = await axios.get("http://localhost:8080/api/policy?type=INCENTIVE");
             console.log("Incentive Policies for Sales:", response.data);
             setPolicies(response.data);
         } catch (error) {

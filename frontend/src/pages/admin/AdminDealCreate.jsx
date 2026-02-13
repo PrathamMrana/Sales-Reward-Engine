@@ -34,7 +34,10 @@ const AdminDealCreate = () => {
 
     const fetchSalesUsers = async () => {
         try {
-            const response = await axios.get("http://localhost:8080/api/users");
+            const userId = localStorage.getItem("userId") || "1";
+            const response = await axios.get("http://localhost:8080/api/users", {
+                params: { currentUserId: userId }
+            });
             console.log("All users:", response.data); // Debug
             const sales = response.data.filter(u => u.role === "SALES" && u.accountStatus === "ACTIVE");
             console.log("Filtered sales users:", sales); // Debug
@@ -52,7 +55,7 @@ const AdminDealCreate = () => {
     const fetchPolicies = async () => {
         try {
             // Fetch INCENTIVE policies, not company policies
-            const response = await axios.get("http://localhost:8080/policies?type=INCENTIVE");
+            const response = await axios.get("http://localhost:8080/api/policy?type=INCENTIVE");
             console.log("Incentive Policies:", response.data); // Debug
             const activePolicies = response.data.filter(p => p.active);
             setPolicies(activePolicies);
@@ -76,6 +79,20 @@ const AdminDealCreate = () => {
 
         try {
             await axios.post("http://localhost:8080/admin/deals", formData);
+
+            // Onboarding Progress: Mark 'First Deal' as complete
+            try {
+                const userId = localStorage.getItem("userId");
+                if (userId) {
+                    await axios.post("http://localhost:8080/api/onboarding/progress/update", {
+                        userId: userId,
+                        task: "firstDeal"
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to update onboarding progress", err);
+            }
+
             alert("✅ Deal created and assigned successfully!");
             navigate("/admin/deals");
         } catch (error) {

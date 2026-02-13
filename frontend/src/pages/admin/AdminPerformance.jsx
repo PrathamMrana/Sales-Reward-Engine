@@ -6,9 +6,12 @@ import 'chart.js/auto';
 import AdminLayout from "../../layouts/AdminLayout";
 import PageHeader from "../../components/common/PageHeader";
 
+import { useAuth } from "../../context/AuthContext";
+
 const AdminPerformance = () => {
     const { userId } = useParams();
     const navigate = useNavigate();
+    const { auth } = useAuth(); // Get current admin context
     const [data, setData] = useState(null);
     const [deals, setDeals] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -44,13 +47,16 @@ const AdminPerformance = () => {
                 }
                 setUserProfile(userObj);
 
-                // 2. Fetch Deals
+                // 2. Fetch Deals (for transaction ledger table only)
                 let allDeals = [];
                 try {
-                    const dealsRes = await axios.get(`http://localhost:8080/deals?userId=${userId}`);
+                    const requestorIdParam = auth.user?.id ? `&requestorId=${auth.user.id}` : "";
+                    const dealsRes = await axios.get(`http://localhost:8080/api/deals?userId=${userId}${requestorIdParam}`);
                     allDeals = dealsRes.data || [];
                 } catch (e) {
-                    const dealsRes = await axios.get(`http://localhost:8080/deals`);
+                    // Fallback attempt
+                    const requestorIdParam = auth.user?.id ? `?requestorId=${auth.user.id}` : "";
+                    const dealsRes = await axios.get(`http://localhost:8080/api/deals${requestorIdParam}`);
                     allDeals = (dealsRes.data || []).filter(d => d.user?.id == userId || d.userId == userId || (d.user && d.user.id && d.user.id.toString() === userId.toString()));
                 }
 
@@ -62,7 +68,7 @@ const AdminPerformance = () => {
                     }
                 }
 
-                // Sort deals by date desc
+                // Sort deals by date desc (for display in table)
                 const sortedDeals = allDeals.sort((a, b) => {
                     const dateA = new Date(a.date || a.createdAt || 0);
                     const dateB = new Date(b.date || b.createdAt || 0);
@@ -70,44 +76,37 @@ const AdminPerformance = () => {
                 });
                 setDeals(sortedDeals);
 
-                // 3. Compute Metrics
-                const approved = sortedDeals.filter(d => (d.status || "").toLowerCase() === 'approved');
-                const totalRev = approved.reduce((acc, d) => acc + (parseFloat(d.amount) || 0), 0);
-                const totalInc = approved.reduce((acc, d) => acc + (parseFloat(d.incentive) || 0), 0);
-                const avgDeal = approved.length ? totalRev / approved.length : 0;
+                // 3. Fetch Performance Metrics from Backend
+                try {
+                    const perfRes = await axios.get(`http://localhost:8080/admin/performance/${userId}`);
+                    const perfData = perfRes.data;
 
-                // 4. Compute Monthly Trend
-                const monthLabels = getLast6MonthsLabels();
-                const trendMap = {};
-                monthLabels.forEach(m => trendMap[m] = 0);
+                    // Transform backend data to match frontend expectations
+                    setData({
+                        totalDeals: perfData.totalDeals || 0,
+                        approvedDeals: perfData.approvedDeals || 0,
+                        totalIncentiveEarned: perfData.totalIncentiveEarned || 0,
+                        approvalRate: perfData.approvalRate || 0,
+                        averageDealValue: perfData.averageDealValue || 0,
+                        monthlyTrend: perfData.monthlyTrend || []
+                    });
+                } catch (perfErr) {
+                    console.error("Error fetching performance metrics from backend:", perfErr);
+                    // Fallback: use frontend calculation if backend fails
+                    const approved = sortedDeals.filter(d => (d.status || "").toLowerCase() === 'approved');
+                    const totalRev = approved.reduce((acc, d) => acc + (parseFloat(d.amount) || 0), 0);
+                    const totalInc = approved.reduce((acc, d) => acc + (parseFloat(d.incentive) || 0), 0);
+                    const avgDeal = approved.length ? totalRev / approved.length : 0;
 
-                approved.forEach(deal => {
-                    const rawDate = deal.date || deal.createdAt;
-                    if (rawDate) {
-                        try {
-                            const d = new Date(rawDate);
-                            if (!isNaN(d.getTime())) {
-                                const yyyyMM = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                                if (trendMap.hasOwnProperty(yyyyMM)) {
-                                    trendMap[yyyyMM] += (parseFloat(deal.incentive) || 0);
-                                }
-                            }
-                        } catch (e) {
-                            // ignore bad dates
-                        }
-                    }
-                });
-
-                const chartData = monthLabels.map(m => ({ month: m, incentiveSum: trendMap[m] }));
-
-                setData({
-                    totalDeals: sortedDeals.length,
-                    approvedDeals: approved.length,
-                    totalIncentiveEarned: totalInc,
-                    approvalRate: sortedDeals.length ? (approved.length / sortedDeals.length) * 100 : 0,
-                    averageDealValue: avgDeal,
-                    monthlyTrend: chartData
-                });
+                    setData({
+                        totalDeals: sortedDeals.length,
+                        approvedDeals: approved.length,
+                        totalIncentiveEarned: totalInc,
+                        approvalRate: sortedDeals.length ? (approved.length / sortedDeals.length) * 100 : 0,
+                        averageDealValue: avgDeal,
+                        monthlyTrend: []
+                    });
+                }
 
             } catch (err) {
                 console.error("Error fetching performance details:", err);

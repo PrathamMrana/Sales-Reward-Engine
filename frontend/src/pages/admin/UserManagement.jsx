@@ -2,10 +2,14 @@ import SalesLayout from "../../layouts/SalesLayout";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import PageHeader from "../../components/common/PageHeader";
+import InviteUserModal from "../../components/admin/InviteUserModal";
+import { useAuth } from "../../context/AuthContext";
 
 const UserManagement = () => {
+    const { auth } = useAuth();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showInviteModal, setShowInviteModal] = useState(false);
 
     useEffect(() => {
         fetchUsers();
@@ -13,7 +17,7 @@ const UserManagement = () => {
 
     const fetchUsers = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/api/users");
+            const res = await axios.get(`http://localhost:8080/api/users?currentUserId=${auth.user?.id}`);
             setUsers(res.data);
             setLoading(false);
         } catch (err) {
@@ -34,6 +38,11 @@ const UserManagement = () => {
         }
     };
 
+    const handleInviteSuccess = () => {
+        // Optionally refresh users list or show a success message
+        fetchUsers();
+    };
+
     if (loading) return <SalesLayout>Loading Users...</SalesLayout>;
 
     const salesUsers = users.filter(u => u.role === "SALES");
@@ -44,8 +53,16 @@ const UserManagement = () => {
                 heading="User Access Management"
                 subtitle="Control sales executive permissions and account status."
                 actions={
-                    <div className="bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 px-4 py-2 rounded-lg text-sm font-medium">
-                        Total Sales Execs: {salesUsers.length}
+                    <div className="flex items-center gap-3">
+                        <div className="bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 px-4 py-2 rounded-lg text-sm font-medium">
+                            Total Sales Execs: {salesUsers.length}
+                        </div>
+                        <button
+                            onClick={() => setShowInviteModal(true)}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-indigo-500/20"
+                        >
+                            + Invite User
+                        </button>
                     </div>
                 }
             />
@@ -93,6 +110,12 @@ const UserManagement = () => {
                     </tbody>
                 </table>
             </div>
+
+            <InviteUserModal
+                isOpen={showInviteModal}
+                onClose={() => setShowInviteModal(false)}
+                onSuccess={handleInviteSuccess}
+            />
         </SalesLayout>
     );
 };

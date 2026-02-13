@@ -1,5 +1,6 @@
 package org.example.salesincentivesystem.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -18,6 +19,8 @@ public class SalesProfile {
     private String mobile;
     private String department; // e.g. "North Region"
     private String employeeCode;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate joiningDate;
     private Long managerId; // Self-referencing ID potentially, keeping simple for now
 

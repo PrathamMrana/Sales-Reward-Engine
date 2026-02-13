@@ -18,7 +18,7 @@ const DealDetailPage = () => {
 
     const fetchDealDetails = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/deals`);
+            const response = await axios.get(`http://localhost:8080/api/deals`);
             const foundDeal = response.data.find(d => d.id.toString() === id);
             if (foundDeal) {
                 setDeal(foundDeal);
@@ -33,7 +33,7 @@ const DealDetailPage = () => {
     const handleStatusUpdate = async (newStatus) => {
         setUpdating(true);
         try {
-            await axios.patch(`http://localhost:8080/deals/${id}/status`, {
+            await axios.patch(`http://localhost:8080/api/deals/${id}/status`, {
                 status: newStatus,
                 comment: comment || `Updated by Sales Executive to ${newStatus}`
             });

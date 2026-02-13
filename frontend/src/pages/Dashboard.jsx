@@ -8,7 +8,7 @@ function Dashboard() {
   const [deals, setDeals] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:8080/deals")
+    axios.get("http://localhost:8080/api/deals")
       .then(res => setDeals(res.data))
       .catch(console.error);
   }, []);

@@ -17,7 +17,7 @@ const SalesPerformancePage = () => {
 
     useEffect(() => {
         if (userId) {
-            axios.get(`http://localhost:8080/deals?userId=${userId}`)
+            axios.get(`http://localhost:8080/api/deals?userId=${userId}`)
                 .then(res => {
                     setDeals(res.data);
                     setLoading(false);
@@ -35,10 +35,12 @@ const SalesPerformancePage = () => {
     const approvalRatio = submittedDeals.length > 0 ? ((approvedDeals.length / submittedDeals.length) * 100).toFixed(1) : 0;
     const avgDealSize = approvedDeals.length > 0 ? (approvedDeals.reduce((sum, d) => sum + d.amount, 0) / approvedDeals.length) : 0;
 
-    // Monthly breakdown
-    const monthlyData = approvedDeals.reduce((acc, d) => {
+    // Monthly breakdown (Includes Submitted for consistent viewing)
+    const monthlyDeals = deals.filter(d => d.status === 'Approved' || d.status === 'Submitted');
+    const monthlyData = monthlyDeals.reduce((acc, d) => {
         if (!d.date) return acc;
-        const date = new Date(d.date);
+        const [year, month, day] = d.date.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
         const key = `${date.getFullYear()}-${date.getMonth()}`;
         const monthName = date.toLocaleString('default', { month: 'long', year: 'numeric' });
 

@@ -3,15 +3,25 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { useAuth } from "../../context/AuthContext";
+import OnboardingChecklist from "../../components/onboarding/OnboardingChecklist";
 
 const AdminDashboard = () => {
+    const { auth } = useAuth();
     const [deals, setDeals] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [onboardingCompleted, setOnboardingCompleted] = useState(true); // Default to true to hide checklist initially
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get("http://localhost:8080/deals");
+                // Pass requestorId to ensure backend knows who is asking (Global vs Org Admin)
+                const requestorId = auth.user?.id;
+                const url = requestorId
+                    ? `http://localhost:8080/api/deals?requestorId=${requestorId}`
+                    : "http://localhost:8080/api/deals";
+
+                const res = await axios.get(url);
                 setDeals(res.data);
                 setLoading(false);
             } catch (err) {
@@ -20,7 +30,18 @@ const AdminDashboard = () => {
             }
         };
         fetchData();
-    }, []);
+
+        // Check onboarding status for admin users
+        if (auth.user && auth.user.role === "ADMIN") {
+            axios.get(`http://localhost:8080/api/onboarding/progress/${auth.user.id}`)
+                .then(res => {
+                    setOnboardingCompleted(res.data.onboardingCompleted || false);
+                })
+                .catch(err => {
+                    console.error("Failed to fetch onboarding status", err);
+                });
+        }
+    }, [auth.user]);
 
     const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -95,6 +116,10 @@ const AdminDashboard = () => {
     return (
         <SalesLayout>
             <div className="space-y-8 animate-in fade-in duration-700 pb-10">
+                {/* Onboarding Checklist for new admins */}
+                {auth.user && auth.user.role === "ADMIN" && !onboardingCompleted && (
+                    <OnboardingChecklist />
+                )}
 
                 {/* ADVANCED COMMAND HEADER */}
                 <div className="relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl group">
@@ -160,6 +185,8 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                 </div>
+
+
 
                 {/* PRIORITY ACTION GRID */}
                 <div>

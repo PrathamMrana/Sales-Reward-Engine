@@ -23,7 +23,7 @@ const SalesPayouts = () => {
         try {
             // Reusing existing endpoint: GET /deals?userId=...
             // Only 'Approved' deals are eligible for payouts
-            const res = await axios.get(`http://localhost:8080/deals?userId=${auth.user.id}`);
+            const res = await axios.get(`http://localhost:8080/api/deals?userId=${auth.user.id}`);
 
             const approvedDeals = res.data.filter(d => d.status === "Approved");
 

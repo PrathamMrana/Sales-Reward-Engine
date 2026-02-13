@@ -2,19 +2,28 @@ import AdminLayout from "../../layouts/AdminLayout";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 
 const PerformanceDashboard = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const { auth } = useAuth();
 
     useEffect(() => {
+        if (!auth?.user?.id) return;
+
         const fetchData = async () => {
             try {
+                const userId = auth.user.id;
                 // Parallel fetch for users and all deals to compute metrics
                 const [usersRes, dealsRes] = await Promise.all([
-                    axios.get("http://localhost:8080/api/users"),
-                    axios.get("http://localhost:8080/deals")
+                    axios.get("http://localhost:8080/api/users", {
+                        params: { currentUserId: userId }
+                    }),
+                    axios.get("http://localhost:8080/api/deals", {
+                        params: { requestorId: userId }
+                    })
                 ]);
 
                 const salesUsers = usersRes.data.filter(u => u.role === 'SALES');
@@ -58,7 +67,7 @@ const PerformanceDashboard = () => {
         };
 
         fetchData();
-    }, []);
+    }, [auth.user]);
 
     const getTierColor = (tier) => {
         switch (tier) {

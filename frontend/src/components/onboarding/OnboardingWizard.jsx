@@ -1,60 +1,29 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronRight, ChevronLeft, Building2, User, Users, FileText, Settings, Rocket } from "lucide-react";
+import { Check, Rocket } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import ProfileStep from "./steps/ProfileStep";
-import OrganizationStep from "./steps/OrganizationStep";
-import RoleStep from "./steps/RoleStep";
-import PolicyStep from "./steps/PolicyStep";
-import TeamStep from "./steps/TeamStep";
-import FirstActionStep from "./steps/FirstActionStep";
-import CompletionStep from "./steps/CompletionStep";
+import axios from "axios";
+
+// Import New Steps
+import WelcomeStep from "./steps/WelcomeStep";
+import InviteStep from "./steps/InviteStep";
 
 const OnboardingWizard = () => {
-    const { auth } = useAuth();
-    const isAdmin = auth?.user?.role === "ADMIN";
+    const { auth, login } = useAuth();
 
-    // Define steps based on role
-    const adminSteps = [
-        { id: 1, title: "Profile", icon: User, component: ProfileStep },
-        { id: 2, title: "Organization", icon: Building2, component: OrganizationStep },
-        { id: 3, title: "Roles", icon: Settings, component: RoleStep },
-        { id: 4, title: "Policies", icon: FileText, component: PolicyStep },
-        { id: 5, title: "Team", icon: Users, component: TeamStep },
-        { id: 6, title: "First Action", icon: Rocket, component: FirstActionStep },
-        { id: 7, title: "Complete", icon: Check, component: CompletionStep }
+    // Simplified 2-Step Flow
+    const steps = [
+        { id: 'welcome', title: "Welcome", component: WelcomeStep },
+        { id: 'invite', title: "Invite Team", component: InviteStep }
     ];
 
-    const salesSteps = [
-        { id: 1, title: "Profile", icon: User, component: ProfileStep },
-        { id: 2, title: "Setup", icon: Settings, component: FirstActionStep }, // Simplified flow for sales
-        { id: 3, title: "Complete", icon: Check, component: CompletionStep }
-    ];
-
-    const steps = isAdmin ? adminSteps : salesSteps;
     const [currentStep, setCurrentStep] = useState(0);
-    const [formData, setFormData] = useState({
-        // Profile
-        fullName: auth?.user?.name || "",
-        timezone: "UTC",
-        language: "en",
-
-        // Org (Admin only)
-        orgName: "",
-        industry: "",
-        companySize: "1-10",
-        currency: "USD",
-        fiscalYear: "Jan-Dec",
-
-        // Roles & Policies (Mock/Placeholder for wizard)
-        rolesConfirmed: false,
-        policyCreated: false,
-        teamInvites: []
-    });
 
     const handleNext = () => {
         if (currentStep < steps.length - 1) {
             setCurrentStep(curr => curr + 1);
+        } else {
+            handleCompletion();
         }
     };
 
@@ -66,66 +35,95 @@ const OnboardingWizard = () => {
 
     const CurrentComponent = steps[currentStep].component;
 
-    return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 sm:p-6">
-            <div className="w-full max-w-5xl bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row h-[80vh] md:h-[700px]">
+    const handleCompletion = async () => {
+        try {
+            console.log("Completing onboarding...");
 
-                {/* Sidebar / Stepper */}
-                <div className="w-full md:w-80 bg-slate-900/80 border-b md:border-b-0 md:border-r border-slate-800 p-6 flex flex-col">
-                    <div className="mb-8">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                            <Rocket className="w-6 h-6 text-indigo-500" />
-                            Get Started
-                        </h2>
-                        <p className="text-slate-400 text-sm mt-1">Complete your setup</p>
+            // Just mark onboarding as complete
+            await axios.post("http://localhost:8080/api/onboarding/complete", {}, {
+                headers: {
+                    Authorization: `Bearer ${auth?.token || ''}`
+                }
+            });
+
+            // Update local auth state
+            const updatedAuth = {
+                ...auth,
+                user: {
+                    ...auth.user,
+                    onboardingCompleted: true
+                },
+                onboardingCompleted: true
+            };
+
+            login(updatedAuth);
+
+            // Redirect happens automatically via AuthContext/Router when onboardingCompleted is true
+            // or we can force it if needed, but App.jsx RequireAuth should handle it.
+
+        } catch (error) {
+            console.error("Failed to complete onboarding:", error);
+            // Even if backend fails, if it's a network issue, we might want to let them in? 
+            // Better to show error.
+            alert("Something went wrong finishing setup. Please try again.");
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 sm:p-6 font-inter">
+            <div className="w-full max-w-5xl bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row h-[600px] ring-1 ring-white/10">
+
+                {/* Sidebar - Simplified */}
+                <div className="w-full md:w-72 bg-slate-900/80 border-r border-slate-800 p-8 flex flex-col relative overflow-hidden justify-between">
+                    <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/10 to-transparent pointer-events-none" />
+
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                                <Rocket className="w-6 h-6 text-white" />
+                            </div>
+                            <h1 className="text-xl font-bold text-white tracking-tight">Setup</h1>
+                        </div>
+
+                        <div className="space-y-4">
+                            {steps.map((step, index) => {
+                                const isActive = index === currentStep;
+                                const isCompleted = index < currentStep;
+
+                                return (
+                                    <div
+                                        key={step.id}
+                                        className={`flex items-center gap-3 transition-colors ${isActive ? 'text-white' : isCompleted ? 'text-emerald-400' : 'text-slate-500'}`}
+                                    >
+                                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-[10px] font-bold transition-all
+                                            ${isActive ? 'border-indigo-500 bg-indigo-500/20 text-indigo-400' :
+                                                isCompleted ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400' :
+                                                    'border-slate-700 bg-slate-800 text-slate-500'}`}
+                                        >
+                                            {isCompleted ? <Check className="w-3 h-3" /> : index + 1}
+                                        </div>
+                                        <span className="text-sm font-medium">{step.title}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto space-y-4 md:space-y-0">
-                        {steps.map((step, index) => {
-                            const Icon = step.icon;
-                            const isActive = index === currentStep;
-                            const isCompleted = index < currentStep;
-
-                            return (
-                                <div
-                                    key={step.id}
-                                    className={`relative flex items-center md:p-3 rounded-xl transition-all duration-300 ${isActive ? "bg-indigo-500/10 border border-indigo-500/20" : "opacity-60"
-                                        }`}
-                                >
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 transition-colors ${isActive ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/25" :
-                                            isCompleted ? "bg-emerald-500/20 text-emerald-500" : "bg-slate-800 text-slate-500"
-                                        }`}>
-                                        {isCompleted ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
-                                    </div>
-                                    <div className="hidden md:block">
-                                        <h3 className={`font-medium ${isActive ? "text-white" : "text-slate-400"}`}>
-                                            {step.title}
-                                        </h3>
-                                        {isActive && (
-                                            <p className="text-xs text-indigo-400">In Progress</p>
-                                        )}
-                                    </div>
-
-                                    {/* Mobile Connector Line */}
-                                    {index < steps.length - 1 && (
-                                        <div className={`absolute left-5 top-14 w-0.5 h-6 -ml-[1px] md:hidden ${isCompleted ? "bg-emerald-500/30" : "bg-slate-800"
-                                            }`} />
-                                    )}
-                                </div>
-                            );
-                        })}
+                    <div className="relative z-10">
+                        <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <motion.div
+                                className="h-full bg-indigo-500"
+                                initial={{ width: 0 }}
+                                animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+                                transition={{ duration: 0.5 }}
+                            />
+                        </div>
                     </div>
                 </div>
 
-                {/* Main Content Area */}
-                <div className="flex-1 flex flex-col relative">
-                    {/* Header for Mobile */}
-                    <div className="md:hidden p-4 border-b border-slate-800 bg-slate-900/50">
-                        <span className="text-sm text-slate-400">Step {currentStep + 1} of {steps.length}</span>
-                        <h2 className="text-lg font-bold text-white">{steps[currentStep].title}</h2>
-                    </div>
-
-                    <div className="flex-1 p-6 md:p-10 overflow-y-auto">
+                {/* Main Content */}
+                <div className="flex-1 flex flex-col relative bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-950">
+                    <div className="flex-1 p-8 md:p-12 overflow-y-auto custom-scrollbar flex items-center justify-center">
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={currentStep}
@@ -133,35 +131,14 @@ const OnboardingWizard = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.3 }}
-                                className="h-full"
+                                className="w-full max-w-2xl"
                             >
                                 <CurrentComponent
-                                    formData={formData}
-                                    setFormData={setFormData}
                                     handleNext={handleNext}
+                                    handleBack={handleBack}
                                 />
                             </motion.div>
                         </AnimatePresence>
-                    </div>
-
-                    {/* Footer Controls */}
-                    <div className="p-6 border-t border-slate-800 bg-slate-900/30 flex justify-between items-center">
-                        <button
-                            onClick={handleBack}
-                            disabled={currentStep === 0}
-                            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-all ${currentStep === 0
-                                    ? "opacity-0 pointer-events-none"
-                                    : "text-slate-400 hover:text-white hover:bg-slate-800"
-                                }`}
-                        >
-                            <ChevronLeft className="w-4 h-4" />
-                            Back
-                        </button>
-
-                        {/* Note: Start/Next buttons are usually inside the step components for validation control, 
-                            but global navigation is here if needed. 
-                            We pass handleNext to components so they can trigger it after validation. 
-                        */}
                     </div>
                 </div>
             </div>

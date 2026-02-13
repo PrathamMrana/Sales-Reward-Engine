@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import Confetti from "react-confetti";
+import { Sparkles } from "lucide-react";
 import axios from "axios";
 
 const CompletionStep = () => {
@@ -9,40 +9,31 @@ const CompletionStep = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const completeOnboarding = async () => {
-            try {
-                // Update backend
-                await axios.post(`http://localhost:8080/api/onboarding/complete/${auth.user.id}`);
+        const completeProfileSetup = async () => {
+            // Profile has been saved in the previous step (PreferencesStep -> handleCompletion)
+            // The backend has marked onboardingCompleted = true
+            // Now redirect to the appropriate dashboard based on role
 
-                // Update local storage via auth context re-login logic
-                // Construct new auth object with onboardingCompleted = true
-                const updatedAuth = {
-                    ...auth,
-                    onboardingCompleted: true,
-                    // If user object is nested, update that too if necessary, 
-                    // but the boolean is usually top-level in our response map now
-                };
+            setTimeout(() => {
+                const role = auth?.user?.role || "SALES";
+                const dashboardPath = role === "ADMIN" ? "/admin" : "/sales";
 
-                // Wait for confetti effect
-                setTimeout(() => {
-                    login(updatedAuth); // Refresh context state
-                    navigate(auth.role === "ADMIN" ? "/admin" : "/sales");
-                }, 3000);
-
-            } catch (error) {
-                console.error("Failed to complete onboarding", error);
-            }
+                // Redirect to dashboard where welcome modal will appear
+                window.location.href = dashboardPath;
+            }, 2000);
         };
 
-        completeOnboarding();
-    }, []);
+        completeProfileSetup();
+    }, [auth]);
 
     return (
-        <div className="h-full flex flex-col items-center justify-center text-center relative">
-            <Confetti numberOfPieces={200} recycle={false} />
+        <div className="h-full flex flex-col items-center justify-center text-center relative animate-in fade-in zoom-in duration-500">
+            <div className="mb-6 p-4 rounded-full bg-indigo-500/20 text-indigo-400">
+                <Sparkles className="w-16 h-16 animate-pulse" />
+            </div>
 
-            <h2 className="text-4xl font-bold text-white mb-4">You're All Set!</h2>
-            <p className="text-slate-400 text-lg">Redirecting you to your dashboard...</p>
+            <h2 className="text-3xl font-bold text-white mb-4">Profile Set Up Successfully!</h2>
+            <p className="text-slate-400 text-lg">Redirecting you to the Setup Hub to finish activation...</p>
         </div>
     );
 };

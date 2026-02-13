@@ -19,11 +19,16 @@ const SalesDashboard = () => {
   const pendingDeals = safeDeals.filter(d => (d.status || "").toUpperCase() === "SUBMITTED");
   const rejectedDeals = safeDeals.filter(d => (d.status || "").toUpperCase() === "REJECTED");
 
-  // This Month Incentive
+  // This Month Incentive (Includes Approved & Submitted for Progress Tracking)
   const now = new Date();
-  const thisMonthDeals = approvedDeals.filter(d => {
+  const thisMonthDeals = safeDeals.filter(d => {
+    const status = (d.status || "").toUpperCase();
+    if (status !== 'APPROVED' && status !== 'SUBMITTED') return false;
+
     try {
-      const dealDate = new Date(d.date);
+      if (!d.date) return false;
+      const [year, month, day] = d.date.split('-').map(Number);
+      const dealDate = new Date(year, month - 1, day);
       return dealDate.getMonth() === now.getMonth() && dealDate.getFullYear() === now.getFullYear();
     } catch { return false; }
   });
@@ -39,7 +44,8 @@ const SalesDashboard = () => {
   // Best Month Calculation
   const monthlyIncentives = approvedDeals.reduce((acc, d) => {
     if (!d.date) return acc;
-    const date = new Date(d.date);
+    const [year, month, day] = d.date.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
     const key = `${date.getFullYear()}-${date.getMonth()}`;
     const monthName = date.toLocaleString('default', { month: 'long', year: 'numeric' });
 
