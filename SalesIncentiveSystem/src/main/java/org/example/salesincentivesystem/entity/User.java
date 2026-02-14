@@ -31,7 +31,7 @@ public class User {
     // --- Profile Flow Fields ---
     private String mobile;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String profilePhotoUrl;
 
     private String department;
