@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Plus, X, ArrowRight, CheckCircle, ShieldCheck, Send } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
-import axios from "axios";
+import api from "../../../api";
 
 const InviteStep = ({ handleNext }) => {
     const { auth } = useAuth();
@@ -18,7 +18,7 @@ const InviteStep = ({ handleNext }) => {
         setError("");
 
         try {
-            await axios.post("http://localhost:8080/api/invitations/send", {
+            await api.post("/api/invitations/send", {
                 email: email.trim(),
                 invitedBy: auth.user.id,
                 role: "SALES"

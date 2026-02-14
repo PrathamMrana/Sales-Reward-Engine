@@ -1,6 +1,6 @@
 import SalesLayout from "../../layouts/SalesLayout";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import PageHeader from "../../components/common/PageHeader";
 
@@ -26,7 +26,7 @@ const PolicySimulation = () => {
     const fetchSimulation = async () => {
         setLoading(true);
         try {
-            const res = await axios.post("http://localhost:8080/api/simulation/preview", {
+            const res = await api.post("/api/simulation/preview", {
                 threshold,
                 lowRate,
                 highRate

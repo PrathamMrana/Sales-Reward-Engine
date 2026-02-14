@@ -1,7 +1,7 @@
 import AdminLayout from "../../layouts/AdminLayout";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../api";
 import { useAuth } from "../../context/AuthContext";
 
 const PerformanceDashboard = () => {
@@ -18,10 +18,10 @@ const PerformanceDashboard = () => {
                 const userId = auth.user.id;
                 // Parallel fetch for users and all deals to compute metrics
                 const [usersRes, dealsRes] = await Promise.all([
-                    axios.get("http://localhost:8080/api/users", {
+                    api.get("/api/users", {
                         params: { currentUserId: userId }
                     }),
-                    axios.get("http://localhost:8080/api/deals", {
+                    api.get("/api/deals", {
                         params: { requestorId: userId }
                     })
                 ]);

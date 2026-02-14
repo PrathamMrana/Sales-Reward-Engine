@@ -1,3 +1,4 @@
+import { API_URL } from "../../api";
 import SalesLayout from "../../layouts/SalesLayout";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -17,7 +18,7 @@ const UserManagement = () => {
 
     const fetchUsers = async () => {
         try {
-            const res = await axios.get(`http://localhost:8080/api/users?currentUserId=${auth.user?.id}`);
+            const res = await axios.get(`${API_URL}/api/users?currentUserId=${auth.user?.id}`);
             setUsers(res.data);
             setLoading(false);
         } catch (err) {
@@ -28,10 +29,10 @@ const UserManagement = () => {
 
     const toggleStatus = async (userId, currentStatus) => {
         const newStatus = currentStatus === "ACTIVE" ? "DISABLED" : "ACTIVE";
-        if (!window.confirm(`Are you sure you want to ${newStatus === 'DISABLED' ? 'Disable' : 'Activate'} this user?`)) return;
+        if (!window.confirm(`Are you sure you want to ${newStatus === `DISABLED' ? 'Disable' : 'Activate'} this user?`)) return;
 
         try {
-            await axios.patch(`http://localhost:8080/api/users/${userId}/status`, { status: newStatus });
+            await axios.patch(`${API_URL}/api/users/${userId}/status`, { status: newStatus });
             setUsers(users.map(u => u.id === userId ? { ...u, accountStatus: newStatus } : u));
         } catch (err) {
             alert("Failed to update status");
@@ -89,7 +90,7 @@ const UserManagement = () => {
                                     <td className="p-4 text-text-secondary">{user.email}</td>
                                     <td className="p-4">
                                         <span className={`px-2 py-1 rounded text-xs font-semibold
-                                            ${user.accountStatus === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                            ${user.accountStatus === `ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                             {user.accountStatus}
                                         </span>
                                     </td>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle, Target, Briefcase, FileText, Users, ChevronRight } from "lucide-react";
-import axios from "axios";
+import api from "../../api";
 import { useAuth } from "../../context/AuthContext";
 
 // --- Step 1: Create First Target ---
@@ -20,12 +20,12 @@ export const TargetStep = ({ onComplete }) => {
         setLoading(true);
         try {
             // Create Target
-            await axios.post("http://localhost:8080/api/targets", {
+            await api.post("/api/targets", {
                 ...formData,
                 createdBy: auth.user.id
             });
             // Update Progress
-            await axios.post("http://localhost:8080/api/onboarding/progress/update", {
+            await api.post("/api/onboarding/progress/update", {
                 userId: auth.user.id,
                 task: "firstTarget"
             });
@@ -92,10 +92,10 @@ export const DealStep = ({ onComplete }) => {
                 date: new Date().toISOString().split('T')[0],
                 user: { id: auth.user.id } // Assign to self
             };
-            await axios.post("http://localhost:8080/api/deals", dealPayload);
+            await api.post("/api/deals", dealPayload);
 
             // Update Progress
-            await axios.post("http://localhost:8080/api/onboarding/progress/update", {
+            await api.post("/api/onboarding/progress/update", {
                 userId: auth.user.id,
                 task: "firstDeal"
             });
@@ -165,13 +165,13 @@ export const PolicyStep = ({ onComplete }) => {
         setLoading(true);
         try {
             // Create Policy
-            await axios.post("http://localhost:8080/api/policy", {
+            await api.post("/api/policy", {
                 ...formData,
                 createdBy: auth.user.id
             });
 
             // Update Progress
-            await axios.post("http://localhost:8080/api/onboarding/progress/update", {
+            await api.post("/api/onboarding/progress/update", {
                 userId: auth.user.id,
                 task: "firstRule"
             });
@@ -235,14 +235,14 @@ export const InviteStep = ({ onComplete }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await axios.post("http://localhost:8080/api/invitations/send", {
+            await api.post("/api/invitations/send", {
                 email,
                 role: "SALES",
                 invitedBy: auth.user.id
             });
 
             // Update Progress
-            await axios.post("http://localhost:8080/api/onboarding/progress/update", {
+            await api.post("/api/onboarding/progress/update", {
                 userId: auth.user.id,
                 task: "firstInvite"
             });

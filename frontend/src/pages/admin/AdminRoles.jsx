@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api";
 import AdminLayout from "../../layouts/AdminLayout";
 
 const AdminRoles = () => {
@@ -22,7 +22,7 @@ const AdminRoles = () => {
 
     const fetchRoles = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/roles");
+            const res = await api.get("/roles");
             const parsedRoles = res.data.map(r => ({
                 ...r,
                 permissions: JSON.parse(r.permissionsJson || "{}")
@@ -72,7 +72,7 @@ const AdminRoles = () => {
                 ...activeRole,
                 permissionsJson: JSON.stringify(activeRole.permissions)
             };
-            await axios.post("http://localhost:8080/roles", payload);
+            await api.post("/roles", payload);
             alert("Permissions saved successfully!");
         } catch (error) {
             alert("Failed to save permissions");

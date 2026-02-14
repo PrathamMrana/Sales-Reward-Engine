@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api";
 import SalesLayout from "../../layouts/SalesLayout";
 import PageHeader from "../../components/common/PageHeader";
 
@@ -14,7 +14,7 @@ const SalesIncentivePolicyView = () => {
     const fetchPolicies = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("http://localhost:8080/api/policy?type=INCENTIVE");
+            const response = await api.get("/api/policy?type=INCENTIVE");
             console.log("Incentive Policies for Sales:", response.data);
             setPolicies(response.data);
         } catch (error) {
@@ -66,7 +66,7 @@ const SalesIncentivePolicyView = () => {
                             <div className="mb-4 p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
                                 <div className="text-sm text-text-secondary font-medium mb-1">Commission Rate</div>
                                 <div className="text-3xl font-bold text-primary-600 dark:text-primary-400">
-                                    {policy.commissionRate ? `${policy.commissionRate}%` : "N/A"}
+                                    {policy.commissionRate ? `${policy.commissionRate}%" : "N/A"}
                                 </div>
                             </div>
 

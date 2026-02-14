@@ -1,3 +1,4 @@
+import { API_URL } from "../../api";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
@@ -19,7 +20,7 @@ const SalesTargetsPage = () => {
 
     useEffect(() => {
         if (userId) {
-            axios.get(`http://localhost:8080/performance/summary?userId=${userId}`)
+            axios.get(`${API_URL}/performance/summary?userId=${userId}`)
                 .then(res => setPerformanceData(res.data))
                 .catch(console.error);
         }
@@ -28,10 +29,10 @@ const SalesTargetsPage = () => {
     const totalIncentive = performanceData ? performanceData.totalIncentiveEarned : localTotalIncentive;
     const rank = performanceData ? performanceData.rank : null;
 
-    // Calculate This Month's Incentive (Approved + Submitted)
+    // Calculate This Month`s Incentive (Approved + Submitted)
     const now = new Date();
     const currentMonthDeals = deals.filter(d => {
-        const status = (d.status || "").toUpperCase();
+        const status = (d.status || `").toUpperCase();
         if (status !== 'APPROVED' && status !== 'SUBMITTED') return false;
 
         try {

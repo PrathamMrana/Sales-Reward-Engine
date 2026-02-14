@@ -1,3 +1,4 @@
+import { API_URL } from "../../api";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
@@ -24,7 +25,7 @@ const SalesLeaderboardPage = () => {
 
         const period = periodMap[filter] || "THIS_MONTH";
 
-        axios.get(`http://localhost:8080/api/leaderboard?period=${period}`)
+        axios.get(`${API_URL}/api/leaderboard?period=${period}`)
             .then(res => {
                 setLeaders(res.data || []);
             })
@@ -48,7 +49,7 @@ const SalesLeaderboardPage = () => {
                                 <button
                                     key={f}
                                     onClick={() => setFilter(f)}
-                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === f ? 'bg-white dark:bg-slate-700 shadow-sm text-primary-600' : 'text-text-secondary hover:text-text-primary'}`}
+                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === f ? `bg-white dark:bg-slate-700 shadow-sm text-primary-600' : 'text-text-secondary hover:text-text-primary'}`}
                                 >
                                     {f}
                                 </button>

@@ -1,3 +1,4 @@
+import { API_URL } from "../../api";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
@@ -68,11 +69,11 @@ const SalesDashboard = () => {
 
   useEffect(() => {
     if (userId) {
-      axios.get(`http://localhost:8080/performance/summary?userId=${userId}`)
+      axios.get(`${API_URL}/performance/summary?userId=${userId}`)
         .then(res => setPerformanceData(res.data))
         .catch(console.error);
 
-      axios.get(`http://localhost:8080/api/notifications/user/${userId}`)
+      axios.get(`${API_URL}/api/notifications/user/${userId}`)
         .then(res => setRecentNotifications(res.data.slice(0, 4)))
         .catch(console.error);
     }
@@ -205,7 +206,7 @@ const SalesDashboard = () => {
                 </div>
                 <span className="text-xs font-bold bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">Average</span>
               </div>
-              <p className="text-4xl font-bold mb-2">₹{avgDealSize.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+              <p className="text-4xl font-bold mb-2">₹{avgDealSize.toLocaleString(`en-IN', { maximumFractionDigits: 0 })}</p>
               <p className="text-purple-100 text-sm">Avg Deal Size</p>
               <Link to="/sales/performance" className="mt-4 inline-flex items-center text-sm font-semibold text-white hover:text-purple-100 transition-colors">
                 View Analytics <span className="ml-1">→</span>

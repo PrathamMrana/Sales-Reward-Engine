@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api";
 import SalesLayout from "../layouts/SalesLayout";
 import { useNotifications } from "../context/NotificationContext";
 import PageHeader from "../components/common/PageHeader";
@@ -30,7 +30,7 @@ const IncentiveSimulator = () => {
     if (dealNameParam) setDealName(dealNameParam);
     if (orgParam) setOrgName(orgParam);
 
-    axios.get("http://localhost:8080/api/policy?type=INCENTIVE")
+    api.get("/api/policy?type=INCENTIVE")
       .then(res => setPolicies(res.data))
       .catch(err => console.error("Failed to load policies", err));
   }, []);

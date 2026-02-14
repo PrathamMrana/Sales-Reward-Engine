@@ -1,6 +1,6 @@
 import SalesLayout from "../../layouts/SalesLayout";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api";
 import PageHeader from "../../components/common/PageHeader";
 
 const NotificationManagement = () => {
@@ -17,7 +17,7 @@ const NotificationManagement = () => {
         // Fetch users for the dropdown
         const fetchUsers = async () => {
             try {
-                const response = await axios.get("http://localhost:8080/api/users");
+                const response = await api.get("/api/users");
                 setUsers(response.data);
             } catch (err) {
                 console.error("Failed to fetch users", err);
@@ -40,7 +40,7 @@ const NotificationManagement = () => {
         setIsSending(true);
         try {
             const prefixedTitle = title.startsWith('ADMIN:') ? title : `ADMIN: ${title}`;
-            await axios.post("http://localhost:8080/notifications/broadcast", {
+            await api.post("/notifications/broadcast", {
                 title: prefixedTitle,
                 message,
                 targetRole,

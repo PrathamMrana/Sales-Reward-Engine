@@ -1,6 +1,6 @@
 import SalesLayout from "../../layouts/SalesLayout";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api, { API_URL } from "../../api";
 import { useAuth } from "../../context/AuthContext";
 import PageHeader from "../../components/common/PageHeader";
 
@@ -20,7 +20,7 @@ const IncentivePolicyPage = () => {
 
   const fetchPolicies = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/policy?type=INCENTIVE");
+      const res = await api.get("/api/policy?type=INCENTIVE");
       setPolicies(res.data);
       setLoading(false);
     } catch (err) {
@@ -32,7 +32,7 @@ const IncentivePolicyPage = () => {
   const handleAddPolicy = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8080/api/policy", {
+      await api.post("/api/policy", {
         ...newPolicy,
         displayOrder: policies.length + 1,
         type: "INCENTIVE"
@@ -42,7 +42,7 @@ const IncentivePolicyPage = () => {
       try {
         const userId = localStorage.getItem("userId");
         if (userId) {
-          await axios.post("http://localhost:8080/api/onboarding/progress/update", {
+          await api.post("/api/onboarding/progress/update", {
             userId: userId,
             task: "firstRule"
           });
@@ -62,7 +62,7 @@ const IncentivePolicyPage = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this policy rule?")) return;
     try {
-      await axios.delete(`http://localhost:8080/api/policy/${id}`);
+      await axios.delete(`${API_URL}/api/policy/${id}`);
       fetchPolicies();
     } catch (err) {
       alert("Failed to delete policy");

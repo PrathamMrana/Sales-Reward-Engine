@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import SalesLayout from "../../layouts/SalesLayout";
-import axios from "axios";
+import api from "../../api";
 import PageHeader from "../../components/common/PageHeader";
 
 const SalesPolicies = () => {
@@ -11,7 +11,7 @@ const SalesPolicies = () => {
     useEffect(() => {
         const fetchPolicies = async () => {
             try {
-                const res = await axios.get("http://localhost:8080/api/policy?type=COMPANY");
+                const res = await api.get("/api/policy?type=COMPANY");
                 setPolicies(res.data);
                 if (res.data.length > 0) setSelectedPolicy(res.data[0]);
             } catch (err) {
@@ -62,7 +62,7 @@ const SalesPolicies = () => {
                                 >
                                     <div className="flex items-center gap-2">
                                         <div className={`p-1.5 rounded-lg ${selectedPolicy?.id === policy.id ? 'bg-white/20' : 'bg-primary-100 dark:bg-primary-900/30'}`}>
-                                            <svg className={`w-4 h-4 ${selectedPolicy?.id === policy.id ? 'text-white' : 'text-primary-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                            <svg className={`w-4 h-4 ${selectedPolicy?.id === policy.id ? 'text-white' : 'text-primary-600'}"} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                                         </div>
                                         <span className="flex-1 line-clamp-2">{policy.title}</span>
                                     </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api";
 import AdminLayout from "../../layouts/AdminLayout";
 import PageHeader from "../../components/common/PageHeader";
 
@@ -14,7 +14,7 @@ const AdminSettings = () => {
 
     const fetchSettings = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/settings");
+            const res = await api.get("/settings");
             setSettings(res.data);
             setLoading(false);
         } catch (error) {
@@ -32,7 +32,7 @@ const AdminSettings = () => {
 
     const handleSave = async () => {
         try {
-            await axios.post("http://localhost:8080/settings/bulk", settings);
+            await api.post("/settings/bulk", settings);
             alert("Settings saved successfully!");
             setHasChanges(false);
         } catch (error) {

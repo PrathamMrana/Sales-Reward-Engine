@@ -1,6 +1,6 @@
 import SalesLayout from "../../layouts/SalesLayout";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import axios from "axios";
+import api, { API_URL } from "../../api";
 import PageHeader from "../../components/common/PageHeader";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -23,7 +23,7 @@ const DealApproval = () => {
     const fetchDeals = useCallback(async () => {
         try {
             const userId = localStorage.getItem("userId") || "1";
-            const res = await axios.get("http://localhost:8080/api/deals", {
+            const res = await api.get("/api/deals", {
                 params: { requestorId: userId }
             });
             setDeals(res.data);
@@ -42,7 +42,7 @@ const DealApproval = () => {
             if (reason) payload.reason = reason;
             if (comment) payload.comment = comment;
 
-            const res = await axios.patch(`http://localhost:8080/api/deals/${dealId}/status`, payload);
+            const res = await axios.patch(`${API_URL}/api/deals/${dealId}/status`, payload);
             setDeals(prev => prev.map(d => d.id === dealId ? res.data : d));
         } catch (err) {
             console.error("Failed to update status", err);
@@ -92,7 +92,7 @@ const DealApproval = () => {
     }), [deals, filter, selectedSalesPerson, sortOrder]);
 
     const stats = useMemo(() => {
-        const pending = deals.filter(d => d.status === 'Submitted' || d.status === 'Pending').length;
+        const pending = deals.filter(d => d.status === `Submitted' || d.status === 'Pending').length;
         const approved = deals.filter(d => d.status === 'Approved').length;
         const totalValue = deals.reduce((acc, d) => acc + (d.amount || 0), 0);
         return { pending, approved, totalValue };

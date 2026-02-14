@@ -1,3 +1,4 @@
+import { API_URL } from "../../api";
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -15,7 +16,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (userId) {
-      axios.get(`http://localhost:8080/performance/summary?userId=${userId}`)
+      axios.get(`${API_URL}/performance/summary?userId=${userId}`)
         .then(res => setProfileData(res.data))
         .catch(err => console.error("Failed to fetch profile", err))
         .finally(() => setLoading(false));
@@ -47,7 +48,7 @@ const ProfilePage = () => {
       {/* 1. Hero Profile Card */}
       <div className={`relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br ${getBgGradient()}`}>
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        <div className="absolute inset-0 opacity-10 bg-[url("https://www.transparenttextures.com/patterns/cubes.png')]"></div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
 
         <div className="relative z-10 px-8 py-10 md:py-14 flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-10">
@@ -119,7 +120,7 @@ const ProfilePage = () => {
             <div className="p-6 space-y-6">
               <DetailRow label="Employee ID" value={profileData.employeeCode} icon="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0c0 .667.333 1 1 1v1m0 0v1m0-1h3m-3 0H7" />
               <DetailRow label="Date Joined" value={profileData.joiningDate} icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              <DetailRow label="Global Rank" value={`#${profileData.rank || "N/A"}`} icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <DetailRow label="Global Rank" value={`#${profileData.rank || "N/A"}"} icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               <DetailRow label="Current Incentive Tier" value={profileData.currentTier + " Tier"} icon="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </div>
           </div>

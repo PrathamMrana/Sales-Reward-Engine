@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import AppIcon from "../components/common/AppIcon";
-import axios from "axios";
+import api, { API_URL } from "../api";
 import { ArrowRight, Lock, User, CheckCircle } from "lucide-react";
 
 const AcceptInvite = () => {
@@ -22,7 +22,7 @@ const AcceptInvite = () => {
         }
 
         // Validate Token with Backend
-        axios.get(`http://localhost:8080/api/invitations/validate?token=${token}`)
+        axios.get(`${API_URL}/api/invitations/validate?token=${token}`)
             .then(res => {
                 if (res.data.valid) {
                     setInviteData(res.data);
@@ -45,7 +45,7 @@ const AcceptInvite = () => {
         }
 
         try {
-            await axios.post("http://localhost:8080/api/auth/complete-invite", {
+            await api.post("/api/auth/complete-invite", {
                 token,
                 password
             });
@@ -102,7 +102,7 @@ const AcceptInvite = () => {
                         </div>
                         <h1 className="text-2xl font-bold text-white mb-2">Accept Invitation</h1>
                         <p className="text-sm text-slate-400">
-                            Join <strong className="text-white">{inviteData?.invitedBy || "Company Admin"}</strong>'s team as a Sales Executive.
+                            Join <strong className="text-white">{inviteData?.invitedBy || "Company Admin"}</strong>`s team as a Sales Executive.
                         </p>
                     </div>
 

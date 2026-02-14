@@ -107,7 +107,7 @@ const InsightsPanel = () => {
     {
       label: "Approval Rate",
       value: `${approvalRate.toFixed(0)}%`,
-      subtext: totalSubmitted > 0 ? `${totalApproved}/${totalSubmitted} deals approved` : "No deals yet",
+      subtext: totalSubmitted > 0 ? `${totalApproved}/${totalSubmitted} deals approved" : "No deals yet",
       icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
       color: approvalRate >= 80 ? "from-emerald-500 to-green-600" : (approvalRate >= 50 ? "from-yellow-500 to-amber-600" : "from-red-500 to-rose-600")
     },
@@ -120,7 +120,7 @@ const InsightsPanel = () => {
     },
     {
       label: "Best Win",
-      value: bestDeal ? `₹${bestDeal.incentive.toLocaleString('en-IN')}` : "-",
+      value: bestDeal ? `₹${bestDeal.incentive.toLocaleString('en-IN')}" : "-",
       subtext: bestDeal ? "Highest incentive this month" : "No incentive yet",
       icon: "M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z",
       color: "from-purple-500 to-violet-600"

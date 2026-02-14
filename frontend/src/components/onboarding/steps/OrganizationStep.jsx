@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../../../api";
 import { useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -10,7 +10,7 @@ const OrganizationStep = ({ formData, setFormData, handleNext }) => {
         setIsLoading(true);
         try {
             // Save organization to backend
-            await axios.post("http://localhost:8080/api/onboarding/organization", {
+            await api.post("/api/onboarding/organization", {
                 userId: auth.user.id,
                 name: formData.orgName,
                 industry: formData.industry,

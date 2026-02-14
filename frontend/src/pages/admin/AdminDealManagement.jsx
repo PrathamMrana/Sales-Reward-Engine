@@ -1,3 +1,4 @@
+import { API_URL } from "../../api";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import AdminLayout from "../../layouts/AdminLayout";
@@ -22,7 +23,7 @@ const AdminDealManagement = () => {
     const fetchDeals = async () => {
         setLoading(true);
         try {
-            let url = "http://localhost:8080/admin/deals?";
+            let url = `${API_URL}/admin/deals?`;
             if (statusFilter) url += `status=${statusFilter}&`;
             if (priorityFilter) url += `priority=${priorityFilter}`;
 

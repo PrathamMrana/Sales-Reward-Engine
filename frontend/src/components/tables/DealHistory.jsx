@@ -142,7 +142,7 @@ const DealHistory = () => {
               className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30 hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-colors"
               title={sortOrder === "asc" ? "Ascending" : "Descending"}
             >
-              <svg className={`w-5 h-5 text-primary-600 transition-transform ${sortOrder === "asc" ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-5 h-5 text-primary-600 transition-transform ${sortOrder === "asc" ? "rotate-180" : ""}"} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
@@ -167,7 +167,7 @@ const DealHistory = () => {
               {filteredDeals.map((deal, index) => (
                 <tr key={deal.id || index} className="hover:bg-surface-2 transition-colors group">
                   <td className="px-6 py-4">
-                    <Link to={`/sales/my-deals/${deal.id}`} className="block">
+                    <Link to={`/sales/my-deals/${deal.id}"} className="block">
                       <div className="text-sm font-bold text-text-primary group-hover:text-primary-600 transition-colors">
                         {deal.dealName || "Unnamed Deal"}
                       </div>

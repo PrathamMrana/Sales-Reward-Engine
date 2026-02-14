@@ -1,3 +1,4 @@
+import { API_URL } from "../../api";
 import { CheckCircle2, Circle, Target, FileText, Settings, UserPlus, Sparkles, TrendingUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -66,7 +67,7 @@ const OnboardingChecklist = () => {
 
     const fetchProgress = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/onboarding/progress/${auth.user.id}`);
+            const response = await axios.get(`${API_URL}/api/onboarding/progress/${auth.user.id}`);
             const newProgress = response.data;
 
             // Check if just completed
@@ -196,7 +197,7 @@ const OnboardingChecklist = () => {
                                 </div>
 
                                 {/* Icon */}
-                                <div className={`flex-shrink-0 p-2.5 rounded-lg ${colors.iconBg || 'bg-slate-100 dark:bg-slate-700'}`}>
+                                <div className={`flex-shrink-0 p-2.5 rounded-lg ${colors.iconBg || `bg-slate-100 dark:bg-slate-700'}`}>
                                     <Icon className={`w-5 h-5 ${colors.iconColor || 'text-slate-600 dark:text-slate-400'}`} />
                                 </div>
 

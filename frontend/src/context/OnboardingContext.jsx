@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
-import axios from "axios";
+import api, { API_URL } from "../api";
 
 const OnboardingContext = createContext();
 
@@ -33,12 +33,12 @@ export const OnboardingProvider = ({ children }) => {
             if (auth.user.role === "ADMIN") {
                 // Fetch Counts Parallelly
                 const [policiesRes, dealsRes, usersRes] = await Promise.allSettled([
-                    axios.get("http://localhost:8080/api/policy"),
-                    axios.get("http://localhost:8080/deals"),
-                    axios.get(`http://localhost:8080/api/users?currentUserId=${auth.user.id}`)
+                    api.get("/api/policy"),
+                    api.get("/deals"),
+                    axios.get(`${API_URL}/api/users?currentUserId=${auth.user.id}`)
                 ]);
 
-                const hasPolicies = policiesRes.status === 'fulfilled' && Array.isArray(policiesRes.value.data) && policiesRes.value.data.length > 0;
+                const hasPolicies = policiesRes.status === `fulfilled' && Array.isArray(policiesRes.value.data) && policiesRes.value.data.length > 0;
                 const hasDeals = dealsRes.status === 'fulfilled' && Array.isArray(dealsRes.value.data) && dealsRes.value.data.length > 0;
                 const userCount = usersRes.status === 'fulfilled' && Array.isArray(usersRes.value.data) ? usersRes.value.data.length : 0;
 
@@ -65,11 +65,11 @@ export const OnboardingProvider = ({ children }) => {
             } else if (auth.user.role === "SALES") {
                 // Sales Logic
                 const [dealsRes, payoutsRes] = await Promise.allSettled([
-                    axios.get(`http://localhost:8080/api/sales/my-deals/${auth.user.id}`),
-                    axios.get(`http://localhost:8080/api/sales/payouts/${auth.user.id}`)
+                    axios.get(`${API_URL}/api/sales/my-deals/${auth.user.id}`),
+                    axios.get(`${API_URL}/api/sales/payouts/${auth.user.id}`)
                 ]);
 
-                const hasDeals = dealsRes.status === 'fulfilled' && Array.isArray(dealsRes.value.data) && dealsRes.value.data.length > 0;
+                const hasDeals = dealsRes.status === `fulfilled' && Array.isArray(dealsRes.value.data) && dealsRes.value.data.length > 0;
                 const hasPayouts = payoutsRes.status === 'fulfilled' && Array.isArray(payoutsRes.value.data) && payoutsRes.value.data.length > 0;
 
                 const steps = [

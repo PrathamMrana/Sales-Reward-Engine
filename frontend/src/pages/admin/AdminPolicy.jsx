@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../layouts/AdminLayout";
-import axios from "axios";
+import api, { API_URL } from "../../api";
 import PageHeader from "../../components/common/PageHeader";
 
 const AdminPolicy = () => {
@@ -14,7 +14,7 @@ const AdminPolicy = () => {
 
     const fetchPolicies = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/policies/admin?type=COMPANY");
+            const res = await api.get("/policies/admin?type=COMPANY");
             setPolicies(res.data);
         } catch (err) {
             console.error("Failed to fetch policies");
@@ -51,7 +51,7 @@ const AdminPolicy = () => {
                 payload.id = selectedPolicy.id;
             }
 
-            await axios.post("http://localhost:8080/policies", payload);
+            await api.post("/policies", payload);
             setIsEditing(false);
             fetchPolicies();
             alert("Policy Saved!");
@@ -63,7 +63,7 @@ const AdminPolicy = () => {
     const handleDelete = async (id) => {
         if (!confirm("Are you sure?")) return;
         try {
-            await axios.delete(`http://localhost:8080/policies/${id}`);
+            await axios.delete(`${API_URL}/policies/${id}`);
             fetchPolicies();
             if (selectedPolicy?.id === id) {
                 setIsEditing(false);
@@ -94,7 +94,7 @@ const AdminPolicy = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* List Column */}
-                <div className={`lg:col-span-1 space-y-4 ${isEditing ? 'hidden lg:block' : ''}`}>
+                <div className={`lg:col-span-1 space-y-4 ${isEditing ? `hidden lg:block' : ''}`}>
                     {policies.length === 0 && (
                         <div className="p-8 text-center text-slate-500 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
                             No policies found. Create one!

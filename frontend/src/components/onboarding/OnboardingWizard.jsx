@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Rocket } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import axios from "axios";
+import api from "../../api";
 
 // Import New Steps
 import WelcomeStep from "./steps/WelcomeStep";
@@ -40,7 +40,7 @@ const OnboardingWizard = () => {
             console.log("Completing onboarding...");
 
             // Just mark onboarding as complete
-            await axios.post("http://localhost:8080/api/onboarding/complete", {}, {
+            await api.post("/api/onboarding/complete", {}, {
                 headers: {
                     Authorization: `Bearer ${auth?.token || ''}`
                 }

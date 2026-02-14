@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api, { API_URL } from "../../api";
 import AdminLayout from "../../layouts/AdminLayout";
 import StatCard from "../../components/common/StatCard";
 import PageHeader from "../../components/common/PageHeader";
@@ -15,8 +15,8 @@ const AdminPayouts = () => {
         setLoading(true);
         try {
             const [payoutsRes, summaryRes] = await Promise.all([
-                axios.get(`http://localhost:8080/payouts?status=${filter}`),
-                axios.get("http://localhost:8080/payouts/summary")
+                axios.get(`${API_URL}/payouts?status=${filter}`),
+                api.get("/payouts/summary")
             ]);
             setPayouts(payoutsRes.data);
             setSummary(summaryRes.data);
@@ -50,7 +50,7 @@ const AdminPayouts = () => {
     const markAsPaid = async () => {
         if (selectedIds.length === 0) return;
         try {
-            await axios.post("http://localhost:8080/payouts/mark-paid", selectedIds);
+            await api.post("/payouts/mark-paid", selectedIds);
             alert("Incentives marked as PAID!");
             setSelectedIds([]);
             fetchData(); // Refresh
@@ -62,7 +62,7 @@ const AdminPayouts = () => {
     const exportCSV = () => {
         const headers = "ID,User,Date,Amount,Incentive,Status\n";
         const rows = payouts.map(p =>
-            `${p.id},${p.user?.name || 'Unknown'},${p.date},${p.amount},${p.incentive},${p.payoutStatus}`
+            `${p.id},${p.user?.name || `Unknown'},${p.date},${p.amount},${p.incentive},${p.payoutStatus}`
         ).join("\n");
 
         const blob = new Blob([headers + rows], { type: "text/csv" });

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Mail, UserPlus, Briefcase, CheckCircle2, Copy, Sparkles } from "lucide-react";
-import axios from "axios";
+import api from "../../api";
 import { useAuth } from "../../context/AuthContext";
 
 const InviteUserModal = ({ isOpen, onClose, onSuccess }) => {
@@ -31,7 +31,7 @@ const InviteUserModal = ({ isOpen, onClose, onSuccess }) => {
     const fetchDeals = async () => {
         setLoadingDeals(true);
         try {
-            const res = await axios.get("http://localhost:8080/api/deals");
+            const res = await api.get("/api/deals");
             // Filter for unassigned deals or deals in PENDING status
             const availableDeals = res.data.filter(d =>
                 !d.user || d.status === "PENDING" || d.status === "DRAFT"
@@ -57,13 +57,13 @@ const InviteUserModal = ({ isOpen, onClose, onSuccess }) => {
                 ...(role === "SALES" && selectedDealId && { assignedDealId: parseInt(selectedDealId) })
             };
 
-            const res = await axios.post("http://localhost:8080/api/invitations/send", payload);
+            const res = await api.post("/api/invitations/send", payload);
             setInviteLink(res.data.link);
 
             // Onboarding Progress: Mark 'First Invite' as complete
             try {
                 if (auth.user && auth.user.id) {
-                    await axios.post("http://localhost:8080/api/onboarding/progress/update", {
+                    await api.post("/api/onboarding/progress/update", {
                         userId: auth.user.id,
                         task: "firstInvite"
                     });

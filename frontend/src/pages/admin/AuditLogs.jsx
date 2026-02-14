@@ -1,3 +1,4 @@
+import { API_URL } from "../../api";
 import SalesLayout from "../../layouts/SalesLayout";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -30,8 +31,8 @@ const AuditLogs = () => {
             if (filters.endDate) params.endDate = filters.endDate + "T23:59:59";
 
             const url = Object.keys(params).length > 0
-                ? "http://localhost:8080/api/audit-logs/search"
-                : "http://localhost:8080/api/audit-logs";
+                ? `${API_URL}/api/audit-logs/search`
+                : `${API_URL}/api/audit-logs`;
 
             const response = await axios.get(url, { params });
             setLogs(response.data);
@@ -57,7 +58,7 @@ const AuditLogs = () => {
                 log.action,
                 log.entityType,
                 log.entityId,
-                `"${(log.details || "").replace(/"/g, '""')}"`
+                `"${(log.details || "").replace(/"/g, """')}"`
             ].join(","))
         ].join("\n");
 

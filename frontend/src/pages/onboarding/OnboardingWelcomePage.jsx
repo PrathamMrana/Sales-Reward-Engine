@@ -1,3 +1,4 @@
+import { API_URL } from "../../api";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -74,7 +75,7 @@ const OnboardingWelcomePage = () => {
 
     const fetchProgress = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/onboarding/progress/${auth.user.id}`);
+            const response = await axios.get(`${API_URL}/api/onboarding/progress/${auth.user.id}`);
             const newProgress = response.data;
 
             // Check if just completed
@@ -94,7 +95,7 @@ const OnboardingWelcomePage = () => {
 
         // Update backend
         try {
-            await axios.post(`http://localhost:8080/api/onboarding/complete/${auth.user.id}`);
+            await axios.post(`${API_URL}/api/onboarding/complete/${auth.user.id}`);
             updateOnboardingStatus(true);
         } catch (error) {
             console.error("Failed to complete onboarding:", error);
@@ -280,7 +281,7 @@ const OnboardingWelcomePage = () => {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 1.5, duration: 0.6 }}
                     >
-                        Let's get your Sales Reward Engine ready in 4 simple steps
+                        Let`s get your Sales Reward Engine ready in 4 simple steps
                     </motion.p>
                 </motion.div>
 

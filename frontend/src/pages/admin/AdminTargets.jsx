@@ -1,6 +1,6 @@
 import SalesLayout from "../../layouts/SalesLayout";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api, { API_URL } from "../../api";
 import { useAuth } from "../../context/AuthContext";
 import PageHeader from "../../components/common/PageHeader";
 import { Target, Plus, Edit2, Trash2, TrendingUp } from "lucide-react";
@@ -25,7 +25,7 @@ const AdminTargets = () => {
 
     const fetchTargets = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/api/targets");
+            const res = await api.get("/api/targets");
             setTargets(res.data);
             setLoading(false);
         } catch (err) {
@@ -36,7 +36,7 @@ const AdminTargets = () => {
 
     const fetchUsers = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/api/users");
+            const res = await api.get("/api/users");
             setUsers(res.data.filter(u => u.role === "SALES"));
         } catch (err) {
             console.error("Failed to fetch users", err);
@@ -46,7 +46,7 @@ const AdminTargets = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:8080/api/targets", {
+            await api.post("/api/targets", {
                 ...formData,
                 createdBy: auth.user.id // Track who created this target for onboarding
             });
@@ -54,7 +54,7 @@ const AdminTargets = () => {
             // Onboarding Progress: Mark 'First Target' as complete
             try {
                 if (auth.user && auth.user.id) {
-                    await axios.post("http://localhost:8080/api/onboarding/progress/update", {
+                    await api.post("/api/onboarding/progress/update", {
                         userId: auth.user.id,
                         task: "firstTarget"
                     });
@@ -75,7 +75,7 @@ const AdminTargets = () => {
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this target?")) return;
         try {
-            await axios.delete(`http://localhost:8080/api/targets/${id}`);
+            await axios.delete(`${API_URL}/api/targets/${id}`);
             fetchTargets();
         } catch (err) {
             console.error("Failed to delete target", err);

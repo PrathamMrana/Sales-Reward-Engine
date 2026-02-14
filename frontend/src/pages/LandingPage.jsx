@@ -122,7 +122,7 @@ const LandingPage = () => {
           </div>
           <div className="hidden md:flex items-center gap-8">
             {['How it Works', 'Integrations', 'Pricing'].map((item) => (
-              <a key={item} href={`#${item.replace(/\s+/g, '-').toLowerCase()}`} className="text-sm font-medium text-slate-400 hover:text-white transition-colors relative group">
+              <a key={item} href={`#${item.replace(/\s+/g, '-').toLowerCase()}"} className="text-sm font-medium text-slate-400 hover:text-white transition-colors relative group">
                 {item}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full" />
               </a>

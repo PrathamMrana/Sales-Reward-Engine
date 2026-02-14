@@ -1,3 +1,4 @@
+import { API_URL } from "../../api";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
@@ -17,13 +18,13 @@ const SalesPerformancePage = () => {
 
     useEffect(() => {
         if (userId) {
-            axios.get(`http://localhost:8080/api/deals?userId=${userId}`)
+            axios.get(`${API_URL}/api/deals?userId=${userId}`)
                 .then(res => {
                     setDeals(res.data);
                     setLoading(false);
                 })
                 .catch(err => {
-                    console.error('Failed to fetch deals', err);
+                    console.error(`Failed to fetch deals', err);
                     setLoading(false);
                 });
         }

@@ -1,3 +1,4 @@
+import { API_URL } from "../../api";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CheckCircle, Circle, Lock, ArrowRight, ShieldCheck, FileText, Target, Users, Loader } from "lucide-react";
@@ -35,7 +36,7 @@ const AdminOnboarding = () => {
     const fetchProgress = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`http://localhost:8080/api/onboarding/progress/${auth.user.id}`);
+            const res = await axios.get(`${API_URL}/api/onboarding/progress/${auth.user.id}`);
             const data = res.data;
             setProgress(data);
 
@@ -87,7 +88,7 @@ const AdminOnboarding = () => {
                     <div className="mx-auto w-20 h-20 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/30">
                         <CheckCircle className="w-10 h-10 text-white" />
                     </div>
-                    <h2 className="text-3xl font-bold text-white mb-4">You're All Set!</h2>
+                    <h2 className="text-3xl font-bold text-white mb-4">You`re All Set!</h2>
                     <p className="text-slate-400 mb-8">
                         Your workspace is configured and ready for action. Access your command center now.
                     </p>

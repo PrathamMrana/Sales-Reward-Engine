@@ -4,7 +4,7 @@ import { X, ArrowRight, CheckCircle, Zap, Building2, Users, Send } from "lucide-
 import { useOnboarding } from "../../context/OnboardingContext";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../api";
 
 const WelcomeModal = () => {
     const { showWelcome, dismissWelcome } = useOnboarding();
@@ -39,7 +39,7 @@ const WelcomeModal = () => {
         setInviteError("");
 
         try {
-            await axios.post("http://localhost:8080/api/invitations/send", {
+            await api.post("/api/invitations/send", {
                 email: inviteEmail,
                 role: "SALES",
                 invitedBy: user.id
@@ -47,7 +47,7 @@ const WelcomeModal = () => {
 
             // Mark step as complete in onboarding progress
             try {
-                await axios.post("http://localhost:8080/api/onboarding/progress/update", {
+                await api.post("/api/onboarding/progress/update", {
                     userId: user.id,
                     task: "firstInvite"
                 });

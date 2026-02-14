@@ -1,3 +1,4 @@
+import { API_URL } from "../../api";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -17,7 +18,7 @@ const AdminDealDetailPage = () => {
 
     const fetchDealDetails = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/admin/deals/${id}`);
+            const response = await axios.get(`${API_URL}/admin/deals/${id}`);
             setDeal(response.data);
         } catch (error) {
             console.error("Error fetching deal details:", error);
@@ -170,7 +171,7 @@ const AdminDealDetailPage = () => {
                                         onClick={() => {
                                             if (window.confirm('Approve this deal?')) {
                                                 // Simple inline approval for now, or could implement modal
-                                                axios.patch(`http://localhost:8080/api/deals/${deal.id}/status`, { status: 'Approved', comment: 'Approved via Detail Page' })
+                                                axios.patch(`${API_URL}/api/deals/${deal.id}/status`, { status: 'Approved', comment: 'Approved via Detail Page' })
                                                     .then(() => { fetchDealDetails(); alert('Deal Approved'); })
                                                     .catch(err => console.error(err));
                                             }
@@ -183,7 +184,7 @@ const AdminDealDetailPage = () => {
                                         onClick={() => {
                                             const reason = window.prompt('Enter rejection reason:');
                                             if (reason) {
-                                                axios.patch(`http://localhost:8080/api/deals/${deal.id}/status`, { status: 'Rejected', reason: reason })
+                                                axios.patch(`${API_URL}/api/deals/${deal.id}/status`, { status: 'Rejected', reason: reason })
                                                     .then(() => { fetchDealDetails(); alert('Deal Rejected'); })
                                                     .catch(err => console.error(err));
                                             }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api, { API_URL } from "../../api";
 import AdminLayout from "../../layouts/AdminLayout";
 import PageHeader from "../../components/common/PageHeader";
 
@@ -20,7 +20,7 @@ const AdminAlerts = () => {
 
     const fetchRules = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/rules");
+            const res = await api.get("/rules");
             setRules(res.data);
         } catch (error) {
             console.error("Failed to fetch rules", error);
@@ -32,7 +32,7 @@ const AdminAlerts = () => {
     const handleCreate = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:8080/rules", newRule);
+            await api.post("/rules", newRule);
             setNewRule({ name: "", metric: "DEAL_AMOUNT", operator: "GT", threshold: 0, action: "NOTIFY_ADMIN" });
             fetchRules();
             alert("Rule created successfully!");
@@ -44,7 +44,7 @@ const AdminAlerts = () => {
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this rule?")) return;
         try {
-            await axios.delete(`http://localhost:8080/rules/${id}`);
+            await axios.delete(`${API_URL}/rules/${id}`);
             fetchRules();
         } catch (error) {
             alert("Failed to delete rule");
@@ -152,7 +152,7 @@ const AdminAlerts = () => {
                                 {rules.map(rule => (
                                     <div key={rule.id} className="bg-surface-2 p-4 rounded-xl border border-border-subtle flex justify-between items-center hover:shadow-md transition-shadow">
                                         <div className="flex items-center gap-4">
-                                            <div className={`p-3 rounded-full ${rule.action === 'FLAG_RISK' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
+                                            <div className={`p-3 rounded-full ${rule.action === `FLAG_RISK' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
                                                 ⚡️
                                             </div>
                                             <div>
