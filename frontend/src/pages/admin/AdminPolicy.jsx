@@ -20,7 +20,7 @@ const AdminPolicy = () => {
     const fetchPolicies = async () => {
         setLoading(true);
         try {
-            const res = await api.get("/api/policies/admin?type=COMPANY");
+            const res = await api.get("/api/policy/admin?type=COMPANY");
             setPolicies(res.data);
         } catch (err) {
             console.error("Failed to fetch policies:", err);
@@ -72,7 +72,7 @@ const AdminPolicy = () => {
                 payload.id = editingPolicy.id;
             }
 
-            await api.post("/api/policies", payload);
+            await api.post("/api/policy", payload);
             setShowForm(false);
             fetchPolicies();
         } catch (err) {
@@ -84,7 +84,7 @@ const AdminPolicy = () => {
     const handleDelete = async (id) => {
         if (!confirm("Are you sure you want to delete this policy document?")) return;
         try {
-            await api.delete(`/api/policies/${id}`);
+            await api.delete(`/api/policy/${id}`);
             fetchPolicies();
             setShowForm(false);
         } catch (err) {

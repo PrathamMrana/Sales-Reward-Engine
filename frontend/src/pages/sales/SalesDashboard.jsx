@@ -1,6 +1,5 @@
-import { API_URL } from "../../api";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import SalesLayout from "../../layouts/SalesLayout";
@@ -69,11 +68,11 @@ const SalesDashboard = () => {
 
   useEffect(() => {
     if (userId) {
-      axios.get(`${API_URL}/performance/summary?userId=${userId}`)
+      api.get(`/performance/summary?userId=${userId}`)
         .then(res => setPerformanceData(res.data))
         .catch(console.error);
 
-      axios.get(`${API_URL}/api/notifications/user/${userId}`)
+      api.get(`/api/notifications/user/${userId}`)
         .then(res => setRecentNotifications(res.data.slice(0, 4)))
         .catch(console.error);
     }

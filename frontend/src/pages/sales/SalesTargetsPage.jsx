@@ -1,6 +1,5 @@
-import { API_URL } from "../../api";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api";
 import { useAuth } from "../../context/AuthContext";
 import SalesLayout from "../../layouts/SalesLayout";
 import GoalTracker from "../../components/common/GoalTracker";
@@ -20,7 +19,7 @@ const SalesTargetsPage = () => {
 
     useEffect(() => {
         if (userId) {
-            axios.get(`${API_URL}/performance/summary?userId=${userId}`)
+            api.get(`/performance/summary?userId=${userId}`)
                 .then(res => setPerformanceData(res.data))
                 .catch(console.error);
         }

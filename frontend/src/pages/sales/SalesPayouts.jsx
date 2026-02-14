@@ -1,8 +1,7 @@
-import { API_URL } from "../../api";
 import React, { useState, useEffect } from "react";
 import SalesLayout from "../../layouts/SalesLayout";
 import { useAuth } from "../../context/AuthContext";
-import axios from "axios";
+import api from "../../api";
 import PageHeader from "../../components/common/PageHeader";
 
 const SalesPayouts = () => {
@@ -24,7 +23,7 @@ const SalesPayouts = () => {
         try {
             // Reusing existing endpoint: GET /deals?userId=...
             // Only 'Approved' deals are eligible for payouts
-            const res = await axios.get(`${API_URL}/api/deals?userId=${auth.user.id}`);
+            const res = await api.get(`/api/deals?userId=${auth.user.id}`);
 
             const approvedDeals = res.data.filter(d => d.status === "Approved");
 

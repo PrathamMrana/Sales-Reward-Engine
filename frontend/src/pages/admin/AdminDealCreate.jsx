@@ -68,7 +68,7 @@ const AdminDealCreate = () => {
         setLoading(true);
 
         try {
-            await api.post("/api/admin/deals", formData);
+            await api.post("/admin/deals", formData);
 
             // Onboarding Progress update
             try {

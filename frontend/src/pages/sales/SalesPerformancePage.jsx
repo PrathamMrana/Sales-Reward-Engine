@@ -1,6 +1,5 @@
-import { API_URL } from "../../api";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api";
 import { useAuth } from "../../context/AuthContext";
 import SalesLayout from "../../layouts/SalesLayout";
 import PerformanceTrend from "../../components/charts/PerformanceTrend";
@@ -18,7 +17,7 @@ const SalesPerformancePage = () => {
 
     useEffect(() => {
         if (userId) {
-            axios.get(`${API_URL}/api/deals?userId=${userId}`)
+            api.get(`/api/deals?userId=${userId}`)
                 .then(res => {
                     setDeals(res.data);
                     setLoading(false);

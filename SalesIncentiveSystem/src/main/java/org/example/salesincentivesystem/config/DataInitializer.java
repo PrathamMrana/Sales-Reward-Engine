@@ -108,10 +108,20 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void restoreDeals() throws Exception {
-        if (dealRepository.count() > 0) {
-            System.out.println("Deals already exist. Skipping deal restoration.");
-            return;
+        // TEMPORARILY DISABLED: Allow reloading deals from JSON
+        // if (dealRepository.count() > 0) {
+        // System.out.println("Deals already exist. Skipping deal restoration.");
+        // return;
+        // }
+
+        // Clear existing deals to avoid duplicates
+        long existingCount = dealRepository.count();
+        if (existingCount > 0) {
+            System.out.println("Clearing " + existingCount + " existing deals before reload...");
+            dealRepository.deleteAll();
         }
+
+        System.out.println("Loading deals from deals.json...");
 
         InputStream is = new ClassPathResource("deals.json").getInputStream();
         // Since deals.json has nested user objects with IDs that might not match the

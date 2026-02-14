@@ -1,6 +1,5 @@
-import { API_URL } from "../../api";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api";
 import { useAuth } from "../../context/AuthContext";
 import SalesLayout from "../../layouts/SalesLayout";
 import PageHeader from "../../components/common/PageHeader";
@@ -25,7 +24,7 @@ const SalesLeaderboardPage = () => {
 
         const period = periodMap[filter] || "THIS_MONTH";
 
-        axios.get(`${API_URL}/api/leaderboard?period=${period}`)
+        api.get(`/api/leaderboard?period=${period}`)
             .then(res => {
                 setLeaders(res.data || []);
             })

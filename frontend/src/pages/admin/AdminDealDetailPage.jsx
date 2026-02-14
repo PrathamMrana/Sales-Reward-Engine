@@ -18,7 +18,7 @@ const AdminDealDetailPage = () => {
 
     const fetchDealDetails = async () => {
         try {
-            const response = await api.get(`/api/admin/deals/${id}`);
+            const response = await api.get(`/admin/deals/${id}`);
             setDeal(response.data);
         } catch (error) {
             console.error("Error fetching deal details:", error);
@@ -27,13 +27,22 @@ const AdminDealDetailPage = () => {
         }
     };
 
-    const handleUpdateStatus = async (status, comment = "") => {
+    const handleUpdateStatus = async (status, reasonOrComment = "") => {
         try {
-            await api.patch(`/api/deals/${deal.id}/status`, { status, comment });
+            const payload = { status };
+
+            // If rejecting, send as 'reason', otherwise as 'comment'
+            if (status === 'Rejected' && reasonOrComment) {
+                payload.reason = reasonOrComment;
+            } else if (reasonOrComment) {
+                payload.comment = reasonOrComment;
+            }
+
+            await api.patch(`/api/deals/${deal.id}/status`, payload);
             fetchDealDetails();
         } catch (err) {
             console.error("Status update failed:", err);
-            alert("❌ Failed to update status.");
+            alert("❌ Failed to update status: " + (err.response?.data?.message || err.message));
         }
     };
 
@@ -229,7 +238,7 @@ const AdminDealDetailPage = () => {
                     <div className="glass-panel p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/5">
                         <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Protocol Authorization</h3>
                         <div className="space-y-4">
-                            {(deal.status === 'Submitted' || deal.status === 'Pending') && (
+                            {(deal.status !== 'Approved' && deal.status !== 'Rejected') && (
                                 <>
                                     <button
                                         onClick={() => handleUpdateStatus('Approved', 'Authorized via Master Command')}

@@ -1,8 +1,7 @@
-import { API_URL } from "../../api";
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
-import axios from "axios";
+import api from "../../api";
 import TierBadge from "../../components/common/TierBadge";
 
 const ProfilePage = () => {
@@ -16,7 +15,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (userId) {
-      axios.get(`${API_URL}/performance/summary?userId=${userId}`)
+      api.get(`/performance/summary?userId=${userId}`)
         .then(res => setProfileData(res.data))
         .catch(err => console.error("Failed to fetch profile", err))
         .finally(() => setLoading(false));

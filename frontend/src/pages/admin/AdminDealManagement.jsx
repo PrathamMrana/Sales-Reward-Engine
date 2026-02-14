@@ -27,7 +27,7 @@ const AdminDealManagement = () => {
             if (statusFilter) params.status = statusFilter;
             if (priorityFilter) params.priority = priorityFilter;
 
-            const response = await api.get("/api/admin/deals", { params });
+            const response = await api.get("/admin/deals", { params });
             setDeals(response.data);
         } catch (error) {
             console.error("Error fetching deals:", error);
