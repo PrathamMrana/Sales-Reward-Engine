@@ -197,7 +197,7 @@ const OnboardingChecklist = () => {
                                 </div>
 
                                 {/* Icon */}
-                                <div className={`flex-shrink-0 p-2.5 rounded-lg ${colors.iconBg || `bg-slate-100 dark:bg-slate-700'}`}>
+                                <div className={`flex-shrink-0 p-2.5 rounded-lg ${colors.iconBg || 'bg-slate-100 dark:bg-slate-700'}`}>
                                     <Icon className={`w-5 h-5 ${colors.iconColor || 'text-slate-600 dark:text-slate-400'}`} />
                                 </div>
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import api, { API_URL } from "../../api";
 import AdminLayout from "../../layouts/AdminLayout";
 import PageHeader from "../../components/common/PageHeader";
@@ -152,7 +153,7 @@ const AdminAlerts = () => {
                                 {rules.map(rule => (
                                     <div key={rule.id} className="bg-surface-2 p-4 rounded-xl border border-border-subtle flex justify-between items-center hover:shadow-md transition-shadow">
                                         <div className="flex items-center gap-4">
-                                            <div className={`p-3 rounded-full ${rule.action === `FLAG_RISK' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
+                                            <div className={`p-3 rounded-full ${rule.action === 'FLAG_RISK' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
                                                 ⚡️
                                             </div>
                                             <div>

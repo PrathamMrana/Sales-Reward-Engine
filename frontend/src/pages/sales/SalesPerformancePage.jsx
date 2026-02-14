@@ -24,7 +24,7 @@ const SalesPerformancePage = () => {
                     setLoading(false);
                 })
                 .catch(err => {
-                    console.error(`Failed to fetch deals', err);
+                    console.error('Failed to fetch deals', err);
                     setLoading(false);
                 });
         }

@@ -92,7 +92,7 @@ const DealApproval = () => {
     }), [deals, filter, selectedSalesPerson, sortOrder]);
 
     const stats = useMemo(() => {
-        const pending = deals.filter(d => d.status === `Submitted' || d.status === 'Pending').length;
+        const pending = deals.filter(d => d.status === 'Submitted' || d.status === 'Pending').length;
         const approved = deals.filter(d => d.status === 'Approved').length;
         const totalValue = deals.reduce((acc, d) => acc + (d.amount || 0), 0);
         return { pending, approved, totalValue };

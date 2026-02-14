@@ -57,16 +57,16 @@ function Dashboard() {
         )}
 
         {[
-          { label: "Total Deals", value: totalDeals },
-          { label: "Total Revenue", value: `₹${totalRevenue}` },
-          { label: "Total Commission", value: `₹${totalCommission}` }
+          { label: `Total Deals", value: totalDeals },
+          { label: 'Total Revenue', value: '₹${totalRevenue}` },
+          { label: 'Total Commission', value: '₹${totalCommission}` }
         ].map((card, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.2 }}
-            className="glass-card p-6"
+            className='glass-card p-6'
           >
             <p className="text-text-secondary text-sm font-medium">{card.label}</p>
             <h2 className="text-2xl font-bold mt-2 text-text-primary">{card.value}</h2>

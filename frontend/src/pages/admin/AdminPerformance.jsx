@@ -51,12 +51,12 @@ const AdminPerformance = () => {
                 // 2. Fetch Deals (for transaction ledger table only)
                 let allDeals = [];
                 try {
-                    const requestorIdParam = auth.user?.id ? `&requestorId=${auth.user.id}" : "";
+                    const requestorIdParam = auth.user?.id ? `&requestorId=${auth.user.id}` : "";
                     const dealsRes = await axios.get(`${API_URL}/api/deals?userId=${userId}${requestorIdParam}`);
                     allDeals = dealsRes.data || [];
                 } catch (e) {
                     // Fallback attempt
-                    const requestorIdParam = auth.user?.id ? `?requestorId=${auth.user.id}` : `";
+                    const requestorIdParam = auth.user?.id ? `?requestorId=${auth.user.id}` : "";
                     const dealsRes = await axios.get(`${API_URL}/api/deals${requestorIdParam}`);
                     allDeals = (dealsRes.data || []).filter(d => d.user?.id == userId || d.userId == userId || (d.user && d.user.id && d.user.id.toString() === userId.toString()));
                 }
@@ -94,7 +94,7 @@ const AdminPerformance = () => {
                 } catch (perfErr) {
                     console.error("Error fetching performance metrics from backend:", perfErr);
                     // Fallback: use frontend calculation if backend fails
-                    const approved = sortedDeals.filter(d => (d.status || "").toLowerCase() === `approved');
+                    const approved = sortedDeals.filter(d => (d.status || "").toLowerCase() === 'approved');
                     const totalRev = approved.reduce((acc, d) => acc + (parseFloat(d.amount) || 0), 0);
                     const totalInc = approved.reduce((acc, d) => acc + (parseFloat(d.incentive) || 0), 0);
                     const avgDeal = approved.length ? totalRev / approved.length : 0;
@@ -212,7 +212,7 @@ const AdminPerformance = () => {
         <AdminLayout>
             <PageHeader
                 heading="Performance Analysis"
-                subtitle={`Overview for ${userProfile?.name || "Unknown User"}`}
+                subtitle={`Overview for ${userProfile?.name || 'Unknown User'}`}
                 actions={
                     <button onClick={() => navigate('/admin/performance')} className="btn-secondary flex items-center gap-2">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
@@ -236,7 +236,7 @@ const AdminPerformance = () => {
                                 <div className={`w-full h-full bg-gradient-to-br ${tier.color} rounded-2xl flex items-center justify-center text-white text-5xl font-black shadow-inner`}>
                                     {userProfile?.name ? userProfile.name.charAt(0).toUpperCase() : "?"}
                                 </div>
-                                <div className="absolute -bottom-3 -right-3 w-10 h-10 bg-[var(--surface-1)] rounded-xl shadow-md flex items-center justify-center border border-[var(--border-subtle)]" title={`Tier: ${tier.name}`}>
+                                <div className='absolute -bottom-3 -right-3 w-10 h-10 bg-[var(--surface-1)] rounded-xl shadow-md flex items-center justify-center border border-[var(--border-subtle)]' title={`Tier: ${tier.name}`}>
                                     {tier.name === 'Diamond' && '💎'}
                                     {tier.name === 'Platinum' && '🏆'}
                                     {tier.name === 'Gold' && '🥇'}

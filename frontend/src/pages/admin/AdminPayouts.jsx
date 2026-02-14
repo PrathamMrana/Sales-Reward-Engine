@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import api, { API_URL } from "../../api";
 import AdminLayout from "../../layouts/AdminLayout";
 import StatCard from "../../components/common/StatCard";
@@ -15,7 +16,7 @@ const AdminPayouts = () => {
         setLoading(true);
         try {
             const [payoutsRes, summaryRes] = await Promise.all([
-                axios.get(`${API_URL}/payouts?status=${filter}`),
+                api.get(`${API_URL}/payouts?status=${filter}`),
                 api.get("/payouts/summary")
             ]);
             setPayouts(payoutsRes.data);
@@ -62,7 +63,7 @@ const AdminPayouts = () => {
     const exportCSV = () => {
         const headers = "ID,User,Date,Amount,Incentive,Status\n";
         const rows = payouts.map(p =>
-            `${p.id},${p.user?.name || `Unknown'},${p.date},${p.amount},${p.incentive},${p.payoutStatus}`
+            `${p.id},${p.user?.name || 'Unknown'},${p.date},${p.amount},${p.incentive},${p.payoutStatus}`
         ).join("\n");
 
         const blob = new Blob([headers + rows], { type: "text/csv" });
@@ -107,8 +108,8 @@ const AdminPayouts = () => {
                 {/* Filters & Actions */}
                 <div className="flex justify-between items-center bg-surface-2 p-4 rounded-xl border border-border-subtle">
                     <div className="flex bg-surface-1 p-1 rounded-lg border border-border-subtle">
-                        <button onClick={() => setFilter("PENDING")} className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === "PENDING" ? 'bg-primary-500 text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}>Pending</button>
-                        <button onClick={() => setFilter("PAID")} className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === "PAID" ? 'bg-primary-500 text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}>Paid History</button>
+                        <button onClick={() => setFilter('PENDING')} className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === "PENDING" ? 'bg-primary-500 text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}>Pending</button>
+                        <button onClick={() => setFilter('PAID')} className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === "PAID" ? 'bg-primary-500 text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}>Paid History</button>
                     </div>
 
                     {filter === "PENDING" && selectedIds.length > 0 && (
@@ -161,9 +162,9 @@ const AdminPayouts = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </AdminLayout>
+                </div >
+            </div >
+        </AdminLayout >
     );
 };
 

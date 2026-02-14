@@ -63,7 +63,7 @@ const PreferencesStep = ({ formData, setFormData, handleNext }) => {
                                     onChange={() => togglePreference('notifications', type)}
                                 />
                                 <span className="text-slate-400 capitalize">
-                                    {type === 'reports' ? 'Weekly Performance Reports' : `Enable ${type} alerts`}
+                                    {type === 'reports' ? 'Weekly Performance Reports' : 'Enable ${type} alerts`}
                                 </span>
                             </label>
                         ))}

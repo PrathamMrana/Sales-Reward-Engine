@@ -189,7 +189,7 @@ const MyDealsPage = () => {
                         className="p-2 rounded-lg bg-surface-2 hover:bg-surface-3 transition-colors"
                         title={sortOrder === "asc" ? "Ascending" : "Descending"}
                     >
-                        <svg className={`w-5 h-5 text-text-secondary transition-transform ${sortOrder === "asc" ? "rotate-180" : ""}"} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`w-5 h-5 text-text-secondary transition-transform ${sortOrder === "asc" ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                     </button>
@@ -255,7 +255,7 @@ const MyDealsPage = () => {
                             <div className="p-4 border-t border-border-subtle bg-surface-2/30 rounded-b-xl">
                                 {(deal.status || "").toUpperCase() === "ASSIGNED" && (
                                     <div className="grid grid-cols-2 gap-3">
-                                        <Link to={`/sales/my-deals/${deal.id}"} className="btn-secondary text-sm py-2 flex items-center justify-center">
+                                        <Link to={`/sales/my-deals/${deal.id}`} className="btn-secondary text-sm py-2 flex items-center justify-center">
                                             View Details
                                         </Link>
                                         <button
@@ -268,7 +268,7 @@ const MyDealsPage = () => {
                                 )}
                                 {(deal.status || "").toUpperCase() === "IN_PROGRESS" && (
                                     <div className="grid grid-cols-2 gap-3">
-                                        <Link to={`/sales/my-deals/${deal.id}"} className="btn-secondary text-sm py-2 flex items-center justify-center">
+                                        <Link to={`/sales/my-deals/${deal.id}`} className="btn-secondary text-sm py-2 flex items-center justify-center">
                                             View Details
                                         </Link>
                                         <button
@@ -281,7 +281,7 @@ const MyDealsPage = () => {
                                 )}
                                 {(deal.status || "").toUpperCase() === "DRAFT" && (
                                     <div className="grid grid-cols-2 gap-3">
-                                        <Link to={`/sales/my-deals/${deal.id}"} className="btn-secondary text-sm py-2 flex items-center justify-center">
+                                        <Link to={`/sales/my-deals/${deal.id}`} className="btn-secondary text-sm py-2 flex items-center justify-center">
                                             Edit Details
                                         </Link>
                                         <button
@@ -293,16 +293,16 @@ const MyDealsPage = () => {
                                     </div>
                                 )}
                                 {!["ASSIGNED", "IN_PROGRESS", "DRAFT"].includes((deal.status || "").toUpperCase()) && (
-                                    <Link to={`/sales/my-deals/${deal.id}"} className="btn-secondary w-full text-sm py-2 flex items-center justify-center">
+                                    <Link to={`/sales/my-deals/${deal.id}`} className="btn-secondary w-full text-sm py-2 flex items-center justify-center">
                                         View Details
                                     </Link>
                                 )}
                             </div>
-                        </div>
+                        </div >
                     ))}
-                </div>
+                </div >
             )}
-        </SalesLayout>
+        </SalesLayout >
     );
 };
 

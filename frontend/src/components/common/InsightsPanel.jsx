@@ -107,12 +107,12 @@ const InsightsPanel = () => {
     {
       label: "Approval Rate",
       value: `${approvalRate.toFixed(0)}%`,
-      subtext: totalSubmitted > 0 ? `${totalApproved}/${totalSubmitted} deals approved" : "No deals yet",
+      subtext: totalSubmitted > 0 ? `${totalApproved}/${totalSubmitted} deals approved` : "No deals yet",
       icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
       color: approvalRate >= 80 ? "from-emerald-500 to-green-600" : (approvalRate >= 50 ? "from-yellow-500 to-amber-600" : "from-red-500 to-rose-600")
     },
     {
-      label: "Deal Velocity",
+      label: 'Deal Velocity' patterns,
       value: `${thisWeekDeals.length}`,
       subtext: "Deals closed this week",
       icon: "M13 10V3L4 14h7v7l9-11h-7z",
@@ -120,7 +120,7 @@ const InsightsPanel = () => {
     },
     {
       label: "Best Win",
-      value: bestDeal ? `₹${bestDeal.incentive.toLocaleString('en-IN')}" : "-",
+      value: bestDeal ? `₹${bestDeal.incentive.toLocaleString('en-IN')}` : \"-\",
       subtext: bestDeal ? "Highest incentive this month" : "No incentive yet",
       icon: "M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z",
       color: "from-purple-500 to-violet-600"
@@ -169,7 +169,7 @@ const InsightsPanel = () => {
               <div
                 className="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm text-white"
                 style={{
-                  background: `linear-gradient(135deg, ${insight.color.includes('emerald') ? '#10b981' : insight.color.includes('yellow') ? '#f59e0b' : insight.color.includes('red') ? '#ef4444' : insight.color.includes('blue') ? '#3b82f6' : '#8b5cf6'}, ${insight.color.includes('emerald') ? '#059669' : insight.color.includes('yellow') ? '#d97706' : insight.color.includes('red') ? '#b91c1c' : insight.color.includes('blue') ? '#2563eb' : '#7c3aed'})`
+                  background: `linear-gradient(135deg, ${insight.color.includes('emerald') ? '#10b981' : insight.color.includes('yellow') ? '#f59e0b' : insight.color.includes('red') ? '#ef4444' : insight.color.includes('blue') ? '#3b82f6' : '#8b5cf6'}, ${insight.color.includes(`emerald') ? '#059669' : insight.color.includes('yellow') ? '#d97706' : insight.color.includes('red') ? '#b91c1c' : insight.color.includes('blue') ? '#2563eb' : '#7c3aed'})`
                 }}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

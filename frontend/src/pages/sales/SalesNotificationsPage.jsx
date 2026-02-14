@@ -47,9 +47,9 @@ const SalesNotificationsPage = () => {
                     subtitle="Stay informed about approvals, incentives, and policy changes."
                     actions={
                         <div className="flex items-center gap-2 p-1 bg-surface-2 rounded-lg border border-border-subtle">
-                            <button onClick={() => setFilter("All")} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${filter === "All" ? "bg-primary-500 text-white shadow-sm" : "text-text-secondary hover:text-text-primary hover:bg-surface-3"}`}>All</button>
-                            <button onClick={() => setFilter("Unread")} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${filter === "Unread" ? "bg-primary-500 text-white shadow-sm" : "text-text-secondary hover:text-text-primary hover:bg-surface-3"}`}>Unread</button>
-                            <button onClick={() => setFilter("Critical")} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${filter === "Critical" ? "bg-primary-500 text-white shadow-sm" : "text-text-secondary hover:text-text-primary hover:bg-surface-3"}`}>Critical</button>
+                            <button onClick={() => setFilter('All')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${filter === 'All' ? "bg-primary-500 text-white shadow-sm" : "text-text-secondary hover:text-text-primary hover:bg-surface-3"}`}>All</button>
+                            <button onClick={() => setFilter('Unread')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${filter === 'Unread' ? "bg-primary-500 text-white shadow-sm" : "text-text-secondary hover:text-text-primary hover:bg-surface-3"}`}>Unread</button>
+                            <button onClick={() => setFilter('Critical')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${filter === 'Critical' ? "bg-primary-500 text-white shadow-sm" : "text-text-secondary hover:text-text-primary hover:bg-surface-3"}`}>Critical</button>
                         </div>
                     }
                 />

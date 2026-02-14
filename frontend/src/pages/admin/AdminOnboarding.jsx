@@ -88,7 +88,7 @@ const AdminOnboarding = () => {
                     <div className="mx-auto w-20 h-20 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/30">
                         <CheckCircle className="w-10 h-10 text-white" />
                     </div>
-                    <h2 className="text-3xl font-bold text-white mb-4">You`re All Set!</h2>
+                    <h2 className='text-3xl font-bold text-white mb-4'>You're All Set!</h2>
                     <p className="text-slate-400 mb-8">
                         Your workspace is configured and ready for action. Access your command center now.
                     </p>
@@ -147,7 +147,7 @@ const AdminOnboarding = () => {
                                         {isDone ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                                     </div>
                                     <div>
-                                        <h4 className={`font-semibold ${isActive ? "text-white" : "text-slate-400"}`}>{step.title}</h4>
+                                        <h4 className={`font-semibold ${isActive ? 'text-white' : "text-slate-400"}`}>{step.title}</h4>
                                         {isActive && <span className="text-xs text-indigo-400 font-medium">In Progress</span>}
                                         {isDone && <span className="text-xs text-emerald-400 font-medium">Completed</span>}
                                     </div>

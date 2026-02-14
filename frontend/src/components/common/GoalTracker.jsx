@@ -63,7 +63,7 @@ const GoalTracker = ({ readOnly = false, compact = false }) => {
 
     if (currentMilestone) {
       milestoneNotified.current.add(currentMilestone);
-      const title = currentMilestone === 100 ? "🎉 Target Achieved!" : `Milestone: ${currentMilestone}% Complete`;
+      const title = currentMilestone === 100 ? '🎉 Target Achieved!' : `Milestone: ${currentMilestone}% Complete`;
       const alreadyNotified = notifications.some(n => n.title === title);
 
       if (!alreadyNotified) {
@@ -167,7 +167,7 @@ const GoalTracker = ({ readOnly = false, compact = false }) => {
             <p className="text-xs text-text-muted uppercase tracking-widest mb-1">Projected</p>
             <p className="text-xl font-semibold text-text-primary">₹{projected.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
             <p className="text-[10px] text-text-secondary mt-0.5">
-              {projected >= monthlyTarget ? "Target likely to be met" : `Short by ₹${(monthlyTarget - projected).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+              {projected >= monthlyTarget ? 'Target likely to be met' : `Short by ₹${(monthlyTarget - projected).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
             </p>
           </div>
         </div>

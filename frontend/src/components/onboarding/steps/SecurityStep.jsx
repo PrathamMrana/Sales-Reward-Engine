@@ -28,17 +28,17 @@ const SecurityStep = ({ formData, setFormData, handleNext }) => {
                         }`}
                 >
                     <div className="flex items-start gap-4">
-                        <div className={`p-3 rounded-xl ${twoFAEnabled ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-500"}`}>
+                        <div className={`p-3 rounded-xl ${twoFAEnabled ? 'bg-indigo-600 text-white' : "bg-slate-800 text-slate-500"}`}>
                             <Smartphone className="w-6 h-6" />
                         </div>
                         <div className="flex-1">
-                            <h3 className={`text-lg font-semibold ${twoFAEnabled ? "text-indigo-400" : "text-white"}`}>
+                            <h3 className={`text-lg font-semibold ${twoFAEnabled ? 'text-indigo-400' : "text-white"}`}>
                                 Two-Factor Authentication
                             </h3>
                             <p className="text-slate-400 text-sm mt-1">
                                 {twoFAEnabled
-                                    ? "Enabled. You'll receive a code via SMS/App on login."
-                                    : "Secure your account with an extra layer of protection."}
+                                    ? \"Enabled. You\"ll receive a code via SMS/App on login."
+                                    : "Secure your account with an extra layer of protection.`}
                             </p>
                         </div>
                         <div className={`w-6 h-6 rounded-full border flex items-center justify-center ${twoFAEnabled ? "bg-indigo-600 border-indigo-600" : "border-slate-600"

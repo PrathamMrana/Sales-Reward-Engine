@@ -38,7 +38,7 @@ export const OnboardingProvider = ({ children }) => {
                     axios.get(`${API_URL}/api/users?currentUserId=${auth.user.id}`)
                 ]);
 
-                const hasPolicies = policiesRes.status === `fulfilled' && Array.isArray(policiesRes.value.data) && policiesRes.value.data.length > 0;
+                const hasPolicies = policiesRes.status === 'fulfilled' && Array.isArray(policiesRes.value.data) && policiesRes.value.data.length > 0;
                 const hasDeals = dealsRes.status === 'fulfilled' && Array.isArray(dealsRes.value.data) && dealsRes.value.data.length > 0;
                 const userCount = usersRes.status === 'fulfilled' && Array.isArray(usersRes.value.data) ? usersRes.value.data.length : 0;
 
@@ -69,7 +69,7 @@ export const OnboardingProvider = ({ children }) => {
                     axios.get(`${API_URL}/api/sales/payouts/${auth.user.id}`)
                 ]);
 
-                const hasDeals = dealsRes.status === `fulfilled' && Array.isArray(dealsRes.value.data) && dealsRes.value.data.length > 0;
+                const hasDeals = dealsRes.status === 'fulfilled' && Array.isArray(dealsRes.value.data) && dealsRes.value.data.length > 0;
                 const hasPayouts = payoutsRes.status === 'fulfilled' && Array.isArray(payoutsRes.value.data) && payoutsRes.value.data.length > 0;
 
                 const steps = [

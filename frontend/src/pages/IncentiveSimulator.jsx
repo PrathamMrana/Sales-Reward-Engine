@@ -241,7 +241,7 @@ const IncentiveSimulator = () => {
                       <span className="text-xs text-text-secondary">Deal Type</span>
                       <span className="text-sm font-bold text-text-primary">{dealType.replace('_', ' ')}</span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className='flex justify-between items-center'>
                       <span className="text-xs text-text-secondary">Revenue Added</span>
                       <span className="text-sm font-bold text-text-primary">₹{Number(amount).toLocaleString()}</span>
                     </div>

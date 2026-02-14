@@ -185,7 +185,7 @@ const PerformanceDashboard = () => {
                                     <tr><td colSpan="6" className="p-8 text-center text-text-muted">Analyzing performance data...</td></tr>
                                 ) : (
                                     users.map((user, idx) => (
-                                        <tr key={user.id} className="group hover:bg-surface-2 transition-colors cursor-pointer" onClick={() => navigate(`/admin/performance/${user.id}`)}>
+                                        <tr key={user.id} className='group hover:bg-surface-2 transition-colors cursor-pointer' onClick={() => navigate(`/admin/performance/${user.id}`)}>
                                             <td className="px-6 py-4 text-center font-bold text-text-secondary group-hover:text-primary-600">
                                                 {getRankIcon(idx)}
                                             </td>

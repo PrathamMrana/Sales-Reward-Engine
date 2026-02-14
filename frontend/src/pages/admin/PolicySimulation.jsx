@@ -115,9 +115,9 @@ const PolicySimulation = () => {
                         <div className={`p-6 rounded-xl shadow border border-border-subtle ${result?.difference >= 0 ? 'bg-red-50 dark:bg-red-900/20' : 'bg-green-50 dark:bg-green-900/20'}`}>
                             <p className="text-sm font-medium text-text-muted mb-1">Projected Total Payout</p>
                             <h2 className={`text-3xl font-bold ${result?.difference >= 0 ? 'text-red-700' : 'text-green-700'}`}>
-                                {loading ? "..." : `₹${result?.projectedPayout?.toLocaleString() || 0}`}
+                                {loading ? '...' : `₹${result?.projectedPayout?.toLocaleString() || 0}`}
                             </h2>
-                            <p className="text-xs mt-2 flex items-center">
+                            <p className='text-xs mt-2 flex items-center'>
                                 <span className={`font-bold mr-1 ${result?.difference >= 0 ? 'text-red-600' : 'text-green-600'}`}>
                                     {result?.difference > 0 ? '+' : ''}{result?.difference?.toLocaleString()}
                                 </span>

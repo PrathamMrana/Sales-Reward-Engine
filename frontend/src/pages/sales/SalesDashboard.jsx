@@ -187,9 +187,9 @@ const SalesDashboard = () => {
               <p className="text-blue-100 text-sm">Total Deals Approved</p>
               <div className="mt-4 flex items-center gap-2">
                 <div className="flex-1 h-2 bg-white/20 rounded-full overflow-hidden">
-                  <div className="h-full bg-white rounded-full" style={{ width: `${approvalRate}%` }}></div>
+                  <div className='h-full bg-white rounded-full' style={{ width: `${approvalRate}%` }}></div>
                 </div>
-                <span className="text-xs font-bold">{approvalRate}%</span>
+                <span className='text-xs font-bold'>{approvalRate}%</span>
               </div>
             </div>
           </div>
@@ -206,7 +206,7 @@ const SalesDashboard = () => {
                 </div>
                 <span className="text-xs font-bold bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">Average</span>
               </div>
-              <p className="text-4xl font-bold mb-2">₹{avgDealSize.toLocaleString(`en-IN', { maximumFractionDigits: 0 })}</p>
+              <p className="text-4xl font-bold mb-2">₹{avgDealSize.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
               <p className="text-purple-100 text-sm">Avg Deal Size</p>
               <Link to="/sales/performance" className="mt-4 inline-flex items-center text-sm font-semibold text-white hover:text-purple-100 transition-colors">
                 View Analytics <span className="ml-1">→</span>

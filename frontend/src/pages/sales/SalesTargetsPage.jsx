@@ -32,7 +32,7 @@ const SalesTargetsPage = () => {
     // Calculate This Month`s Incentive (Approved + Submitted)
     const now = new Date();
     const currentMonthDeals = deals.filter(d => {
-        const status = (d.status || `").toUpperCase();
+        const status = (d.status || "").toUpperCase();
         if (status !== 'APPROVED' && status !== 'SUBMITTED') return false;
 
         try {

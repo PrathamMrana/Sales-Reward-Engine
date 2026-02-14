@@ -102,7 +102,7 @@ const AcceptInvite = () => {
                         </div>
                         <h1 className="text-2xl font-bold text-white mb-2">Accept Invitation</h1>
                         <p className="text-sm text-slate-400">
-                            Join <strong className="text-white">{inviteData?.invitedBy || "Company Admin"}</strong>`s team as a Sales Executive.
+                            Join <strong className='text-white'>{inviteData?.invitedBy || "Company Admin"}</strong>'s team as a Sales Executive.
                         </p>
                     </div>
 

@@ -158,8 +158,8 @@ const NotificationPanel = () => {
                     key={tab}
                     onClick={() => setFilter(tab)}
                     className={`text-[10px] uppercase tracking-widest font-bold pb-1 border-b-2 transition-colors ${filter === tab
-                        ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-                        : 'border-transparent text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                      ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                      : 'border-transparent text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
                       }`}
                   >
                     {tab}
@@ -179,11 +179,11 @@ const NotificationPanel = () => {
                   </div>
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100">All Caught Up</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {filter === 'All' ? "No new notifications." : `No ${filter} found.`}
+                    {filter === 'All' ? 'No new notifications.' : `No ${filter} found.`}
                   </p>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-100 dark:divide-slate-800">
+                <div className='divide-y divide-gray-100 dark:divide-slate-800'>
                   {filteredNotifications.map((notification) => (
                     <div
                       key={notification.id}
@@ -197,7 +197,7 @@ const NotificationPanel = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-start">
-                            <p className={`text-sm font-medium ${!notification.isRead ? "text-primary-900 dark:text-primary-100" : "text-gray-900 dark:text-gray-100"}`}>
+                            <p className={`text-sm font-medium ${!notification.isRead ? 'text-primary-900 dark:text-primary-100' : "text-gray-900 dark:text-gray-100"}`}>
                               {notification.title}
                             </p>
                             <span className="text-[10px] text-gray-400 whitespace-nowrap ml-2">

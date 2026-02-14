@@ -58,7 +58,7 @@ const AuditLogs = () => {
                 log.action,
                 log.entityType,
                 log.entityId,
-                `"${(log.details || "").replace(/"/g, """')}"`
+                `"${(log.details || "").replace(/"/g, '""')}"`
             ].join(","))
         ].join("\n");
 

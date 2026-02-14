@@ -411,7 +411,7 @@ const AdminDashboard = () => {
                                 {topPerformers.map((user, idx) => (
                                     <div key={user.name} className="flex items-center justify-between p-4 bg-surface-2 rounded-2xl border border-border-subtle hover:border-primary-500/50 transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
                                         <div className="flex items-center gap-5">
-                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg text-white shadow-xl ${idx === 0 ? "bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-yellow-500/30" : idx === 1 ? "bg-gradient-to-br from-slate-300 to-slate-500 shadow-slate-500/30" : "bg-gradient-to-br from-orange-400 to-orange-600 shadow-orange-500/30"}`}>
+                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg text-white shadow-xl ${idx === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-yellow-500/30' : idx === 1 ? "bg-gradient-to-br from-slate-300 to-slate-500 shadow-slate-500/30" : "bg-gradient-to-br from-orange-400 to-orange-600 shadow-orange-500/30"}`}>
                                                 {idx + 1}
                                             </div>
                                             <div>

@@ -94,7 +94,7 @@ const AdminPolicy = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* List Column */}
-                <div className={`lg:col-span-1 space-y-4 ${isEditing ? `hidden lg:block' : ''}`}>
+                <div className={`lg:col-span-1 space-y-4 ${isEditing ? 'hidden lg:block' : ''}`}>
                     {policies.length === 0 && (
                         <div className="p-8 text-center text-slate-500 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
                             No policies found. Create one!

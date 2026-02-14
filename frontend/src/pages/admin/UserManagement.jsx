@@ -29,7 +29,7 @@ const UserManagement = () => {
 
     const toggleStatus = async (userId, currentStatus) => {
         const newStatus = currentStatus === "ACTIVE" ? "DISABLED" : "ACTIVE";
-        if (!window.confirm(`Are you sure you want to ${newStatus === `DISABLED' ? 'Disable' : 'Activate'} this user?`)) return;
+        if (!window.confirm(`Are you sure you want to ${newStatus === 'DISABLED' ? 'Disable' : 'Activate'} this user?`)) return;
 
         try {
             await axios.patch(`${API_URL}/api/users/${userId}/status`, { status: newStatus });
@@ -90,7 +90,7 @@ const UserManagement = () => {
                                     <td className="p-4 text-text-secondary">{user.email}</td>
                                     <td className="p-4">
                                         <span className={`px-2 py-1 rounded text-xs font-semibold
-                                            ${user.accountStatus === `ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                            ${user.accountStatus === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                             {user.accountStatus}
                                         </span>
                                     </td>
@@ -98,7 +98,6 @@ const UserManagement = () => {
                                         <button
                                             onClick={() => toggleStatus(user.id, user.accountStatus)}
                                             className={`px-3 py-1 rounded text-sm font-medium transition-colors
-                                                ${user.accountStatus === 'ACTIVE'
                                                     ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'
                                                     : 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-200'}`}
                                         >

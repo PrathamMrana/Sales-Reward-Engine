@@ -245,7 +245,7 @@ const AdminIncentivePolicy = () => {
                                                     onChange={handleChange}
                                                     className="peer sr-only"
                                                 />
-                                                <div className="w-11 h-6 bg-slate-400 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-["'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600 dark:bg-slate-700"></div>
+                                                <div className="w-11 h-6 bg-slate-400 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600 dark:bg-slate-700"></div>
                                             </div>
                                             <div>
                                                 <span className="block text-sm font-bold text-slate-900 dark:text-white">Active Policy</span>
@@ -353,13 +353,13 @@ const AdminIncentivePolicy = () => {
                                             <div>
                                                 <span className="text-xs text-slate-500 uppercase tracking-wider block mb-1">Deal Range</span>
                                                 <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                                                    {policy.minDealAmount ? `₹${(policy.minDealAmount / 1000).toFixed(0)}k+" : "Any"}
+                                                    {policy.minDealAmount ? `₹${(policy.minDealAmount / 1000).toFixed(0)}k+` : "Any"}
                                                 </span>
                                             </div>
                                             <div>
                                                 <span className="text-xs text-slate-500 uppercase tracking-wider block mb-1">Bonus</span>
-                                                <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                                                    {policy.bonusAmount ? `+₹${(policy.bonusAmount / 1000).toFixed(0)}k" : "-"}
+                                                <span className='text-sm font-bold text-emerald-600 dark:text-emerald-400'>
+                                                    {policy.bonusAmount ? `+₹${(policy.bonusAmount / 1000).toFixed(0)}k` : "-"}
                                                 </span>
                                             </div>
                                         </div>

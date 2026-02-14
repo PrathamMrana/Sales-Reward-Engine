@@ -49,9 +49,9 @@ const TierBadge = ({ totalIncentive, rank }) => {
                         <span>{Math.round(progress)}%</span>
                     </div>
                     <div className="h-1.5 bg-black/20 rounded-full overflow-hidden backdrop-blur-sm">
-                        <div className="h-full bg-white/90 shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-1000 ease-out" style={{ width: `${progress}%` }}></div>
+                        <div className='h-full bg-white/90 shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-1000 ease-out' style={{ width: `${progress}%` }}></div>
                     </div>
-                    <p className="text-[10px] mt-1 opacity-80 text-right">
+                    <p className='text-[10px] mt-1 opacity-80 text-right'>
                         +₹{(nextThreshold - totalIncentive).toLocaleString()} needed
                     </p>
                 </div>

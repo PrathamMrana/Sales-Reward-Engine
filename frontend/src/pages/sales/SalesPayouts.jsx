@@ -53,7 +53,7 @@ const SalesPayouts = () => {
                 if (!d.date) return acc;
                 const date = new Date(d.date);
                 const key = `${date.getFullYear()}-${date.getMonth()}`;
-                const monthName = date.toLocaleString(`default', { month: 'long', year: 'numeric' });
+                const monthName = date.toLocaleString('default', { month: 'long', year: 'numeric' });
 
                 if (!acc[key]) acc[key] = { month: monthName, amount: 0 };
                 acc[key].amount += d.incentive;

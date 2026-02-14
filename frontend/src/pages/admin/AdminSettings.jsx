@@ -68,7 +68,7 @@ const AdminSettings = () => {
                                 <div key={setting.key} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-border-subtle pb-6 last:border-0 last:pb-0">
                                     <div className="md:col-span-1">
                                         <p className="font-semibold text-text-primary capitalize">{setting.key.replace(/_/g, ' ')}</p>
-                                        <p className="text-sm text-text-muted">{setting.description}</p>
+                                        <p className='text-sm text-text-muted'>{setting.description}</p>
                                     </div>
                                     <div className="md:col-span-2">
                                         {setting.key === 'maintenance_mode' ? (
@@ -88,13 +88,14 @@ const AdminSettings = () => {
                                                 onChange={(e) => handleChange(setting.key, e.target.value)}
                                                 className="input-modern w-full max-w-md"
                                             />
-                                        )}
-                                    </div>
-                                </div>
+                                        )
+                                        }
+                                    </div >
+                                </div >
                             ))}
-                        </div>
+                        </div >
                     )}
-                </div>
+                </div >
 
                 <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 rounded-r-lg">
                     <div className="flex">
@@ -110,8 +111,8 @@ const AdminSettings = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-        </AdminLayout>
+            </div >
+        </AdminLayout >
     );
 };
 

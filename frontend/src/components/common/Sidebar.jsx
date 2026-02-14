@@ -114,7 +114,7 @@ const Sidebar = () => {
     >
       {/* --- Header --- */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-border-subtle bg-bg-secondary/50 backdrop-blur-sm">
-        <div className={`flex items-center gap-3 overflow-hidden ${isCollapsed ? "justify-center w-full" : ""}`}>
+        <div className={`flex items-center gap-3 overflow-hidden ${isCollapsed ? 'justify-center w-full' : ""}`}>
           <div className="flex-shrink-0 text-primary-600 dark:text-primary-400">
             <AppIcon size="w-8 h-8" />
           </div>
@@ -136,7 +136,7 @@ const Sidebar = () => {
       </div>
 
       {/* --- User Profile (Compact) --- */}
-      <div className={`px-3 py-4 border-b border-border-subtle/50 ${isCollapsed ? "flex justify-center" : ""}`}>
+      <div className={`px-3 py-4 border-b border-border-subtle/50 ${isCollapsed ? 'flex justify-center' : ""}`}>
         <div className={`
            flex items-center gap-3 p-2 rounded-xl transition-colors
            ${!isCollapsed ? "bg-surface-2 border border-border-subtle hover:border-primary-500/30" : "bg-transparent"}
@@ -188,7 +188,7 @@ const Sidebar = () => {
                       ? "bg-primary-50 dark:bg-primary-500/10 text-primary-700 dark:text-primary-300 font-medium"
                       : "text-text-secondary hover:bg-slate-100 dark:hover:bg-white/10 hover:text-text-primary hover:translate-x-1"
                     }
-                    ${isCollapsed ? "justify-center" : ""}
+                    ${isCollapsed ? 'justify-center' : ''}
                   `}
                 >
                   {({ isActive }) => (

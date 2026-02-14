@@ -87,7 +87,7 @@ const SalesReportsPage = () => {
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `${reportType.toLowerCase()}_report_${dateRange.replace(/ /g, '_')}_${new Date().toISOString().split('T')[0]}.csv`);
+        link.setAttribute('download', `${reportType.toLowerCase()}_report_${dateRange.replace(/ /g, '_')}_${new Date().toISOString().split('T')[0]}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -118,22 +118,22 @@ const SalesReportsPage = () => {
                 <h1>${reportType} Report</h1>
                 <p><strong>Period:</strong> ${dateRange} | <strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
                 
-                <div class="summary">
-                    <div class="summary-item">
-                        <div class="summary-label">Total Deals</div>
-                        <div class="summary-value">${filteredDeals.length}</div>
+                <div className="summary">
+                    <div className="summary-item">
+                        <div className="summary-label">Total Deals</div>
+                        <div className="summary-value">${filteredDeals.length}</div>
                     </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Approved Deals</div>
-                        <div class="summary-value">${approvedDeals.length}</div>
+                    <div className="summary-item">
+                        <div className="summary-label">Approved Deals</div>
+                        <div className="summary-value">${approvedDeals.length}</div>
                     </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Total Incentive</div>
-                        <div class="summary-value">₹${totalIncentive.toLocaleString()}</div>
+                    <div className="summary-item">
+                        <div className="summary-label">Total Incentive</div>
+                        <div className="summary-value">₹${totalIncentive.toLocaleString()}</div>
                     </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Total Value</div>
-                        <div class="summary-value">₹${totalAmount.toLocaleString()}</div>
+                    <div className="summary-item">
+                        <div className="summary-label">Total Value</div>
+                        <div className="summary-value">₹${totalAmount.toLocaleString()}</div>
                     </div>
                 </div>
                 
@@ -299,7 +299,7 @@ const SalesReportsPage = () => {
                     </div>
                 </div>
             </div>
-        </SalesLayout>
+        </SalesLayout >
     );
 };
 

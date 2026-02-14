@@ -39,7 +39,7 @@ const DealDetailPage = () => {
                 comment: comment || `Updated by Sales Executive to ${newStatus}`
             });
             setComment("");
-            alert(`✅ Success! Deal status updated to '${newStatus}'.`);
+            alert(`✅ Success! Deal status updated to ${newStatus}.`);
             await fetchDealDetails();
         } catch (error) {
             console.error("Error updating status:", error);

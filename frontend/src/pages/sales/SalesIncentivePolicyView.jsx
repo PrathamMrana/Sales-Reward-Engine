@@ -66,7 +66,7 @@ const SalesIncentivePolicyView = () => {
                             <div className="mb-4 p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
                                 <div className="text-sm text-text-secondary font-medium mb-1">Commission Rate</div>
                                 <div className="text-3xl font-bold text-primary-600 dark:text-primary-400">
-                                    {policy.commissionRate ? `${policy.commissionRate}%" : "N/A"}
+                                    {policy.commissionRate ? `${policy.commissionRate}%` : "N/A"}
                                 </div>
                             </div>
 
@@ -74,7 +74,7 @@ const SalesIncentivePolicyView = () => {
                             {(policy.minDealAmount || policy.maxDealAmount) && (
                                 <div className="mb-4">
                                     <div className="text-sm font-medium text-text-secondary mb-2">Deal Range</div>
-                                    <div className="text-text-primary">
+                                    <div className='text-text-primary' patterns>
                                         {policy.minDealAmount && policy.maxDealAmount
                                             ? `₹${policy.minDealAmount.toLocaleString()} - ₹${policy.maxDealAmount.toLocaleString()}`
                                             : policy.minDealAmount

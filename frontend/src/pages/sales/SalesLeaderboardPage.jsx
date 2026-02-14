@@ -49,7 +49,7 @@ const SalesLeaderboardPage = () => {
                                 <button
                                     key={f}
                                     onClick={() => setFilter(f)}
-                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === f ? `bg-white dark:bg-slate-700 shadow-sm text-primary-600' : 'text-text-secondary hover:text-text-primary'}`}
+                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === f ? 'bg-white dark:bg-slate-700 shadow-sm text-primary-600' : 'text-text-secondary hover:text-text-primary'}`}
                                 >
                                     {f}
                                 </button>
@@ -133,7 +133,7 @@ const SalesLeaderboardPage = () => {
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                             {leaders.map((leader, idx) => (
-                                <tr key={leader.name} className={`group transition-colors ${currentUserId && leader.name === auth?.user?.name ? "bg-primary-50 dark:bg-primary-900/20" : "hover:bg-gray-50 dark:hover:bg-gray-800/50"}`}>
+                                <tr key={leader.name} className={`group transition-colors ${currentUserId && leader.name === auth?.user?.name ? 'bg-primary-50 dark:bg-primary-900/20' : "hover:bg-gray-50 dark:hover:bg-gray-800/50"}`}>
                                     <td className="px-6 py-4">
                                         <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white shadow-md transform group-hover:scale-110 transition-transform ${idx === 0 ? "bg-gradient-to-br from-yellow-300 to-yellow-600 ring-2 ring-yellow-200" :
                                             idx === 1 ? "bg-gradient-to-br from-slate-300 to-slate-500 ring-2 ring-slate-200" :
