@@ -42,11 +42,26 @@ const DealApproval = () => {
             if (reason) payload.reason = reason;
             if (comment) payload.comment = comment;
 
-            const res = await axios.patch(`${API_URL}/api/deals/${dealId}/status`, payload);
+            console.log(`[DealApproval] Updating deal ${dealId} to status: ${status}`, payload);
+
+            // Use the api instance instead of axios
+            const res = await api.patch(`/api/deals/${dealId}/status`, payload);
+
+            console.log(`[DealApproval] Successfully updated deal ${dealId}:`, res.data);
             setDeals(prev => prev.map(d => d.id === dealId ? res.data : d));
+
+            // Refresh deals to ensure consistency
+            await fetchDeals();
         } catch (err) {
-            console.error("Failed to update status", err);
-            alert("Failed to update deal status");
+            console.error(`[DealApproval] Failed to update deal ${dealId} status:`, err);
+            console.error("[DealApproval] Error details:", {
+                message: err.message,
+                response: err.response?.data,
+                status: err.response?.status
+            });
+
+            const errorMsg = err.response?.data?.message || err.message || "Failed to update deal status";
+            alert(`Error: ${errorMsg}\n\nPlease check the console for details.`);
         }
     };
 

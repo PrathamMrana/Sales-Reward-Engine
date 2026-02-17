@@ -92,14 +92,30 @@ const MyDealsPage = () => {
 
     const handleStatusUpdate = async (dealId, newStatus) => {
         try {
-            await api.patch(`/api/deals/${dealId}/status`, {
+            const payload = {
                 status: newStatus,
                 comment: newStatus === "IN_PROGRESS" ? "Started working on this deal." : "Deal submitted for approval."
-            });
-            fetchMyDeals();
+            };
+
+            console.log(`[MyDeals] Updating deal ${dealId} to status: ${newStatus}`, payload);
+
+            const response = await api.patch(`/api/deals/${dealId}/status`, payload);
+
+            console.log(`[MyDeals] Successfully updated deal ${dealId}:`, response.data);
+
+            // Refresh deals list
+            await fetchMyDeals();
         } catch (error) {
-            console.error("Failed to update status", error);
-            alert("Failed to update status. Please try again.");
+            console.error(`[MyDeals] Failed to update deal ${dealId} status:`, error);
+            console.error("[MyDeals] Error details:", {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status,
+                requestedStatus: newStatus
+            });
+
+            const errorMsg = error.response?.data?.message || error.message || "Failed to update status";
+            alert(`Error updating deal status: ${errorMsg}\n\nPlease check the console for details or contact support.`);
         }
     };
 
