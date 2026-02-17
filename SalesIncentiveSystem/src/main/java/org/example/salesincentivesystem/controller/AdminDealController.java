@@ -272,20 +272,20 @@ public class AdminDealController {
      * Admin gets all deals with optional filters
      */
     @GetMapping
-    public List<Deal> getAllDeals(
+        public List<Deal> getAllDeals(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String priority) {
 
         List<Deal> allDeals = dealRepository.findAll();
 
-        // Apply filters
+        // Apply filters (case-insensitive for status and priority)
         return allDeals.stream()
-                .filter(d -> status == null || status.equals(d.getStatus()))
-                .filter(d -> userId == null || (d.getUser() != null && userId.equals(d.getUser().getId())))
-                .filter(d -> priority == null || priority.equals(d.getPriority()))
-                .collect(java.util.stream.Collectors.toList());
-    }
+            .filter(d -> status == null || (d.getStatus() != null && status.equalsIgnoreCase(d.getStatus())))
+            .filter(d -> userId == null || (d.getUser() != null && userId.equals(d.getUser().getId())))
+            .filter(d -> priority == null || (d.getPriority() != null && priority.equalsIgnoreCase(d.getPriority())))
+            .collect(java.util.stream.Collectors.toList());
+        }
 
     /**
      * Admin reassigns deal to different sales executive
