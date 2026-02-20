@@ -19,8 +19,6 @@ public class EmailService {
     @Async
     public void sendWelcomeEmail(String to, String name) {
         try {
-            System.out.println("📧 [EMAIL SERVICE] Attempting to send welcome email to: " + to);
-            
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
@@ -90,10 +88,7 @@ public class EmailService {
             System.out.println("Welcome email sent to " + to);
 
         } catch (Exception e) {
-            System.err.println("❌ [EMAIL SERVICE] FAILED to send email to: " + to);
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
-            System.err.println("Falling back to console output:");
+            System.err.println("SMTP Config not found, printing email to console:");
             System.out.println("==================================================");
             System.out.println("From: noreply@salesrewardengine.com");
             System.out.println("To: " + to);
