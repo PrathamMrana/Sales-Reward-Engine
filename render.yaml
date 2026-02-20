@@ -31,9 +31,9 @@ services:
           name: sales-db
           property: password
       - key: MAIL_USERNAME
-        sync: false
+        value: teamsalesrewardengine@gmail.com
       - key: MAIL_PASSWORD
-        sync: false
+        value: xpnuokdljhuisbhf
 
 databases:
   - name: sales-db
