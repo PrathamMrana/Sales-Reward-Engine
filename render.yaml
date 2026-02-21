@@ -30,10 +30,9 @@ services:
         fromDatabase:
           name: sales-db
           property: password
-      - key: MAIL_USERNAME
-        value: teamsalesrewardengine@gmail.com
-      - key: MAIL_PASSWORD
-        value: xpnuokdljhuisbhf
+      # ℹ️ SENDGRID_API_KEY: Set this directly in Render dashboard → Environment
+      # This prevents committing secrets to GitHub. Navigate to your Render service,
+      # go to Environment tab, and add: SENDGRID_API_KEY = SG.dM2TFOsvQxOfodUWR8pqog...
 
 databases:
   - name: sales-db
