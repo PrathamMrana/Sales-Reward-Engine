@@ -42,3 +42,5 @@ build/
 application-local.properties
 **/.env
 **/application-local.properties
+*.dump
+sales-db-backup.dump
