@@ -24,24 +24,25 @@ public class LeaderboardController {
             @RequestParam(defaultValue = "THIS_MONTH") String period,
             @RequestParam(required = false) Long requestorId) {
 
-        String orgName = null;
-        if (requestorId != null) {
-            orgName = userRepository.findById(requestorId)
-                    .map(org.example.salesincentivesystem.entity.User::getOrganizationName)
-                    .orElse(null);
-
-            // SECURITY: If not global admin and no org, return empty
-            boolean isGlobalAdmin = userRepository.findById(requestorId)
-                    .map(org.example.salesincentivesystem.entity.User::isAdminTypeGlobal)
-                    .orElse(false);
-
-            if (!isGlobalAdmin) {
-                // If no orgName is set, fallback to null (global) to avoid empty leaderboards
-                // for incomplete profiles
-                return leaderboardService.getLeaderboard(period, orgName);
-            }
+        if (requestorId == null) {
+            return java.util.List.of();
         }
 
-        return leaderboardService.getLeaderboard(period, null);
+        return userRepository.findById(requestorId)
+                .map(user -> {
+                    if (user.isAdminTypeGlobal()) {
+                        // Global stats for Super Admins
+                        return leaderboardService.getLeaderboard(period, null);
+                    } else {
+                        String orgName = user.getOrganizationName();
+                        if (orgName == null || orgName.trim().isEmpty()) {
+                            // Non-global users with no organization assigned should see an empty
+                            // leaderboard
+                            return java.util.List.<LeaderboardEntry>of();
+                        }
+                        return leaderboardService.getLeaderboard(period, orgName);
+                    }
+                })
+                .orElse(java.util.List.of());
     }
 }

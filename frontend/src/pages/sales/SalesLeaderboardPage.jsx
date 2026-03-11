@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import api from "../../api";
+import api, { authApi } from "../../api";
 import { useAuth } from "../../context/AuthContext";
 import SalesLayout from "../../layouts/SalesLayout";
 import PageHeader from "../../components/common/PageHeader";
@@ -24,7 +24,7 @@ const SalesLeaderboardPage = () => {
 
         const period = periodMap[filter] || "THIS_MONTH";
 
-        api.get(`/api/leaderboard?period=${period}`)
+        authApi.get(`/api/leaderboard?period=${period}&requestorId=${currentUserId}`)
             .then(res => {
                 setLeaders(res.data || []);
             })
@@ -132,21 +132,21 @@ const SalesLeaderboardPage = () => {
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                             {leaders.map((leader, idx) => (
-                                <tr key={leader.name} className={`group transition-colors ${currentUserId && leader.name === auth?.user?.name ? 'bg-primary-50 dark:bg-primary-900/20' : "hover:bg-gray-50 dark:hover:bg-gray-800/50"}`}>
+                                <tr key={leader.userId || leader.name || idx} className={`group transition-colors ${currentUserId && leader.userId === currentUserId ? 'bg-primary-50 dark:bg-primary-900/20' : "hover:bg-gray-50 dark:hover:bg-gray-800/50"}`}>
                                     <td className="px-6 py-4">
                                         <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white shadow-md transform group-hover:scale-110 transition-transform ${idx === 0 ? "bg-gradient-to-br from-yellow-300 to-yellow-600 ring-2 ring-yellow-200" :
                                             idx === 1 ? "bg-gradient-to-br from-slate-300 to-slate-500 ring-2 ring-slate-200" :
-                                                idx === 2 ? "bg-gradient-to-br from-orange-400 to-amber-700 ring-2 ring-orange-200" : "bg-gray-200 text-gray-600"
+                                                idx === 2 ? "bg-gradient-to-br from-orange-400 to-amber-700 ring-2 ring-orange-200" : "bg-gray-200 text-gray-600 shadow-none text-xs"
                                             }`}>
                                             {idx === 0 ? "🏆" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : idx + 1}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 font-bold text-text-primary">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-xs font-bold">
-                                                {leader.name[0]}
+                                            <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-xs font-bold ring-2 ring-white">
+                                                {leader.name ? leader.name[0] : '?'}
                                             </div>
-                                            {leader.name}
+                                            {leader.name || 'Anonymous User'}
                                             {currentUserId && leader.name === auth?.user?.name && <span className="px-2 py-0.5 rounded text-[10px] bg-primary-200 text-primary-800">You</span>}
                                         </div>
                                     </td>
