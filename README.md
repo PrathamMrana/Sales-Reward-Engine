@@ -8,189 +8,122 @@
   A modern, full-stack incentive tracking system for high-performing sales organizations.
 
   [![React](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
-  [![TypeScript](https://img.shields.io/badge/Vite-5.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-  [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
+  [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
   [![Java 21](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
-  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+  [![Neon](https://img.shields.io/badge/Database-Neon.tech-00E599?style=for-the-badge&logo=postgresql&logoColor=black)](https://neon.tech/)
 
   <br />
 </div>
 
 ---
 
-## 🌐 Live Demo
+## 🌐 Production Environment
 
-🚀 **[Try Sales Reward Engine Live →](https://sales-reward-engine.vercel.app)**
+🚀 **[Access Sales Reward Engine →](https://sales-reward-engine.vercel.app)**
 
-| Component | URL |
-| :--- | :--- |
-| 🖥️ **Frontend** | [sales-reward-engine.vercel.app](https://sales-reward-engine.vercel.app) |
-| ⚙️ **Backend API** | [sales-reward-api.onrender.com](https://sales-reward-api.onrender.com) |
-| 🗄️ **Database** | AWS RDS PostgreSQL |
-
-> ☕ **First time visiting?** Our backend server takes a power nap when no one's around! 
-> Give it ~1 minute to wake up, stretch, and load your dashboard. 😴➡️🚀
-
-### Demo Credentials
-
-| Role | Email | Password |
+| Component | Status | URL |
 | :--- | :--- | :--- |
-| 👨‍💼 **Global Admin** | `admin@test.com` | `admin123` |
-| 🧑‍💻 **Sales Executive** | `sales@test.com` | `sales123` |
+| 🖥️ **Frontend UI** | Online | [sales-reward-engine.vercel.app](https://sales-reward-engine.vercel.app) |
+| ⚙️ **Backend API** | Online | [sales-incentive-backend.onrender.com](https://sales-incentive-backend.onrender.com) |
+| 🗄️ **Database** | Active | **Neon Serverless PostgreSQL 17** (Singapore) |
+
+> 📊 **Live Stats Dashboard**:
+> - **94** Registered Users & Sales Executives
+> - **112** Processed Deals & Transactions
+> - **303+** Secured Audit Logs
+> - **44** Active Performance Profiles
 
 ---
 
 ## 📋 Overview
 
-The **Sales Reward Engine** is a comprehensive, enterprise-grade incentive calculation solution designed for modern sales teams. It provides real-time commission tracking, predictive incentive simulations, automated deal approvals, and stunning performance analytics—all wrapped in a highly advanced dual-theme **"Aurora Glass"** UI.
+The **Sales Reward Engine** is a comprehensive, multi-tenant incentive calculation solution designed for modern sales teams. It provides real-time commission tracking, dynamic policy management, automated deal approvals, and stunning performance analytics—all secured via organization-level data isolation.
 
 ---
 
-## ✨ Key Features
+## ✨ Key Enterprise Features
 
-- 🎯 **Advanced Incentive Calculation** - Support for Flat Rate, Tiered, and Performance-multiplier policies.
-- 📊 **Real-Time Analytics Dashboard** - Revenue tracking, live Payout metrics, and interactive Performance Trends.
-- 🔮 **What-If Simulator** - Allow sales reps to accurately predict commissions before officially closing a deal.
-- 🏪 **Deal Lifecycle Management** - Automated workflows from submission to approval, complete with categorization (Upsell, Renewal, New Business).
-- 🌓 **Dual-Theme "Aurora Glass" UI** - A premium, visually stunning interface supporting both strict Light and deep Dark modes seamlessly.
-- 👥 **Role-Based Access Control** - Distinct permissions and interfaces for Sales Executives vs. Global Administrators.
+- 🎯 **Dynamic Incentive Engine** - Configure **Incentive** and **General Policies** (Flat Rate, Tiered, or Multiplier) that update in real-time.
+- 🏢 **Multi-Tenant Data Isolation** - Administrators only see users, deals, targets, and audit logs within their own organization.
+- 📊 **Performance Target Tracking** - Set individual monthly targets and track real-time achievements vs. goals.
+- 🛡️ **Comprehensive System Auditing** - Detailed tracking of all critical actions with a searchable, organization-filtered log for Admins.
+- 🚀 **Smart Onboarding Wizard** - Guided setup experience with role-specific tasks and progress tracking.
+- 🔮 **What-If Simulator** - Enable sales reps to predict commissions accurately before finalizing a deal.
+- 🏪 **Deal Lifecycle Management** - Automated workflows for submission, approval, and rejection with categorization.
+- 🌓 **Aurora Glass UI** - Premium visually stunning interface supporting both strict Light and deep Dark modes.
 
 ---
 
 ## 🏗️ Tech Stack
 
-### Frontend Architecture
+### Frontend (Modern React)
+- **React 18.2** with Vite 5.0
+- **TailwindCSS 3.4** (Custom "Hyper-Glass" design system)
+- **Recharts 2.12** (Interactive analytics & trends)
+- **Lucide React** (Premium iconography)
+- **Context API** (State management for Auth & Theme)
 
-| Technology | Version | Purpose |
-| :--- | :--- | :--- |
-| **React** | 18.2 | Core UI Framework |
-| **Vite** | 5.0 | High-speed Build Tool |
-| **TailwindCSS** | 3.4 | Utility-first Styling & Glassmorphism |
-| **Recharts** | 2.12 | Interactive Charts & Analytics |
-| **Lucide React**| 0.3 | Premium SVG Iconography |
-| **Axios** | 1.6 | Asynchronous HTTP requests |
-
-### Backend Architecture
-
-| Technology | Version | Purpose |
-| :--- | :--- | :--- |
-| **Spring Boot**| 3.2 | Core Backend Framework |
-| **Java** | 21 | High-performance Language |
-| **Spring Sec.**| 6.2 | Role-based Auth & Cryptography |
-| **Spring JPA** | 3.2 | Database ORM |
-| **PostgreSQL** | 16 | Primary Relational Database |
-| **H2 Database**| - | In-memory dev/testing DB |
-| **JWT** | 0.11 | Secure Token Authentication |
+### Backend (Spring Boot Core)
+- **Spring Boot 3.3.0** / **Java 21**
+- **Spring Security 6.2** (JWT & Role-based authentication)
+- **Spring JPA** (Hibernate 6.5)
+- **PostgreSQL 17** (Neon Serverless API integration)
+- **SendGrid API** (Automated invitations & communications)
 
 ---
 
-## 📁 Project Structure
+## 📁 System Architecture
 
 ```text
 Sales-Reward-Engine/
-├── frontend/                 # High-Performance React UI
+├── frontend/                 # React 18 / Tailwind / Vite
 │   ├── src/
-│   │   ├── api/             # Axios interceptors & service logic
-│   │   ├── components/      # Glass cards, Custom Charts, Forms, Tables
-│   │   ├── layouts/         # Role-specific Layouts (Admin vs Sales)
-│   │   ├── pages/           # Logic-heavy views (Simulator, Dashboard)
-│   │   ├── context/         # Centralized Auth & Theme Context
-│   │   └── index.css        # Global Aurora meshes & hyper-glass styles
-│   └── package.json
+│   │   ├── api/             # authApi & standard interceptors
+│   │   ├── components/      # Glass cards, Charts, Onboarding Wizard
+│   │   ├── pages/           # Admin Dashboard, Audit Logs, Simulator
+│   │   └── index.css        # Aurora meshes & custom theme tokens
 │
-├── SalesIncentiveSystem/    # Robust Spring Boot REST API
+├── SalesIncentiveSystem/    # Spring Boot 3.3 REST API
 │   ├── src/main/java...
-│   │   ├── config/          # JWT, CORS, & App Configurations
-│   │   ├── controllers/     # Secure REST API Endpoints
-│   │   ├── models/          # JPA Entities (Policies, Deals, Users)
-│   │   └── services/        # Business Logic & Commission Math
+│   │   ├── config/          # JWT, CORS, Multi-tenant Security
+│   │   ├── controllers/     # Secure Endpoints (Targets, Deals, Logs)
+│   │   ├── models/          # JPA Entities (User, Deal, AuditLog)
+│   │   └── services/        # Incentive Logic & Data Isolation
 │   └── build.gradle
-│
-└── README.md
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Development Setup
 
-### Prerequisites
-- **Node.js**: v18+ and npm
-- **Java**: JDK 21+
-- **Gradle**: (Optional, wrapper included)
-
-### ⚙️ Backend Setup
-
-1. **Navigate to the Backend**
+### 🖥️ Local Environment
+1. **Clone & Install**
    ```bash
-   cd SalesIncentiveSystem
+   git clone https://github.com/PrathamMrana/Sales-Reward-Engine.git
+   cd Sales-Reward-Engine/frontend && npm install
    ```
-2. **Launch the Spring Boot App**
-   *(Uses H2 in-memory DB by default for zero-config startup)*
+2. **Launch Backend**
    ```bash
-   # macOS / Linux
-   ./gradlew bootRun
-
-   # Windows
-   gradlew.bat bootRun
+   cd ../SalesIncentiveSystem && ./gradlew bootRun
    ```
-   *The backend mounts at: `http://localhost:8080`*
-
-### 🖥️ Frontend Setup
-
-1. **Navigate to the Frontend**
+3. **Launch Frontend**
    ```bash
-   cd frontend
+   cd ../frontend && npm run dev
    ```
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
-3. **Start the Development Server**
-   ```bash
-   npm run dev
-   ```
-   *The stunning UI mounts at: `http://localhost:5173`*
 
 ---
 
-## 👥 User Roles & Permissions
+## 👥 Demo Environment
 
-| Role | Permissions | Available Modules |
+| Role | Primary Email | Password |
 | :--- | :--- | :--- |
-| **Global Admin** | Full system control. Approve/Reject all deals. Create incentive logic. Manage users. | *Policy Settings, System Audit, Deal Approval, User Management* |
-| **Sales Rep** | Submit deals, run simulations, view personal earnings, access leaderboards. | *My Dashboard, Deal Intake, What-If Simulator, My Payouts* |
-
----
-
-## 📈 Core Modules
-
-### 1. The Command Center (Dashboard)
-- Bird's-eye view of organization-wide or personal metrics.
-- Animated, real-time counter displays.
-- Quick-access action buttons.
-
-### 2. The Incentive Engine
-- Administer flat rate, tiered, or multiplier policies.
-- Automatically calculate payouts upon deal approval.
-- Assign active policies instantly securely.
-
-### 3. Deal & Payout Management
-- Frictionless deal submission forms.
-- One-click approvals for Administrators.
-- Beautiful *Earnings Breakdowns* with interactive Recharts.
-
----
-
-## 👨‍💻 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+| 👑 **Global Admin** | `admin@test.com` | `admin123` |
+| 👨‍💼 **Org Admin** | `david@test.com` | `david123` |
+| 🧑‍💻 **Sales Executive** | `sales@test.com` | `sales123` |
 
 ---
 
 <div align="center">
-  <p>Built with ❤️ for modern, high-performing sales teams.</p>
+  <p>Engineered with precision for high-performing sales organizations.</p>
 </div>
