@@ -125,7 +125,7 @@ const ElegantGuide = ({ isOpen, onClose }) => {
       visual: (
         <div className="flex flex-col gap-3 w-full max-w-sm mx-auto p-6 bg-white/5 rounded-2xl border border-white/10">
           <div className="p-3 bg-violet-500/10 rounded-xl border border-violet-500/20 flex justify-between items-center">
-            <span className="text-sm font-bold text-violet-300">If Deal > $10k</span>
+            <span className="text-sm font-bold text-violet-300">If Deal &gt; $10k</span>
             <span className="text-xs px-2 py-1 bg-violet-500/20 rounded text-violet-200">Tier 1</span>
           </div>
           <div className="w-0.5 h-4 bg-slate-600 mx-auto"></div>
