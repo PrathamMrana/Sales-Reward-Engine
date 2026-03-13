@@ -66,6 +66,7 @@ const TiltCard = ({ children, className }) => {
 const ElegantGuide = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [teamName, setTeamName] = useState('');
   const totalSteps = 3;
 
   // Reset step when opened
@@ -77,7 +78,7 @@ const ElegantGuide = ({ isOpen, onClose }) => {
     if (currentStep < totalSteps) setCurrentStep(prev => prev + 1);
     else {
       onClose();
-      navigate('/register');
+      navigate('/register', { state: { teamName } });
     }
   };
 
@@ -95,6 +96,8 @@ const ElegantGuide = ({ isOpen, onClose }) => {
             <label className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-1 block">What's your team name?</label>
             <input 
               type="text" 
+              value={teamName}
+              onChange={(e) => setTeamName(e.target.value)}
               placeholder="e.g. Enterprise Sales" 
               className="w-full bg-[#0f172a] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-400/50 transition-colors"
             />
@@ -133,7 +136,7 @@ const ElegantGuide = ({ isOpen, onClose }) => {
       visual: (
         <div className="flex flex-col gap-3 w-full max-w-sm mx-auto p-6 bg-white/5 rounded-2xl border border-white/10">
           <div className="p-3 bg-violet-500/10 rounded-xl border border-violet-500/20 flex justify-between items-center">
-            <span className="text-sm font-bold text-violet-300">If Deal &gt; $10k</span>
+            <span className="text-sm font-bold text-violet-300">{teamName ? `${teamName} — ` : ''}If Deal &gt; $10k</span>
             <span className="text-xs px-2 py-1 bg-violet-500/20 rounded text-violet-200">Tier 1</span>
           </div>
           <div className="w-0.5 h-4 bg-slate-600 mx-auto"></div>
@@ -158,7 +161,7 @@ const ElegantGuide = ({ isOpen, onClose }) => {
       visual: (
         <div className="w-full max-w-sm mx-auto p-6 bg-white/5 rounded-2xl border border-white/10 flex flex-col items-center justify-center">
           <div className="text-center mb-6">
-             <p className="text-slate-400 text-sm uppercase tracking-widest mb-2">Live Payout</p>
+             <p className="text-slate-400 text-sm uppercase tracking-widest mb-2">{teamName ? `${teamName} Live Payout` : 'Live Payout'}</p>
              <motion.h4 
                initial={{ opacity: 0, scale: 0.8 }}
                animate={{ opacity: 1, scale: 1 }}
