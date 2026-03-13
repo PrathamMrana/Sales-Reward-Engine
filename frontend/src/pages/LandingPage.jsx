@@ -91,6 +91,14 @@ const ElegantGuide = ({ isOpen, onClose }) => {
       bg: "bg-blue-500/10",
       visual: (
         <div className="flex flex-col gap-4 w-full max-w-sm mx-auto p-6 bg-white/5 rounded-2xl border border-white/10">
+          <div className="mb-2">
+            <label className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-1 block">What's your team name?</label>
+            <input 
+              type="text" 
+              placeholder="e.g. Enterprise Sales" 
+              className="w-full bg-[#0f172a] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-400/50 transition-colors"
+            />
+          </div>
           <div className="flex items-center gap-4 p-3 bg-white/5 rounded-xl border border-white/10">
             <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
               <Database className="w-5 h-5 text-blue-400" />
@@ -111,7 +119,7 @@ const ElegantGuide = ({ isOpen, onClose }) => {
               className="h-full bg-gradient-to-r from-blue-500 to-cyan-400" 
             />
           </div>
-          <p className="text-xs text-center text-slate-400 font-mono">Syncing CRM Nodes...</p>
+          <p className="text-xs text-center text-slate-400 font-mono">Connecting your CRM...</p>
         </div>
       )
     },
