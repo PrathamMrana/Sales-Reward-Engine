@@ -64,6 +64,7 @@ const TiltCard = ({ children, className }) => {
 
 // --- VIBRANT & ADVANCED HOLOGRAPHIC GUIDE ---
 const ElegantGuide = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
   return (
     <AnimatePresence>
       {isOpen && (
@@ -78,7 +79,7 @@ const ElegantGuide = ({ isOpen, onClose }) => {
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.9, y: 30, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="w-full max-w-[1200px] hyper-glass p-[2px] relative overflow-visible"
+            className="w-full max-w-[1300px] hyper-glass p-[2px] relative overflow-visible"
           >
             {/* Animated Gradient Border Wrap */}
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-pink-500 to-cyan-500 rounded-3xl opacity-50 blur-[2px] animate-pulse" />
@@ -90,21 +91,21 @@ const ElegantGuide = ({ isOpen, onClose }) => {
               <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-gradient-to-tr from-cyan-400/20 to-blue-500/20 blur-[100px] rounded-full pointer-events-none" />
 
               {/* Header */}
-              <div className="flex justify-between items-center mb-16 relative z-20">
+              <div className="flex justify-between items-center mb-12 lg:mb-16 relative z-20">
                 <div className="flex items-center gap-6">
                   <div className="relative group">
                     <div className="absolute inset-0 bg-blue-500 blur-xl opacity-50 group-hover:opacity-100 transition-opacity" />
-                    <div className="p-4 bg-white/5 rounded-2xl border border-white/20 shadow-xl backdrop-blur-md relative z-10">
-                      <Orbit className="w-10 h-10 text-cyan-400 animate-[spin_10s_linear_infinite]" />
+                    <div className="p-4 bg-white/5 rounded-2xl border border-white/20 shadow-xl backdrop-blur-md relative z-10 flex items-center justify-center">
+                      <Zap className="w-10 h-10 text-cyan-400 animate-pulse" />
                     </div>
                   </div>
                   <div>
                     <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-widest text-glow-soft">
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">System</span> Architecture
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Quick</span> Start
                     </h2>
                     <p className="text-cyan-300 font-mono text-sm uppercase tracking-widest mt-2 flex items-center gap-3">
                       <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                      Live Interactive Walkthrough
+                      App Initialization Sequence
                     </p>
                   </div>
                 </div>
@@ -113,23 +114,28 @@ const ElegantGuide = ({ isOpen, onClose }) => {
                 </button>
               </div>
 
-              {/* Three Steps */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 relative z-20">
+              {/* Four Steps Configuration */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 relative z-20">
                 {[
                   {
-                    i: Network, t: "Connect Elements",
-                    d: "Instantly link your existing data streams through our secure API gateways. No coding required.",
-                    color: "from-blue-400 to-cyan-400", bg: "bg-blue-500/10", borderHover: "group-hover:border-cyan-400/50"
+                    i: ShieldCheck, t: "1. Register Admin",
+                    d: "Create your secure admin profile and initialize your isolated workspace ecosystem.",
+                    color: "from-blue-400 to-cyan-400", bg: "bg-blue-500/10", borderHover: "group-hover:border-blue-400/50", iconColor: "text-blue-400"
                   },
                   {
-                    i: Layers, t: "Compile Logic",
-                    d: "Use the visual builder to map out complex incentive structures, tiers, and multi-variable rules.",
-                    color: "from-violet-400 to-pink-400", bg: "bg-violet-500/10", borderHover: "group-hover:border-pink-400/50"
+                    i: Database, t: "2. Connect Data",
+                    d: "Import sales quotas, establish metrics, and link foundational performance nodes.",
+                    color: "from-violet-400 to-fuchsia-400", bg: "bg-violet-500/10", borderHover: "group-hover:border-violet-400/50", iconColor: "text-violet-400"
                   },
                   {
-                    i: Activity, t: "Execute & Track",
-                    d: "Publish your live incentive engine and monitor real-time performance across your entire organization.",
-                    color: "from-emerald-400 to-teal-400", bg: "bg-emerald-500/10", borderHover: "group-hover:border-teal-400/50"
+                    i: Workflow, t: "3. Build Logic",
+                    d: "Construct dynamic incentive rule-sets using our zero-code visual policy engine.",
+                    color: "from-pink-400 to-rose-400", bg: "bg-pink-500/10", borderHover: "group-hover:border-pink-400/50", iconColor: "text-pink-400"
+                  },
+                  {
+                    i: LineChart, t: "4. Run & Reward",
+                    d: "Activate the engine to instantly calculate commissions and drive revenue growth.",
+                    color: "from-emerald-400 to-teal-400", bg: "bg-emerald-500/10", borderHover: "group-hover:border-emerald-400/50", iconColor: "text-emerald-400"
                   }
                 ].map((step, idx) => (
                   <motion.div
@@ -137,19 +143,22 @@ const ElegantGuide = ({ isOpen, onClose }) => {
                     initial={{ y: 30, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2 + (idx * 0.15) }}
-                    className={`bg-white/5 p-8 rounded-[2rem] border border-white/10 transition-all duration-300 group hover:-translate-y-2 hover:bg-white/10 ${step.borderHover} relative overflow-hidden`}
+                    className={`bg-white/5 p-6 rounded-[2rem] border border-white/10 transition-all duration-300 group hover:-translate-y-2 hover:bg-white/10 ${step.borderHover} relative overflow-hidden flex flex-col`}
                   >
                     {/* Hover Glow Background */}
                     <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500 z-0" style={{ backgroundImage: `var(--tw-gradient-stops)` }} />
 
-                    <div className="relative z-10">
-                      <div className={`p-4 ${step.bg} rounded-2xl w-max mb-8 border border-white/10 group-hover:scale-110 transition-transform`}>
-                        <step.i className="w-10 h-10 text-white" />
+                    <div className="relative z-10 flex-1 flex flex-col">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className={`p-4 ${step.bg} rounded-2xl border border-white/10 group-hover:scale-110 transition-transform`}>
+                          <step.i className={`w-8 h-8 ${step.iconColor}`} />
+                        </div>
+                        <span className="text-4xl font-black text-white/5 group-hover:text-white/10 transition-colors">0{idx + 1}</span>
                       </div>
-                      <h3 className={`text-2xl font-black uppercase tracking-wider mb-4 text-transparent bg-clip-text bg-gradient-to-r ${step.color}`}>
+                      <h3 className={`text-xl font-black uppercase tracking-wider mb-4 text-transparent bg-clip-text bg-gradient-to-r ${step.color}`}>
                         {step.t}
                       </h3>
-                      <p className="text-slate-300 leading-relaxed font-bold text-lg">{step.d}</p>
+                      <p className="text-slate-300 leading-relaxed font-bold text-sm flex-1">{step.d}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -157,8 +166,8 @@ const ElegantGuide = ({ isOpen, onClose }) => {
 
               {/* Footer Button */}
               <div className="flex justify-center mt-auto relative z-20">
-                <button onClick={onClose} className="btn-vibrant px-16 py-6 text-xl tracking-[0.2em] shadow-[0_0_40px_rgba(59,130,246,0.3)] hover:shadow-[0_0_60px_rgba(59,130,246,0.5)]">
-                  Activate Sequence & Return
+                <button onClick={() => { onClose(); navigate('/register'); }} className="btn-vibrant px-16 py-6 text-xl tracking-[0.2em] shadow-[0_0_40px_rgba(59,130,246,0.3)] hover:shadow-[0_0_60px_rgba(59,130,246,0.5)]">
+                  Begin Free Initialization
                 </button>
               </div>
             </div>
