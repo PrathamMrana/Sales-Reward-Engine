@@ -76,6 +76,20 @@ const AdminPerformance = () => {
                 setDeals(sortedDeals);
 
                 // 3. Fetch Performance Metrics from Backend
+                const approved = sortedDeals.filter(d => (d.status || "").toLowerCase() === 'approved');
+                const months = getLast6MonthsLabels();
+                const calculatedTrend = months.map(mStr => {
+                    const monthDeals = approved.filter(d => {
+                        const date = new Date(d.date || d.createdAt || 0);
+                        const m = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                        return m === mStr;
+                    });
+                    return {
+                        month: mStr,
+                        incentiveSum: monthDeals.reduce((sum, d) => sum + (parseFloat(d.incentive) || 0), 0)
+                    };
+                });
+
                 try {
                     const perfRes = await api.get(`/admin/performance/${userId}`);
                     const perfData = perfRes.data;
@@ -87,12 +101,11 @@ const AdminPerformance = () => {
                         totalIncentiveEarned: perfData.totalIncentiveEarned || 0,
                         approvalRate: perfData.approvalRate || 0,
                         averageDealValue: perfData.averageDealValue || 0,
-                        monthlyTrend: perfData.monthlyTrend || []
+                        monthlyTrend: (perfData.monthlyTrend && perfData.monthlyTrend.length > 0) ? perfData.monthlyTrend : calculatedTrend
                     });
                 } catch (perfErr) {
                     console.error("Error fetching performance metrics from backend:", perfErr);
                     // Fallback: use frontend calculation if backend fails
-                    const approved = sortedDeals.filter(d => (d.status || "").toLowerCase() === 'approved');
                     const totalRev = approved.reduce((acc, d) => acc + (parseFloat(d.amount) || 0), 0);
                     const totalInc = approved.reduce((acc, d) => acc + (parseFloat(d.incentive) || 0), 0);
                     const avgDeal = approved.length ? totalRev / approved.length : 0;
@@ -103,7 +116,7 @@ const AdminPerformance = () => {
                         totalIncentiveEarned: totalInc,
                         approvalRate: sortedDeals.length ? (approved.length / sortedDeals.length) * 100 : 0,
                         averageDealValue: avgDeal,
-                        monthlyTrend: []
+                        monthlyTrend: calculatedTrend
                     });
                 }
 
