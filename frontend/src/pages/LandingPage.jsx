@@ -213,18 +213,21 @@ const ElegantGuide = ({ isOpen, onClose }) => {
 
                 {/* Step Content */}
                 <div className="flex-1 flex flex-col justify-center">
-                  <motion.div
-                    key={`content-${currentStep}`}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className={`w-14 h-14 rounded-2xl ${currentStepData.bg} flex items-center justify-center mb-6`}>
-                      <StepIcon className={`w-7 h-7 text-transparent bg-clip-text bg-gradient-to-r ${currentStepData.color}`} style={{ color: "inherit" }} />
-                    </div>
-                    <h2 className="text-3xl font-black text-white mb-4">{currentStepData.title}</h2>
-                    <p className="text-slate-300 text-lg leading-relaxed">{currentStepData.description}</p>
-                  </motion.div>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`content-${currentStep}`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className={`w-14 h-14 rounded-2xl ${currentStepData.bg} flex items-center justify-center mb-6`}>
+                        <StepIcon className={`w-7 h-7 text-transparent bg-clip-text bg-gradient-to-r ${currentStepData.color}`} style={{ color: "inherit" }} />
+                      </div>
+                      <h2 className="text-3xl font-black text-white mb-4">{currentStepData.title}</h2>
+                      <p className="text-slate-300 text-lg leading-relaxed">{currentStepData.description}</p>
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
 
                 {/* Footer Action */}
@@ -249,15 +252,18 @@ const ElegantGuide = ({ isOpen, onClose }) => {
                  <div className={`absolute inset-0 bg-gradient-to-br ${currentStepData.color} opacity-10 transition-colors duration-700`} />
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-white/[0.02] rounded-full blur-3xl" />
                  
-                 <motion.div
-                    key={`visual-${currentStep}`}
-                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ duration: 0.4, type: "spring" }}
-                    className="w-full relative z-10"
-                 >
-                    {currentStepData.visual}
-                 </motion.div>
+                 <AnimatePresence mode="wait">
+                   <motion.div
+                      key={`visual-${currentStep}`}
+                      initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 1.05, y: -10 }}
+                      transition={{ duration: 0.4, type: "spring" }}
+                      className="w-full relative z-10"
+                   >
+                      {currentStepData.visual}
+                   </motion.div>
+                 </AnimatePresence>
               </div>
 
             </div>
