@@ -21,8 +21,8 @@ const api = axios.create({
 // Add a request interceptor to include requestorId for data isolation
 api.interceptors.request.use((config) => {
     try {
-        // DO NOT add requestorId for PATCH requests to deal status endpoint
-        if (config.method === 'patch' && config.url.includes('/api/deals/') && config.url.includes('/status')) {
+        // DO NOT add requestorId for PATCH requests to status endpoints
+        if (config.method === 'patch' && config.url.includes('/status')) {
             console.log('[API Interceptor] Skipping requestorId for status update:', config.url);
             return config;
         }
