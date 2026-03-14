@@ -50,7 +50,7 @@ const AdminTargets = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await api.post("/api/targets", {
+            await authApi.post("/api/targets", {
                 ...formData,
                 createdBy: auth.user.id // Track who created this target for onboarding
             });
@@ -58,7 +58,7 @@ const AdminTargets = () => {
             // Onboarding Progress: Mark 'First Target' as complete
             try {
                 if (auth.user && auth.user.id) {
-                    await api.post("/api/onboarding/progress/update", {
+                    await authApi.post("/api/onboarding/progress/update", {
                         userId: auth.user.id,
                         task: "firstTarget"
                     });
@@ -79,7 +79,7 @@ const AdminTargets = () => {
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this target?")) return;
         try {
-            await axios.delete(`${API_URL}/api/targets/${id}`);
+            await api.delete(`/api/targets/${id}`);
             fetchTargets();
         } catch (err) {
             console.error("Failed to delete target", err);
