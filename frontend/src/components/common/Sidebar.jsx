@@ -82,6 +82,7 @@ const Sidebar = () => {
       items: [
         { path: "/admin", label: "Overview", icon: LayoutDashboard },
         { path: "/admin/deals", label: "Manage Deals", icon: Briefcase },
+        { path: "/admin/targets", label: "Targets", icon: Target },
         { path: "/admin/approvals", label: "Deal Approvals", icon: CheckCircle2 },
       ]
     },
