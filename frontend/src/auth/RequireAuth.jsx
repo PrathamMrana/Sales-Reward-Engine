@@ -19,10 +19,22 @@ const RequireAuth = ({ allowedRoles, requireActivation = true }) => {
 
   // Check Role with case insensitivity just in case
   if (allowedRoles) {
-    const hasAllowedRole = allowedRoles.some(role => role.toUpperCase() === userRole.toUpperCase());
+    const hasAllowedRole = allowedRoles.some(role => {
+      const r = typeof role === 'string' ? role : String(role);
+      const ur = typeof userRole === 'string' ? userRole : String(userRole);
+      return r.toUpperCase() === ur.toUpperCase();
+    });
+    
     if (!hasAllowedRole) {
-      console.warn(`RequireAuth: Unauthorized access. Expected one of ${allowedRoles}, got ${userRole}`);
-      return <Navigate to="/unauthorized" replace />;
+      return (
+        <div style={{ padding: 20, color: 'red' }}>
+          <h1>Unauthorized</h1>
+          <p>Expected one of: {JSON.stringify(allowedRoles)}</p>
+          <p>Your actual role is: {JSON.stringify(userRole)}</p>
+          <p>Full Auth Object: {JSON.stringify(auth)}</p>
+          <button onClick={() => { localStorage.clear(); window.location.href='/login'; }}>Clear Data & Login</button>
+        </div>
+      );
     }
   }
 
