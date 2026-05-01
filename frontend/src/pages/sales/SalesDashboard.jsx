@@ -26,9 +26,9 @@ const SalesDashboard = () => {
     if (status !== 'APPROVED' && status !== 'SUBMITTED') return false;
 
     try {
-      if (!d.date) return false;
-      const [year, month, day] = d.date.split('-').map(Number);
-      const dealDate = new Date(year, month - 1, day);
+      const dateString = d.date || d.createdAt || d.actualCloseDate;
+      if (!dateString) return false;
+      const dealDate = new Date(dateString);
       return dealDate.getMonth() === now.getMonth() && dealDate.getFullYear() === now.getFullYear();
     } catch { return false; }
   });
@@ -43,9 +43,11 @@ const SalesDashboard = () => {
 
   // Best Month Calculation
   const monthlyIncentives = approvedDeals.reduce((acc, d) => {
-    if (!d.date) return acc;
-    const [year, month, day] = d.date.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
+    const dateString = d.date || d.createdAt || d.actualCloseDate;
+    if (!dateString) return acc;
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return acc;
+    
     const key = `${date.getFullYear()}-${date.getMonth()}`;
     const monthName = date.toLocaleString('default', { month: 'long', year: 'numeric' });
 

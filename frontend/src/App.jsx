@@ -2,13 +2,10 @@ import React, { useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Login from "./auth/Login";
 import Register from "./auth/Register";
-import AcceptInvite from "./auth/AcceptInvite"; // New
+import AcceptInvite from "./auth/AcceptInvite";
 import RequireAuth from "./auth/RequireAuth";
 import LandingPage from "./pages/LandingPage";
-import AdminOnboarding from "./pages/admin/AdminOnboarding"; // New
-// ... existing imports
-
-// ... inside Routes
+import AdminOnboarding from "./pages/admin/AdminOnboarding";
 import SalesDashboard from "./pages/sales/SalesDashboard";
 import DealHistoryPage from "./pages/sales/DealHistoryPage";
 import IncentiveSimulator from "./pages/IncentiveSimulator";
