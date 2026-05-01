@@ -3,6 +3,8 @@ package org.example.salesincentivesystem.controller;
 import org.example.salesincentivesystem.entity.Deal;
 import org.example.salesincentivesystem.entity.User;
 import org.example.salesincentivesystem.repository.DealRepository;
+import org.example.salesincentivesystem.entity.Notification;
+import org.example.salesincentivesystem.repository.NotificationRepository;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -14,11 +16,14 @@ public class PayoutController {
 
     private final DealRepository dealRepository;
     private final org.example.salesincentivesystem.repository.UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
 
     public PayoutController(DealRepository dealRepository,
-            org.example.salesincentivesystem.repository.UserRepository userRepository) {
+            org.example.salesincentivesystem.repository.UserRepository userRepository,
+            NotificationRepository notificationRepository) {
         this.dealRepository = dealRepository;
         this.userRepository = userRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     // GET /payouts?status=PENDING
@@ -84,6 +89,19 @@ public class PayoutController {
         deals.forEach(d -> {
             d.setPayoutStatus("PAID");
             d.setPayoutDate(today);
+
+            try {
+                if (d.getUser() != null) {
+                    Notification n = new Notification(
+                        d.getUser(),
+                        "SUCCESS",
+                        "Payout Processed",
+                        "Your incentive payout of ₹" + d.getIncentive() + " for deal '" + d.getDealName() + "' has been processed!"
+                    );
+                    n.setTimestamp(java.time.LocalDateTime.now());
+                    notificationRepository.save(n);
+                }
+            } catch (Exception ignored) {}
         });
 
         return dealRepository.saveAll(deals);

@@ -3,6 +3,8 @@ package org.example.salesincentivesystem.controller;
 import org.example.salesincentivesystem.entity.Deal;
 import org.example.salesincentivesystem.repository.DealRepository;
 import org.example.salesincentivesystem.repository.UserRepository;
+import org.example.salesincentivesystem.entity.Notification;
+import org.example.salesincentivesystem.repository.NotificationRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,10 +17,12 @@ public class DealController {
 
     private final DealRepository dealRepository;
     private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
 
-    public DealController(DealRepository dealRepository, UserRepository userRepository) {
+    public DealController(DealRepository dealRepository, UserRepository userRepository, NotificationRepository notificationRepository) {
         this.dealRepository = dealRepository;
         this.userRepository = userRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     // ✅ POST - Create a new deal
@@ -135,6 +139,7 @@ public class DealController {
                 }
             }
 
+            String oldStatus = deal.getStatus();
             String newStatus = statusUpdate.get("status");
             deal.setStatus(newStatus);
 
@@ -158,7 +163,28 @@ public class DealController {
                 }
             }
 
-            return ResponseEntity.ok(dealRepository.save(deal));
+            Deal savedDeal = dealRepository.save(deal);
+
+            try {
+                if ("IN_PROGRESS".equalsIgnoreCase(newStatus) && !"IN_PROGRESS".equalsIgnoreCase(oldStatus)) {
+                    notifyAdmins(savedDeal, "Deal Started", "Sales executive " + (savedDeal.getUser() != null ? savedDeal.getUser().getName() : "Unknown") + " has started working on deal: " + savedDeal.getDealName(), "INFO");
+                } else if (("Pending".equalsIgnoreCase(newStatus) || "SUBMITTED".equalsIgnoreCase(newStatus)) && !newStatus.equalsIgnoreCase(oldStatus)) {
+                    notifyAdmins(savedDeal, "Deal Submitted", "Sales executive " + (savedDeal.getUser() != null ? savedDeal.getUser().getName() : "Unknown") + " has submitted deal: " + savedDeal.getDealName() + " for review.", "SUCCESS");
+                }
+            } catch (Exception ignored) {}
+
+            return ResponseEntity.ok(savedDeal);
         }).orElse(ResponseEntity.notFound().build());
+    }
+
+    private void notifyAdmins(Deal deal, String title, String message, String type) {
+        userRepository.findAll().stream()
+                .filter(u -> "ADMIN".equals(u.getRole()))
+                .filter(u -> u.isAdminTypeGlobal() || (u.getOrganizationName() != null && u.getOrganizationName().equals(deal.getOrganizationName())))
+                .forEach(admin -> {
+                    Notification n = new Notification(admin, type, title, message);
+                    n.setTimestamp(java.time.LocalDateTime.now());
+                    notificationRepository.save(n);
+                });
     }
 }
