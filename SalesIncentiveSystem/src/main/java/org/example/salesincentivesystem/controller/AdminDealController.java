@@ -61,14 +61,12 @@ public class AdminDealController {
             }
             deal.setDealName(dealName);
 
-            // Inherit or validate organization
-            if (requestorOrg != null) {
-                deal.setOrganizationName(requestorOrg);
+            // Use provided organization name (Institution Name)
+            String orgName = (String) payload.get("organizationName");
+            if (orgName == null || orgName.trim().isEmpty()) {
+                // Fallback to requestor org if not provided, though UI makes it required
+                deal.setOrganizationName(requestorOrg != null ? requestorOrg : "N/A");
             } else {
-                String orgName = (String) payload.get("organizationName");
-                if (orgName == null || orgName.trim().isEmpty()) {
-                    return org.springframework.http.ResponseEntity.badRequest().body("Organization Name is required");
-                }
                 deal.setOrganizationName(orgName);
             }
 
@@ -244,7 +242,8 @@ public class AdminDealController {
             if (requestor != null) {
                 boolean isGlobalAdmin = requestor.isAdminTypeGlobal();
                 boolean isSameOrg = requestor.getOrganizationName() != null &&
-                        requestor.getOrganizationName().equals(deal.getOrganizationName());
+                        deal.getUser() != null &&
+                        requestor.getOrganizationName().equals(deal.getUser().getOrganizationName());
                 if (!isGlobalAdmin && !isSameOrg) {
                     throw new RuntimeException("Access denied: Organization mismatch");
                 }
@@ -371,7 +370,8 @@ public class AdminDealController {
             if (requestor != null) {
                 boolean isGlobalAdmin = requestor.isAdminTypeGlobal();
                 boolean isSameOrg = requestor.getOrganizationName() != null &&
-                        requestor.getOrganizationName().equals(deal.getOrganizationName());
+                        deal.getUser() != null &&
+                        requestor.getOrganizationName().equals(deal.getUser().getOrganizationName());
                 if (!isGlobalAdmin && !isSameOrg) {
                     throw new RuntimeException("Access denied: Organization mismatch");
                 }
@@ -442,7 +442,8 @@ public class AdminDealController {
             if (requestor != null) {
                 boolean isGlobalAdmin = requestor.isAdminTypeGlobal();
                 boolean isSameOrg = requestor.getOrganizationName() != null &&
-                        requestor.getOrganizationName().equals(deal.getOrganizationName());
+                        deal.getUser() != null &&
+                        requestor.getOrganizationName().equals(deal.getUser().getOrganizationName());
                 if (!isGlobalAdmin && !isSameOrg) {
                     throw new RuntimeException("Access denied: Organization mismatch");
                 }

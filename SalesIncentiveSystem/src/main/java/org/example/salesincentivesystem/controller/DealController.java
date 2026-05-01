@@ -37,15 +37,21 @@ public class DealController {
             deal.setStatus("Submitted");
             deal.setDate(java.time.LocalDate.now());
 
+            // Use provided organization name (Institution Name)
+            String orgName = (String) dealData.get("organizationName");
+            deal.setOrganizationName(orgName != null ? orgName : "N/A");
+
             // Handle User Association
             if (dealData.get("user") != null) {
                 Map<String, Object> userMap = (Map<String, Object>) dealData.get("user");
                 Long userId = Long.valueOf(userMap.get("id").toString());
                 userRepository.findById(userId).ifPresent(user -> {
                     deal.setUser(user);
-                    // NEW: Inherit Organization from User
-                    if (user.getOrganizationName() != null) {
-                        deal.setOrganizationName(user.getOrganizationName());
+                    // Only fallback to user org if no organizationName was provided in payload
+                    if (deal.getOrganizationName() == null || "N/A".equals(deal.getOrganizationName())) {
+                        if (user.getOrganizationName() != null) {
+                            deal.setOrganizationName(user.getOrganizationName());
+                        }
                     }
                 });
             }
@@ -132,7 +138,8 @@ public class DealController {
                 boolean isGlobalAdmin = "ADMIN".equals(requestor.getRole()) && requestor.isAdminTypeGlobal();
                 boolean isSameOrgAdmin = "ADMIN".equals(requestor.getRole()) &&
                         requestor.getOrganizationName() != null &&
-                        requestor.getOrganizationName().equals(deal.getOrganizationName());
+                        deal.getUser() != null &&
+                        requestor.getOrganizationName().equals(deal.getUser().getOrganizationName());
 
                 if (!isGlobalAdmin && !isSameOrgAdmin) {
                     return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN).<Deal>build();
@@ -180,7 +187,7 @@ public class DealController {
     private void notifyAdmins(Deal deal, String title, String message, String type) {
         userRepository.findAll().stream()
                 .filter(u -> "ADMIN".equals(u.getRole()))
-                .filter(u -> u.isAdminTypeGlobal() || (u.getOrganizationName() != null && u.getOrganizationName().equals(deal.getOrganizationName())))
+                .filter(u -> u.isAdminTypeGlobal() || (u.getOrganizationName() != null && deal.getUser() != null && u.getOrganizationName().equals(deal.getUser().getOrganizationName())))
                 .forEach(admin -> {
                     Notification n = new Notification(admin, type, title, message);
                     n.setTimestamp(java.time.LocalDateTime.now());
