@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import SalesLayout from "../../layouts/SalesLayout";
 import OnboardingBanner from "../../components/common/OnboardingBanner";
 import { useSales } from "../../context/SalesContext";
+import { useNotifications } from "../../context/NotificationContext";
 
 const SalesDashboard = () => {
   const { deals = [] } = useSales(); // Default to empty array to prevent crash
@@ -66,16 +67,13 @@ const SalesDashboard = () => {
 
   // Async Data State
   const [performanceData, setPerformanceData] = useState(null);
-  const [recentNotifications, setRecentNotifications] = useState([]);
+  const { notifications } = useNotifications();
+  const recentNotifications = notifications.slice(0, 4);
 
   useEffect(() => {
     if (userId) {
       api.get(`/performance/summary?userId=${userId}`)
         .then(res => setPerformanceData(res.data))
-        .catch(console.error);
-
-      api.get(`/api/notifications/user/${userId}`)
-        .then(res => setRecentNotifications(res.data.slice(0, 4)))
         .catch(console.error);
     }
   }, [userId, deals]);
