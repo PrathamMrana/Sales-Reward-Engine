@@ -164,9 +164,10 @@ public class DealController {
             if ("Approved".equalsIgnoreCase(newStatus)) {
                 deal.setActualCloseDate(java.time.LocalDate.now());
                 deal.setApprovedAt(java.time.LocalDateTime.now());
-                // Calculate Incentive (Simple 5% logic for demo)
+                // Calculate Incentive using the deal's specific rate (Inherited from Policy)
                 if (deal.getAmount() > 0) {
-                    deal.setIncentive(deal.getAmount() * 0.05);
+                    double rate = deal.getRate() > 0 ? deal.getRate() : 5.0;
+                    deal.setIncentive(deal.getAmount() * (rate / 100.0));
                 }
             }
 
