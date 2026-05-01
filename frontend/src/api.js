@@ -22,7 +22,7 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
     try {
         // DO NOT add requestorId for PATCH requests to status endpoints
-        if (config.method === 'patch' && config.url.includes('/status')) {
+        if (config.method && config.method.toLowerCase() === 'patch' && config.url && config.url.includes('/status')) {
             console.log('[API Interceptor] Skipping requestorId for status update:', config.url);
             return config;
         }
