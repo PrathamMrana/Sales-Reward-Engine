@@ -6,6 +6,7 @@ import SalesLayout from "../../layouts/SalesLayout";
 import OnboardingBanner from "../../components/common/OnboardingBanner";
 import { useSales } from "../../context/SalesContext";
 import { useNotifications } from "../../context/NotificationContext";
+import GoalTracker from "../../components/common/GoalTracker";
 
 const SalesDashboard = () => {
   const { deals = [] } = useSales(); // Default to empty array to prevent crash
@@ -393,6 +394,9 @@ const SalesDashboard = () => {
           {/* Right Column - Notifications & Quick Links */}
           <div className="space-y-6">
 
+
+            {/* AI Goal Forecast Card */}
+            <GoalTracker />
 
             {/* Recent Notifications */}
             <div className="card-modern p-6">

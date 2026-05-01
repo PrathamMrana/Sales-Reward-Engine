@@ -319,41 +319,8 @@ const SalesTargetsPage = () => {
                             </div>
                         </div>
 
-                        {/* Forecast / Insights */}
-                        <div className="card-modern p-6">
-                            <h3 className="font-bold text-text-primary mb-3">AI Goal Forecast</h3>
-                            <div className="flex items-start gap-3">
-                                <div className="p-2 bg-amber-100 text-amber-600 rounded-lg">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                                </div>
-                                <div>
-                                    {/* Calculating gap and deals needed */}
-                                    {(() => {
-                                        const { monthlyTarget } = useSales(); // Access context directly or pass as prop
-                                        // Use thisMonthIncentive for Gap analysis
-                                        const current = thisMonthIncentive > 0 ? thisMonthIncentive : 0;
-                                        const gap = Math.max(0, monthlyTarget - current); // Target from Context
-                                        // Assume avg incentive from deals or default 5000
-                                        const avgIncentive = approvedDeals.length > 0 ? (current / approvedDeals.length) : 5000;
-                                        const dealsNeeded = Math.ceil(gap / avgIncentive);
-
-                                        return gap > 0 ? (
-                                            <>
-                                                <p className="text-sm text-text-secondary">
-                                                    You are <span className="font-bold text-amber-600">₹{gap.toLocaleString()}</span> away from your monthly target.
-                                                </p>
-                                                <p className="text-xs text-text-muted mt-2">
-                                                    At your average of <b>₹{Math.round(avgIncentive).toLocaleString()}/deal</b>, you need roughly:
-                                                </p>
-                                                <p className="text-xl font-bold text-primary-600 mt-1">{dealsNeeded} more deals 🎯</p>
-                                            </>
-                                        ) : (
-                                            <p className="text-sm font-bold text-emerald-600">You have hit your target! Great job! 🚀</p>
-                                        );
-                                    })()}
-                                </div>
-                            </div>
-                        </div>
+                        {/* AI Goal Forecast & Tracking */}
+                        <GoalTracker />
                     </div>
                 </div>
             </div>
